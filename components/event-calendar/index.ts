@@ -17,6 +17,7 @@ export { EventsPopup } from "./events-popup";
 export * from "./hooks/use-current-time-indicator";
 export * from "./hooks/use-event-visibility";
 export { MonthView } from "./month-view";
+export { YearView } from "./year-view";
 // Type exports
 export type { CalendarEvent, CalendarView, EventColor } from "./types";
 export * from "./utils";

@@ -216,10 +216,18 @@ export function MonthView({
 
                       {hasMore && (
                         <Popover modal>
-                          <PopoverTrigger render={<button className="mt-(--event-gap) flex h-(--event-height) w-full select-none items-center overflow-hidden px-1 text-left text-[10px] text-muted-foreground outline-none backdrop-blur-md transition hover:bg-muted/50 hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:px-2 sm:text-xs" onClick={(e) => e.stopPropagation()} type="button" />}><span>
-                                                                      + {remainingCount}{" "}
-                                                                      <span className="max-sm:sr-only">more</span>
-                                                                    </span></PopoverTrigger>
+                          <PopoverTrigger asChild>
+                            <button
+                              className="mt-(--event-gap) flex h-(--event-height) w-full select-none items-center overflow-hidden px-1 text-left text-[10px] text-muted-foreground outline-none backdrop-blur-md transition hover:bg-muted/50 hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:px-2 sm:text-xs"
+                              onClick={(e) => e.stopPropagation()}
+                              type="button"
+                            >
+                              <span>
+                                + {remainingCount}{" "}
+                                <span className="max-sm:sr-only">more</span>
+                              </span>
+                            </button>
+                          </PopoverTrigger>
                           <PopoverContent
                             align="center"
                             className="max-w-52 p-3"

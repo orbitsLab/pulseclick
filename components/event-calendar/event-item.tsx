@@ -50,26 +50,19 @@ function EventWrapper({
   onMouseDown,
   onTouchStart,
 }: EventWrapperProps) {
-  // Always use the currentTime (if provided) to determine if the event is in the past
-  const displayEnd = currentTime
-    ? new Date(
-        new Date(currentTime).getTime() +
-          (new Date(event.end).getTime() - new Date(event.start).getTime()),
-      )
-    : new Date(event.end);
-
-  const isEventInPast = isPast(displayEnd);
+  const isCompleted = Boolean(event.completed);
 
   return (
     <button
       className={cn(
-        "flex size-full select-none overflow-hidden px-1 text-left font-medium outline-none backdrop-blur-md transition focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 data-dragging:cursor-grabbing data-past-event:line-through data-dragging:shadow-lg sm:px-2",
-        getEventColorClasses(event.color),
+        "flex size-full select-none overflow-hidden px-1.5 text-left font-medium outline-none transition focus-visible:border-ring focus-visible:ring-[2px] focus-visible:ring-ring/50 data-dragging:cursor-grabbing data-dragging:shadow-lg sm:px-2",
+        getEventColorClasses(event.color, isCompleted),
         getBorderRadiusClasses(isFirstDay, isLastDay),
+        isCompleted && "line-through opacity-60",
         className,
       )}
       data-dragging={isDragging || undefined}
-      data-past-event={isEventInPast || undefined}
+      data-completed={isCompleted || undefined}
       onClick={onClick}
       onMouseDown={onMouseDown}
       onTouchStart={onTouchStart}
@@ -152,7 +145,7 @@ export function EventItem({
     return (
       <EventWrapper
         className={cn(
-          "mt-[var(--event-gap)] h-[var(--event-height)] items-center text-[10px] sm:text-xs",
+          "mt-[var(--event-gap)] h-[var(--event-height)] items-center text-[11px] sm:text-xs",
           className,
         )}
         currentTime={currentTime}
@@ -167,14 +160,28 @@ export function EventItem({
         onTouchStart={onTouchStart}
       >
         {children || (
-          <span className="truncate">
+          <div className="flex items-center gap-1.5 w-full truncate">
+            {event.completed ? (
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+            ) : event.priority && event.priority > 0 ? (
+              <span
+                className={cn(
+                  "inline-block h-1.5 w-1.5 rounded-full shrink-0",
+                  event.priority === 3
+                    ? "bg-rose-500"
+                    : event.priority === 2
+                    ? "bg-amber-500"
+                    : "bg-sky-500"
+                )}
+              />
+            ) : null}
             {!event.allDay && (
-              <span className="truncate font-normal opacity-70 sm:text-[11px]">
-                {formatTimeWithOptionalMinutes(displayStart)}{" "}
+              <span className="font-mono tt-meta opacity-75 shrink-0">
+                {formatTimeWithOptionalMinutes(displayStart)}
               </span>
             )}
-            {event.title}
-          </span>
+            <span className="truncate">{event.title}</span>
+          </div>
         )}
       </EventWrapper>
     );
@@ -186,7 +193,7 @@ export function EventItem({
         className={cn(
           "py-1",
           durationMinutes < 45 ? "items-center" : "flex-col",
-          view === "week" ? "text-[10px] sm:text-xs" : "text-xs",
+          view === "week" ? "text-[11px] sm:text-xs" : "text-xs",
           className,
         )}
         currentTime={currentTime}
@@ -201,19 +208,49 @@ export function EventItem({
         onTouchStart={onTouchStart}
       >
         {durationMinutes < 45 ? (
-          <div className="truncate">
-            {event.title}{" "}
+          <div className="flex items-center gap-1.5 truncate">
+            {event.completed ? (
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+            ) : event.priority && event.priority > 0 ? (
+              <span
+                className={cn(
+                  "inline-block h-1.5 w-1.5 rounded-full shrink-0",
+                  event.priority === 3
+                    ? "bg-rose-500"
+                    : event.priority === 2
+                    ? "bg-amber-500"
+                    : "bg-sky-500"
+                )}
+              />
+            ) : null}
+            <span className="truncate">{event.title}</span>
             {showTime && (
-              <span className="opacity-70">
+              <span className="opacity-75 font-mono text-[10px]">
                 {formatTimeWithOptionalMinutes(displayStart)}
               </span>
             )}
           </div>
         ) : (
           <>
-            <div className="truncate font-medium">{event.title}</div>
+            <div className="flex items-center gap-1.5 truncate font-medium">
+              {event.completed ? (
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+              ) : event.priority && event.priority > 0 ? (
+                <span
+                  className={cn(
+                    "inline-block h-1.5 w-1.5 rounded-full shrink-0",
+                    event.priority === 3
+                      ? "bg-rose-500"
+                      : event.priority === 2
+                      ? "bg-amber-500"
+                      : "bg-sky-500"
+                  )}
+                />
+              ) : null}
+              <span className="truncate">{event.title}</span>
+            </div>
             {showTime && (
-              <div className="truncate font-normal opacity-70 sm:text-[11px]">
+              <div className="truncate font-mono opacity-75 text-[10px]">
                 {getEventTime()}
               </div>
             )}
@@ -223,15 +260,17 @@ export function EventItem({
     );
   }
 
-  // Agenda view - kept separate since it's significantly different
+  // Agenda view
+  const isCompleted = Boolean(event.completed);
+
   return (
     <button
       className={cn(
-        "flex w-full flex-col gap-1 rounded p-2 text-left outline-none transition focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 data-past-event:line-through data-past-event:opacity-90",
-        getEventColorClasses(eventColor),
+        "flex w-full flex-col gap-1.5 rounded-xl border p-3 text-left outline-none transition focus-visible:border-ring focus-visible:ring-[2px] focus-visible:ring-ring/50",
+        getEventColorClasses(eventColor, isCompleted),
+        isCompleted && "line-through opacity-60",
         className,
       )}
-      data-past-event={isPast(new Date(event.end)) || undefined}
       onClick={onClick}
       onMouseDown={onMouseDown}
       onTouchStart={onTouchStart}
@@ -239,25 +278,57 @@ export function EventItem({
       {...dndListeners}
       {...dndAttributes}
     >
-      <div className="font-medium text-sm">{event.title}</div>
-      <div className="text-xs opacity-70">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 font-medium tt-heading truncate">
+          {event.completed ? (
+            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+          ) : event.priority && event.priority > 0 ? (
+            <span
+              className={cn(
+                "inline-block h-2 w-2 rounded-full shrink-0",
+                event.priority === 3
+                  ? "bg-rose-500"
+                  : event.priority === 2
+                  ? "bg-amber-500"
+                  : "bg-sky-500"
+              )}
+            />
+          ) : null}
+          <span className="truncate">{event.title}</span>
+        </div>
+        {event.listName && (
+          <span className="tt-meta rounded-md bg-[var(--tt-panel-alt)] border border-[var(--tt-border)] px-2 py-0.5 text-[var(--tt-muted)] shrink-0 font-medium">
+            {event.listName}
+          </span>
+        )}
+      </div>
+      <div className="flex items-center gap-2 tt-meta text-[var(--tt-muted)]">
         {event.allDay ? (
           <span>All day</span>
         ) : (
-          <span className="uppercase">
-            {formatTimeWithOptionalMinutes(displayStart)} -{" "}
-            {formatTimeWithOptionalMinutes(displayEnd)}
+          <span className="font-mono">
+            {formatTimeWithOptionalMinutes(displayStart)} – {formatTimeWithOptionalMinutes(displayEnd)}
           </span>
         )}
         {event.location && (
           <>
-            <span className="px-1 opacity-35"> · </span>
+            <span className="opacity-40">·</span>
             <span>{event.location}</span>
           </>
         )}
+        {event.subtaskCount ? (
+          <>
+            <span className="opacity-40">·</span>
+            <span className="text-[var(--tt-accent-text)] font-medium">
+              {event.subtasksCompleted ?? 0}/{event.subtaskCount} subtasks
+            </span>
+          </>
+        ) : null}
       </div>
       {event.description && (
-        <div className="my-1 text-xs opacity-90">{event.description}</div>
+        <div className="tt-body text-[var(--tt-muted)] line-clamp-2 mt-0.5">
+          {event.description}
+        </div>
       )}
     </button>
   );

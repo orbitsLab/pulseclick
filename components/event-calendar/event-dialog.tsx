@@ -2,6 +2,7 @@
 
 import { RiCalendarLine, RiDeleteBinLine } from "@remixicon/react";
 import { format, isBefore } from "date-fns";
+import { ExternalLink } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type {
@@ -49,6 +50,8 @@ interface EventDialogProps {
   onClose: () => void;
   onSave: (event: CalendarEvent) => void;
   onDelete: (eventId: string) => void;
+  onOpenTaskDetails?: (taskId: string) => void;
+  lists?: Array<{ id: string; name: string; color?: string }>;
 }
 
 export function EventDialog({
@@ -57,6 +60,8 @@ export function EventDialog({
   onClose,
   onSave,
   onDelete,
+  onOpenTaskDetails,
+  lists = [],
 }: EventDialogProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -67,14 +72,11 @@ export function EventDialog({
   const [allDay, setAllDay] = useState(false);
   const [location, setLocation] = useState("");
   const [color, setColor] = useState<EventColor>("sky");
+  const [completed, setCompleted] = useState(false);
+  const [listId, setListId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
-
-  // Debug log to check what event is being passed
-  useEffect(() => {
-    console.log("EventDialog received event:", event);
-  }, [event]);
 
   const resetForm = useCallback(() => {
     setTitle("");
@@ -86,6 +88,8 @@ export function EventDialog({
     setAllDay(false);
     setLocation("");
     setColor("sky");
+    setCompleted(false);
+    setListId(null);
     setError(null);
   }, []);
 
@@ -110,13 +114,14 @@ export function EventDialog({
       setAllDay(event.allDay || false);
       setLocation(event.location || "");
       setColor((event.color as EventColor) || "sky");
-      setError(null); // Reset error when opening dialog
+      setCompleted(Boolean(event.completed));
+      setListId(event.listId || null);
+      setError(null);
     } else {
       resetForm();
     }
   }, [event, formatTimeForInput, resetForm]);
 
-  // Memoize time options so they're only calculated once
   const timeOptions = useMemo(() => {
     const options = [];
     for (let hour = StartHour; hour <= EndHour; hour++) {
@@ -124,14 +129,13 @@ export function EventDialog({
         const formattedHour = hour.toString().padStart(2, "0");
         const formattedMinute = minute.toString().padStart(2, "0");
         const value = `${formattedHour}:${formattedMinute}`;
-        // Use a fixed date to avoid unnecessary date object creations
         const date = new Date(2000, 0, 1, hour, minute);
         const label = format(date, "h:mm a");
         options.push({ label, value });
       }
     }
     return options;
-  }, []); // Empty dependency array ensures this only runs once
+  }, []);
 
   const handleSave = () => {
     const start = new Date(startDate);
@@ -162,22 +166,28 @@ export function EventDialog({
       end.setHours(23, 59, 59, 999);
     }
 
-    // Validate that end date is not before start date
     if (isBefore(end, start)) {
       setError("End date cannot be before start date");
       return;
     }
 
-    // Use generic title if empty
-    const eventTitle = title.trim() ? title : "(no title)";
+    const eventTitle = title.trim() ? title : "New Task";
+
+    let priority = 0;
+    if (color === "rose") priority = 3;
+    else if (color === "amber") priority = 2;
+    else if (color === "sky") priority = 1;
 
     onSave({
       allDay,
       color,
+      completed,
       description,
       end,
       id: event?.id || "",
+      listId: listId === "inbox" ? null : listId,
       location,
+      priority,
       start,
       title: eventTitle,
     });
@@ -189,7 +199,6 @@ export function EventDialog({
     }
   };
 
-  // Updated color options to match types.ts
   const colorOptions: Array<{
     value: EventColor;
     label: string;
@@ -197,38 +206,38 @@ export function EventDialog({
     borderClass: string;
   }> = [
     {
-      bgClass: "bg-sky-400 data-[state=checked]:bg-sky-400",
-      borderClass: "border-sky-400 data-[state=checked]:border-sky-400",
-      label: "Sky",
-      value: "sky",
-    },
-    {
-      bgClass: "bg-amber-400 data-[state=checked]:bg-amber-400",
-      borderClass: "border-amber-400 data-[state=checked]:border-amber-400",
-      label: "Amber",
-      value: "amber",
-    },
-    {
-      bgClass: "bg-violet-400 data-[state=checked]:bg-violet-400",
-      borderClass: "border-violet-400 data-[state=checked]:border-violet-400",
-      label: "Violet",
-      value: "violet",
-    },
-    {
-      bgClass: "bg-rose-400 data-[state=checked]:bg-rose-400",
-      borderClass: "border-rose-400 data-[state=checked]:border-rose-400",
-      label: "Rose",
+      bgClass: "bg-rose-500 data-[state=checked]:bg-rose-500",
+      borderClass: "border-rose-500 data-[state=checked]:border-rose-500",
+      label: "High Priority",
       value: "rose",
     },
     {
-      bgClass: "bg-emerald-400 data-[state=checked]:bg-emerald-400",
-      borderClass: "border-emerald-400 data-[state=checked]:border-emerald-400",
+      bgClass: "bg-amber-500 data-[state=checked]:bg-amber-500",
+      borderClass: "border-amber-500 data-[state=checked]:border-amber-500",
+      label: "Medium Priority",
+      value: "amber",
+    },
+    {
+      bgClass: "bg-sky-500 data-[state=checked]:bg-sky-500",
+      borderClass: "border-sky-500 data-[state=checked]:border-sky-500",
+      label: "Low Priority",
+      value: "sky",
+    },
+    {
+      bgClass: "bg-emerald-500 data-[state=checked]:bg-emerald-500",
+      borderClass: "border-emerald-500 data-[state=checked]:border-emerald-500",
       label: "Emerald",
       value: "emerald",
     },
     {
-      bgClass: "bg-orange-400 data-[state=checked]:bg-orange-400",
-      borderClass: "border-orange-400 data-[state=checked]:border-orange-400",
+      bgClass: "bg-violet-500 data-[state=checked]:bg-violet-500",
+      borderClass: "border-violet-500 data-[state=checked]:border-violet-500",
+      label: "Violet",
+      value: "violet",
+    },
+    {
+      bgClass: "bg-orange-500 data-[state=checked]:bg-orange-400",
+      borderClass: "border-orange-500 data-[state=checked]:border-orange-400",
       label: "Orange",
       value: "orange",
     },
@@ -236,71 +245,103 @@ export function EventDialog({
 
   return (
     <Dialog onOpenChange={(open) => !open && onClose()} open={isOpen}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[480px] bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)]">
         <DialogHeader>
-          <DialogTitle>{event?.id ? "Edit Event" : "Create Event"}</DialogTitle>
+          <DialogTitle className="tt-heading font-semibold text-[var(--tt-text)]">
+            {event?.id ? "Edit Task" : "New Scheduled Task"}
+          </DialogTitle>
           <DialogDescription className="sr-only">
             {event?.id
-              ? "Edit the details of this event"
-              : "Add a new event to your calendar"}
+              ? "Edit task schedule and details"
+              : "Create a new scheduled task"}
           </DialogDescription>
         </DialogHeader>
+
         {error && (
-          <div className="rounded-md bg-destructive/15 px-3 py-2 text-destructive text-sm">
+          <div className="rounded-lg bg-rose-500/15 border border-rose-500/30 px-3 py-2 text-rose-400 text-sm">
             {error}
           </div>
         )}
-        <div className="grid gap-4 py-4">
-          <div className="*:not-first:mt-1.5">
-            <Label htmlFor="title">Title</Label>
+
+        <div className="grid gap-3.5 py-2 max-h-[70vh] overflow-y-auto pr-1">
+          {/* Title */}
+          <div className="space-y-1">
+            <Label htmlFor="title" className="tt-label text-[var(--tt-text)]">
+              Task Title
+            </Label>
             <Input
               id="title"
+              placeholder="What needs to be done?"
               onChange={(e) => setTitle(e.target.value)}
               value={title}
+              className="bg-[var(--tt-panel-alt)] border-[var(--tt-border)] text-[var(--tt-text)] placeholder:text-[var(--tt-muted)] focus-visible:ring-[var(--tt-accent)]"
             />
           </div>
 
-          <div className="*:not-first:mt-1.5">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              value={description}
-            />
-          </div>
+          {/* List selection */}
+          {lists.length > 0 && (
+            <div className="space-y-1">
+              <Label htmlFor="task-list" className="tt-label text-[var(--tt-text)]">
+                List
+              </Label>
+              <Select
+                value={listId || "inbox"}
+                onValueChange={(val) => setListId(val === "inbox" ? null : val)}
+              >
+                <SelectTrigger
+                  id="task-list"
+                  className="bg-[var(--tt-panel-alt)] border-[var(--tt-border)] text-[var(--tt-text)]"
+                >
+                  <SelectValue placeholder="Inbox" />
+                </SelectTrigger>
+                <SelectContent className="bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)]">
+                  <SelectItem value="inbox">Inbox</SelectItem>
+                  {lists.map((l) => (
+                    <SelectItem key={l.id} value={l.id}>
+                      {l.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
-          <div className="flex gap-4">
-            <div className="flex-1 *:not-first:mt-1.5">
-              <Label htmlFor="start-date">Start Date</Label>
+          {/* Start Date & Time */}
+          <div className="flex gap-3">
+            <div className="flex-1 space-y-1">
+              <Label htmlFor="start-date" className="tt-label text-[var(--tt-text)]">
+                Start / Due Date
+              </Label>
               <Popover onOpenChange={setStartDateOpen} open={startDateOpen}>
-                <PopoverTrigger render={<Button className={cn(
-                                                    "group w-full justify-between border-input bg-background px-3 font-normal outline-none outline-offset-0 hover:bg-background focus-visible:outline-[3px]",
-                                                    !startDate && "text-muted-foreground",
-                                                  )} id="start-date" variant={"outline"} />}><span
-                                                    className={cn(
-                                                      "truncate",
-                                                      !startDate && "text-muted-foreground",
-                                                    )}
-                                                  >
-                                                    {startDate ? format(startDate, "PPP") : "Pick a date"}
-                                                  </span><RiCalendarLine
-                                                    aria-hidden="true"
-                                                    className="shrink-0 text-muted-foreground/80"
-                                                    size={16}
-                                                  /></PopoverTrigger>
-                <PopoverContent align="start" className="w-auto p-2">
+                <PopoverTrigger asChild>
+                  <Button
+                    className={cn(
+                      "w-full justify-between border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-3 font-normal text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/80",
+                      !startDate && "text-[var(--tt-muted)]",
+                    )}
+                    id="start-date"
+                    variant="outline"
+                  >
+                    <span className="truncate">
+                      {startDate ? format(startDate, "MMM d, yyyy") : "Pick date"}
+                    </span>
+                    <RiCalendarLine
+                      aria-hidden="true"
+                      className="shrink-0 text-[var(--tt-muted)]"
+                      size={16}
+                    />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-auto p-2 bg-[var(--tt-panel)] border-[var(--tt-border)]">
                   <Calendar
                     defaultMonth={startDate}
                     mode="single"
                     onSelect={(date) => {
                       if (date) {
                         setStartDate(date);
-                        // If end date is before the new start date, update it to match the start date
                         if (isBefore(endDate, date)) {
                           setEndDate(date);
                         }
-                        setError(null);
                         setStartDateOpen(false);
                       }
                     }}
@@ -311,13 +352,18 @@ export function EventDialog({
             </div>
 
             {!allDay && (
-              <div className="min-w-28 *:not-first:mt-1.5">
-                <Label htmlFor="start-time">Start Time</Label>
+              <div className="w-32 space-y-1">
+                <Label htmlFor="start-time" className="tt-label text-[var(--tt-text)]">
+                  Start Time
+                </Label>
                 <Select onValueChange={setStartTime} value={startTime}>
-                  <SelectTrigger id="start-time">
-                    <SelectValue placeholder="Select time" />
+                  <SelectTrigger
+                    id="start-time"
+                    className="bg-[var(--tt-panel-alt)] border-[var(--tt-border)] text-[var(--tt-text)]"
+                  >
+                    <SelectValue placeholder="Time" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)] max-h-56">
                     {timeOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
@@ -329,26 +375,33 @@ export function EventDialog({
             )}
           </div>
 
-          <div className="flex gap-4">
-            <div className="flex-1 *:not-first:mt-1.5">
-              <Label htmlFor="end-date">End Date</Label>
+          {/* End Date & Time */}
+          <div className="flex gap-3">
+            <div className="flex-1 space-y-1">
+              <Label htmlFor="end-date" className="tt-label text-[var(--tt-text)]">
+                End Date
+              </Label>
               <Popover onOpenChange={setEndDateOpen} open={endDateOpen}>
-                <PopoverTrigger render={<Button className={cn(
-                                                    "group w-full justify-between border-input bg-background px-3 font-normal outline-none outline-offset-0 hover:bg-background focus-visible:outline-[3px]",
-                                                    !endDate && "text-muted-foreground",
-                                                  )} id="end-date" variant={"outline"} />}><span
-                                                    className={cn(
-                                                      "truncate",
-                                                      !endDate && "text-muted-foreground",
-                                                    )}
-                                                  >
-                                                    {endDate ? format(endDate, "PPP") : "Pick a date"}
-                                                  </span><RiCalendarLine
-                                                    aria-hidden="true"
-                                                    className="shrink-0 text-muted-foreground/80"
-                                                    size={16}
-                                                  /></PopoverTrigger>
-                <PopoverContent align="start" className="w-auto p-2">
+                <PopoverTrigger asChild>
+                  <Button
+                    className={cn(
+                      "w-full justify-between border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-3 font-normal text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/80",
+                      !endDate && "text-[var(--tt-muted)]",
+                    )}
+                    id="end-date"
+                    variant="outline"
+                  >
+                    <span className="truncate">
+                      {endDate ? format(endDate, "MMM d, yyyy") : "Pick date"}
+                    </span>
+                    <RiCalendarLine
+                      aria-hidden="true"
+                      className="shrink-0 text-[var(--tt-muted)]"
+                      size={16}
+                    />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-auto p-2 bg-[var(--tt-panel)] border-[var(--tt-border)]">
                   <Calendar
                     defaultMonth={endDate}
                     disabled={{ before: startDate }}
@@ -356,7 +409,6 @@ export function EventDialog({
                     onSelect={(date) => {
                       if (date) {
                         setEndDate(date);
-                        setError(null);
                         setEndDateOpen(false);
                       }
                     }}
@@ -367,13 +419,18 @@ export function EventDialog({
             </div>
 
             {!allDay && (
-              <div className="min-w-28 *:not-first:mt-1.5">
-                <Label htmlFor="end-time">End Time</Label>
+              <div className="w-32 space-y-1">
+                <Label htmlFor="end-time" className="tt-label text-[var(--tt-text)]">
+                  End Time
+                </Label>
                 <Select onValueChange={setEndTime} value={endTime}>
-                  <SelectTrigger id="end-time">
-                    <SelectValue placeholder="Select time" />
+                  <SelectTrigger
+                    id="end-time"
+                    className="bg-[var(--tt-panel-alt)] border-[var(--tt-border)] text-[var(--tt-text)]"
+                  >
+                    <SelectValue placeholder="Time" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)] max-h-56">
                     {timeOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
@@ -385,29 +442,55 @@ export function EventDialog({
             )}
           </div>
 
-          <div className="flex items-center gap-2">
-            <Checkbox
-              checked={allDay}
-              id="all-day"
-              onCheckedChange={(checked) => setAllDay(checked === true)}
-            />
-            <Label htmlFor="all-day">All day</Label>
+          {/* All day & Completed Toggles */}
+          <div className="flex items-center justify-between py-1 border-y border-[var(--tt-border)]/60">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                checked={allDay}
+                id="all-day"
+                onCheckedChange={(checked) => setAllDay(checked === true)}
+              />
+              <Label htmlFor="all-day" className="tt-label text-[var(--tt-text)] cursor-pointer">
+                All day
+              </Label>
+            </div>
+
+            {event?.id && (
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  checked={completed}
+                  id="task-completed"
+                  onCheckedChange={(checked) => setCompleted(checked === true)}
+                />
+                <Label htmlFor="task-completed" className="tt-label text-[var(--tt-text)] cursor-pointer">
+                  Completed
+                </Label>
+              </div>
+            )}
           </div>
 
-          <div className="*:not-first:mt-1.5">
-            <Label htmlFor="location">Location</Label>
-            <Input
-              id="location"
-              onChange={(e) => setLocation(e.target.value)}
-              value={location}
+          {/* Description */}
+          <div className="space-y-1">
+            <Label htmlFor="desc" className="tt-label text-[var(--tt-text)]">
+              Description / Notes
+            </Label>
+            <Textarea
+              id="desc"
+              rows={2}
+              placeholder="Add description..."
+              onChange={(e) => setDescription(e.target.value)}
+              value={description}
+              className="bg-[var(--tt-panel-alt)] border-[var(--tt-border)] text-[var(--tt-text)] placeholder:text-[var(--tt-muted)] resize-none"
             />
           </div>
-          <fieldset className="space-y-4">
-            <legend className="font-medium text-foreground text-sm leading-none">
-              Etiquette
+
+          {/* Priority & Color */}
+          <fieldset className="space-y-2">
+            <legend className="tt-label font-medium text-[var(--tt-text)]">
+              Priority & Color
             </legend>
             <RadioGroup
-              className="flex gap-1.5"
+              className="flex items-center gap-2"
               defaultValue={colorOptions[0]?.value}
               onValueChange={(value: EventColor) => setColor(value)}
               value={color}
@@ -415,8 +498,9 @@ export function EventDialog({
               {colorOptions.map((colorOption) => (
                 <RadioGroupItem
                   aria-label={colorOption.label}
+                  title={colorOption.label}
                   className={cn(
-                    "size-6 shadow-none",
+                    "size-6 shadow-none cursor-pointer rounded-full transition-transform hover:scale-110",
                     colorOption.bgClass,
                     colorOption.borderClass,
                   )}
@@ -428,22 +512,55 @@ export function EventDialog({
             </RadioGroup>
           </fieldset>
         </div>
-        <DialogFooter className="flex-row sm:justify-between">
-          {event?.id && (
+
+        <DialogFooter className="flex-row items-center justify-between gap-2 pt-3 border-t border-[var(--tt-border)]">
+          <div className="flex items-center gap-2">
+            {event?.id && (
+              <Button
+                aria-label="Delete task"
+                onClick={handleDelete}
+                size="sm"
+                variant="destructive"
+                className="gap-1.5"
+              >
+                <RiDeleteBinLine aria-hidden="true" size={15} />
+                <span className="hidden sm:inline">Delete</span>
+              </Button>
+            )}
+
+            {event?.id && onOpenTaskDetails && (
+              <Button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onOpenTaskDetails(event.id);
+                }}
+                size="sm"
+                variant="outline"
+                className="gap-1.5 border-[var(--tt-border)] bg-[var(--tt-panel-alt)] text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/80"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Full Details</span>
+              </Button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
             <Button
-              aria-label="Delete event"
-              onClick={handleDelete}
-              size="icon"
+              onClick={onClose}
               variant="outline"
+              size="sm"
+              className="border-[var(--tt-border)] bg-[var(--tt-panel-alt)] text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/80"
             >
-              <RiDeleteBinLine aria-hidden="true" size={16} />
-            </Button>
-          )}
-          <div className="flex flex-1 justify-end gap-2">
-            <Button onClick={onClose} variant="outline">
               Cancel
             </Button>
-            <Button onClick={handleSave}>Save</Button>
+            <Button
+              onClick={handleSave}
+              size="sm"
+              className="bg-[var(--tt-accent-strong)] text-white hover:bg-[var(--tt-accent-strong)]/90"
+            >
+              Save
+            </Button>
           </div>
         </DialogFooter>
       </DialogContent>

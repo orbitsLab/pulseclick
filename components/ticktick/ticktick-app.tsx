@@ -142,8 +142,8 @@ function TickTickWorkspace({
 
       {/* 2. Main Workspace (3-pane layout) */}
       <div className="flex flex-1 h-full overflow-hidden">
-        {/* Navigation Sidebar (Shown on Tasks and Calendar) */}
-        {(activeModule === "tasks" || activeModule === "calendar") && (
+        {/* Navigation Sidebar (Shown on Tasks only; hidden in Calendar view) */}
+        {activeModule === "tasks" && (
           <TickTickSidebar
             activeView={activeView}
             activeListId={activeListId}
