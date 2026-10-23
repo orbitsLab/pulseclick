@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
-import { ModuleRail, TickTickModule } from "./module-rail";
+import React, { useEffect } from "react";
+import { ModuleRail } from "./module-rail";
 import { TickTickSidebar } from "./sidebar";
 import { TaskInputBar } from "./task-input-bar";
 import { TaskListView } from "./task-list-view";
@@ -19,16 +19,14 @@ import { CommandPalette } from "./command-palette";
 import { QuickAddModal } from "./quick-add-modal";
 import { FilterPanel } from "./filter-panel";
 import { ThemePicker } from "./theme-picker";
-import { useTickTick } from "@/hooks/use-ticktick";
+import { SyncIndicator } from "./sync-indicator";
+import { TickTickProvider, useTickTickContext } from "@/context/ticktick-context";
 import { applyTheme, DEFAULT_THEME_ID } from "@/lib/themes";
 import {
   ListTodo,
   Columns3,
-  CheckCircle2,
-  Command,
   Search,
   Plus,
-  GanttChartSquare,
 } from "lucide-react";
 
 interface TickTickAppProps {
@@ -39,54 +37,44 @@ interface TickTickAppProps {
   onThemeChange?: (themeId: string) => void;
 }
 
-export function TickTickApp({
+function TickTickWorkspace({
   user,
   isDark,
   onToggleTheme,
   onLogout,
   onThemeChange,
 }: TickTickAppProps) {
-  // Navigation State
-  const [activeModule, setActiveModule] = useState<TickTickModule>("tasks");
-  const [activeView, setActiveView] = useState<string>("today");
-  const [activeListId, setActiveListId] = useState<string | null>(null);
-  const [activeTag, setActiveTag] = useState<string | null>(null);
-  const [activeFilterId, setActiveFilterId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [statsRange, setStatsRange] = useState<"week" | "month" | "quarter" | "year">(
-    "month"
-  );
-
-  // Task View layout switcher (List vs Kanban)
-  const [taskLayout, setTaskLayout] = useState<"list" | "kanban">("list");
-
-  // Selected task for Right Pane Inspector
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
-
-  // Command palette state
-  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
-
-  // Floating Quick Add modal state
-  const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
-
-  // Filter & theme panels
-  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
-  const [isThemePickerOpen, setIsThemePickerOpen] = useState(false);
-
-  // Global keydown listener for Cmd+K / Ctrl+K
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setIsCommandPaletteOpen((prev) => !prev);
-      }
-    }
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  // TickTick TanStack Query Hook
   const {
+    activeModule,
+    setActiveModule,
+    activeView,
+    activeListId,
+    activeTag,
+    activeFilterId,
+    setActiveFilterId,
+    searchQuery,
+    setSearchQuery,
+    statsRange,
+    setStatsRange,
+    taskLayout,
+    setTaskLayout,
+    selectedTaskId,
+    setSelectedTaskId,
+    selectedTask,
+    currentListName,
+    selectView,
+    selectFilter,
+    selectModule,
+
+    isCommandPaletteOpen,
+    setIsCommandPaletteOpen,
+    isQuickAddOpen,
+    setIsQuickAddOpen,
+    isFilterPanelOpen,
+    setIsFilterPanelOpen,
+    isThemePickerOpen,
+    setIsThemePickerOpen,
+
     tasks,
     lists,
     inboxCount,
@@ -95,7 +83,6 @@ export function TickTickApp({
     allCount,
     tags,
     pomodoroStats,
-    habits,
     filters,
     countdowns,
     stats,
@@ -105,20 +92,17 @@ export function TickTickApp({
     members,
     assignees,
     subscriptions,
+
     toggleComplete,
     addTask,
     updateTask,
     deleteTask,
-    batchAction,
     addList,
     updateList,
     deleteList,
     addTag,
     deleteTag,
     logPomodoro,
-    addHabit,
-    toggleHabitCheck,
-    deleteHabit,
     createFilter,
     updateFilter,
     deleteFilter,
@@ -136,71 +120,19 @@ export function TickTickApp({
     addSubscription,
     deleteSubscription,
     syncSubscription,
-  } = useTickTick({
-    view: activeModule === "timeline" ? "timeline" : activeView,
-    listId: activeListId,
-    tag: activeTag,
-    search: searchQuery,
-    filterId: activeFilterId,
-    statsRange,
-    remindersTaskId: selectedTaskId,
-    assigneesTaskId: selectedTaskId,
-  });
+  } = useTickTickContext();
 
-  // Publish the workspace theme as CSS custom properties.
+  // Publish workspace theme as CSS variables
   useEffect(() => {
     applyTheme(settings?.themeId ?? DEFAULT_THEME_ID);
   }, [settings?.themeId]);
-
-  const selectedTask = useMemo(
-    () => tasks.find((t) => t.id === selectedTaskId) || null,
-    [tasks, selectedTaskId]
-  );
-
-  // View Title calculation
-  let currentListName = "Today";
-  if (activeListId) {
-    const l = lists.find((item) => item.id === activeListId);
-    currentListName = l ? l.name : "List";
-  } else if (activeTag) {
-    currentListName = `#${activeTag}`;
-  } else {
-    switch (activeView) {
-      case "all":
-        currentListName = "All Tasks";
-        break;
-      case "today":
-        currentListName = "Today";
-        break;
-      case "tomorrow":
-        currentListName = "Tomorrow";
-        break;
-      case "next7":
-        currentListName = "Next 7 Days";
-        break;
-      case "inbox":
-        currentListName = "Inbox";
-        break;
-      case "completed":
-        currentListName = "Completed";
-        break;
-      case "trash":
-        currentListName = "Trash";
-        break;
-      default:
-        currentListName = "Tasks";
-    }
-  }
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[var(--tt-panel-alt)] text-[var(--tt-text)] relative">
       {/* 1. Far Left Module Icon Rail */}
       <ModuleRail
         activeModule={activeModule}
-        onSelectModule={(mod) => {
-          setActiveModule(mod);
-          setSelectedTaskId(null);
-        }}
+        onSelectModule={selectModule}
         isDark={isDark}
         onToggleTheme={onToggleTheme}
         user={user}
@@ -208,7 +140,7 @@ export function TickTickApp({
         onOpenThemePicker={() => setIsThemePickerOpen(true)}
       />
 
-      {/* 2. TickTick Main Workspace (3-pane layout) */}
+      {/* 2. Main Workspace (3-pane layout) */}
       <div className="flex flex-1 h-full overflow-hidden">
         {/* Navigation Sidebar (Shown on Tasks and Calendar) */}
         {(activeModule === "tasks" || activeModule === "calendar") && (
@@ -216,14 +148,8 @@ export function TickTickApp({
             activeView={activeView}
             activeListId={activeListId}
             activeTag={activeTag}
-            onSelectView={(v, lId, tag) => {
-              setActiveView(v);
-              setActiveListId(lId || null);
-              setActiveTag(tag || null);
-              setActiveFilterId(null);
-              setSelectedTaskId(null);
-            }}
-            onSelectDate={(dateIso) => {
+            onSelectView={selectView}
+            onSelectDate={(_dateIso) => {
               setActiveModule("calendar");
             }}
             lists={lists}
@@ -246,13 +172,7 @@ export function TickTickApp({
               color: f.color,
             }))}
             activeFilterId={activeFilterId}
-            onSelectFilter={(filterId) => {
-              setActiveFilterId(filterId);
-              setActiveListId(null);
-              setActiveTag(null);
-              setActiveModule("tasks");
-              setSelectedTaskId(null);
-            }}
+            onSelectFilter={selectFilter}
             onOpenFilterPanel={() => setIsFilterPanelOpen(true)}
           />
         )}
@@ -290,8 +210,10 @@ export function TickTickApp({
               )}
             </div>
 
-            {/* Right Header: Cmd+K Command Palette Trigger & Layout switcher buttons */}
+            {/* Right Header: Sync Indicator, Cmd+K Command Palette Trigger & Layout switcher buttons */}
             <div className="flex items-center gap-2">
+              <SyncIndicator />
+
               <button
                 type="button"
                 onClick={() => setIsCommandPaletteOpen(true)}
@@ -311,7 +233,11 @@ export function TickTickApp({
                     type="button"
                     onClick={() => setTaskLayout("list")}
                     title="List View"
-                    className={`rounded-md p-1.5 transition-colors ${ taskLayout === "list" ? "bg-[var(--tt-panel)] text-[var(--tt-accent-text)] shadow-xs dark:bg-[var(--tt-panel-alt)] dark:text-[var(--tt-accent-text)]" : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] dark:text-[var(--tt-muted)]" }`}
+                    className={`rounded-md p-1.5 transition-colors ${
+                      taskLayout === "list"
+                        ? "bg-[var(--tt-panel)] text-[var(--tt-accent-text)] shadow-xs dark:bg-[var(--tt-panel-alt)] dark:text-[var(--tt-accent-text)]"
+                        : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] dark:text-[var(--tt-muted)]"
+                    }`}
                   >
                     <ListTodo className="h-4 w-4" />
                   </button>
@@ -319,7 +245,11 @@ export function TickTickApp({
                     type="button"
                     onClick={() => setTaskLayout("kanban")}
                     title="Kanban Board View"
-                    className={`rounded-md p-1.5 transition-colors ${ taskLayout === "kanban" ? "bg-[var(--tt-panel)] text-[var(--tt-accent-text)] shadow-xs dark:bg-[var(--tt-panel-alt)] dark:text-[var(--tt-accent-text)]" : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] dark:text-[var(--tt-muted)]" }`}
+                    className={`rounded-md p-1.5 transition-colors ${
+                      taskLayout === "kanban"
+                        ? "bg-[var(--tt-panel)] text-[var(--tt-accent-text)] shadow-xs dark:bg-[var(--tt-panel-alt)] dark:text-[var(--tt-accent-text)]"
+                        : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] dark:text-[var(--tt-muted)]"
+                    }`}
                   >
                     <Columns3 className="h-4 w-4" />
                   </button>
@@ -331,26 +261,10 @@ export function TickTickApp({
           {/* Content Rendering based on Module */}
           {activeModule === "tasks" && (
             <div className="flex-1 flex flex-col gap-4 overflow-hidden">
-              <TaskInputBar
-                currentListName={currentListName}
-                currentListId={activeListId}
-                lists={lists}
-                tags={tags}
-                onAddTask={addTask}
-              />
+              <TaskInputBar />
 
               {taskLayout === "list" ? (
-                <TaskListView
-                  tasks={tasks}
-                  selectedTaskId={selectedTaskId}
-                  onSelectTask={(id) => setSelectedTaskId(id)}
-                  onToggleComplete={(id, completed) => toggleComplete({ taskId: id, completed })}
-                  onTogglePin={(id, isPinned) => updateTask({ taskId: id, isPinned })}
-                  onDeleteTask={(id) => deleteTask({ taskId: id })}
-                  onUpdateTask={updateTask}
-                  onBatchAction={batchAction}
-                  viewName={currentListName}
-                />
+                <TaskListView />
               ) : (
                 <TaskKanbanView
                   tasks={tasks}
@@ -441,14 +355,7 @@ export function TickTickApp({
             />
           )}
 
-          {activeModule === "habits" && (
-            <HabitView
-              habits={habits}
-              onToggleHabitCheck={toggleHabitCheck}
-              onAddHabit={addHabit}
-              onDeleteHabit={deleteHabit}
-            />
-          )}
+          {activeModule === "habits" && <HabitView />}
 
           {activeModule === "matrix" && (
             <EisenhowerMatrixView
@@ -518,17 +425,8 @@ export function TickTickApp({
         tasks={tasks}
         lists={lists}
         tags={tags}
-        onSelectModule={(mod) => {
-          setActiveModule(mod);
-          setSelectedTaskId(null);
-        }}
-        onSelectView={(v, lId, tag) => {
-          setActiveView(v);
-          setActiveListId(lId || null);
-          setActiveTag(tag || null);
-          setActiveFilterId(null);
-          setSelectedTaskId(null);
-        }}
+        onSelectModule={selectModule}
+        onSelectView={selectView}
         onSelectTask={(taskId) => {
           setSelectedTaskId(taskId);
         }}
@@ -550,14 +448,7 @@ export function TickTickApp({
         onCreateFilter={createFilter}
         onUpdateFilter={(id, updates) => updateFilter({ id, ...updates })}
         onDeleteFilter={deleteFilter}
-        onApplyFilter={(filterId: string) => {
-          setActiveFilterId(filterId);
-          setActiveListId(null);
-          setActiveTag(null);
-          setActiveModule("tasks");
-          setIsFilterPanelOpen(false);
-          setSelectedTaskId(null);
-        }}
+        onApplyFilter={selectFilter}
       />
 
       {/* Theme Picker */}
@@ -575,5 +466,13 @@ export function TickTickApp({
         }}
       />
     </div>
+  );
+}
+
+export function TickTickApp(props: TickTickAppProps) {
+  return (
+    <TickTickProvider>
+      <TickTickWorkspace {...props} />
+    </TickTickProvider>
   );
 }

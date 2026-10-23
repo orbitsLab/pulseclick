@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   Inbox,
   Calendar as CalendarIcon,
@@ -22,23 +22,24 @@ import {
 } from "lucide-react";
 import { TaskList, Tag } from "@/hooks/use-ticktick";
 import { toISODate, getTodayISO } from "@/lib/date-utils";
+import { TickTickContext } from "@/context/ticktick-context";
 
 interface SidebarProps {
-  activeView: string;
-  activeListId: string | null;
-  activeTag: string | null;
-  onSelectView: (view: string, listId?: string | null, tag?: string | null) => void;
+  activeView?: string;
+  activeListId?: string | null;
+  activeTag?: string | null;
+  onSelectView?: (view: string, listId?: string | null, tag?: string | null) => void;
   onSelectDate?: (dateIso: string) => void;
-  lists: TaskList[];
-  inboxCount: number;
-  tags: Tag[];
-  onAddList: (list: { name: string; color: string; icon?: string }) => Promise<any>;
+  lists?: TaskList[];
+  inboxCount?: number;
+  tags?: Tag[];
+  onAddList?: (list: { name: string; color: string; icon?: string }) => Promise<any>;
   onUpdateList?: (list: { id: string; name?: string; color?: string; icon?: string }) => Promise<any>;
   onDeleteList?: (id: string) => Promise<any>;
-  onAddTag: (tag: { name: string; color?: string }) => Promise<any>;
+  onAddTag?: (tag: { name: string; color?: string }) => Promise<any>;
   onDeleteTag?: (id: string) => Promise<any>;
-  searchQuery: string;
-  onSearchChange: (q: string) => void;
+  searchQuery?: string;
+  onSearchChange?: (q: string) => void;
   todayCount?: number;
   tomorrowCount?: number;
   allCount?: number;
@@ -48,30 +49,36 @@ interface SidebarProps {
   onOpenFilterPanel?: () => void;
 }
 
-export function TickTickSidebar({
-  activeView,
-  activeListId,
-  activeTag,
-  onSelectView,
-  onSelectDate,
-  lists,
-  inboxCount,
-  tags,
-  onAddList,
-  onUpdateList,
-  onDeleteList,
-  onAddTag,
-  onDeleteTag,
-  searchQuery,
-  onSearchChange,
-  todayCount = 0,
-  tomorrowCount = 0,
-  allCount = 0,
-  filters = [],
-  activeFilterId = null,
-  onSelectFilter,
-  onOpenFilterPanel,
-}: SidebarProps) {
+export function TickTickSidebar(props: SidebarProps = {}) {
+  const context = useContext(TickTickContext);
+
+  const activeView = props.activeView ?? context?.activeView ?? "today";
+  const activeListId = props.activeListId !== undefined ? props.activeListId : (context?.activeListId ?? null);
+  const activeTag = props.activeTag !== undefined ? props.activeTag : (context?.activeTag ?? null);
+  const onSelectView = props.onSelectView ?? context?.selectView ?? (() => {});
+  const onSelectDate = props.onSelectDate ?? ((_dateIso) => context?.selectModule("calendar"));
+  const lists = props.lists ?? context?.lists ?? [];
+  const inboxCount = props.inboxCount ?? context?.inboxCount ?? 0;
+  const tags = props.tags ?? context?.tags ?? [];
+  const onAddList = props.onAddList ?? context?.addList ?? (async () => {});
+  const onUpdateList = props.onUpdateList ?? context?.updateList;
+  const onDeleteList = props.onDeleteList ?? context?.deleteList;
+  const onAddTag = props.onAddTag ?? context?.addTag ?? (async () => {});
+  const onDeleteTag = props.onDeleteTag ?? context?.deleteTag;
+  const searchQuery = props.searchQuery ?? context?.searchQuery ?? "";
+  const onSearchChange = props.onSearchChange ?? context?.setSearchQuery ?? (() => {});
+  const todayCount = props.todayCount ?? context?.todayCount ?? 0;
+  const tomorrowCount = props.tomorrowCount ?? context?.tomorrowCount ?? 0;
+  const allCount = props.allCount ?? context?.allCount ?? 0;
+  const filters = props.filters ?? (context?.filters?.map((f: any) => ({
+    id: f.id,
+    name: f.name,
+    icon: f.icon,
+    color: f.color,
+  })) || []);
+  const activeFilterId = props.activeFilterId !== undefined ? props.activeFilterId : (context?.activeFilterId ?? null);
+  const onSelectFilter = props.onSelectFilter ?? context?.selectFilter ?? (() => {});
+  const onOpenFilterPanel = props.onOpenFilterPanel ?? (() => context?.setIsFilterPanelOpen(true));
   const today = getTodayISO();
   const [listsCollapsed, setListsCollapsed] = useState(false);
   const [tagsCollapsed, setTagsCollapsed] = useState(false);

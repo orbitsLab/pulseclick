@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { onest, instrumentSerif, geistMono } from "./fonts";
 import "./globals.css";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { Toaster } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
   title: "PulseTick — Tasks, Schedule, Habits & Focus",
@@ -22,6 +23,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-[var(--tt-bg)] text-[var(--tt-text)] selection:bg-[var(--tt-accent)]/30">
         <QueryProvider>
           {children}
+          <Toaster />
         </QueryProvider>
       </body>
     </html>

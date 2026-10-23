@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   Check,
   Flag,
@@ -21,34 +21,36 @@ import {
 } from "lucide-react";
 import { Task } from "@/hooks/use-ticktick";
 import { getTodayISO, addDays, formatShortDate } from "@/lib/date-utils";
+import { TickTickContext } from "@/context/ticktick-context";
 
 interface TaskListViewProps {
-  tasks: Task[];
-  selectedTaskId: string | null;
-  onSelectTask: (taskId: string) => void;
-  onToggleComplete: (taskId: string, completed: boolean) => void;
-  onTogglePin: (taskId: string, isPinned: boolean) => void;
-  onDeleteTask: (taskId: string) => void;
+  tasks?: Task[];
+  selectedTaskId?: string | null;
+  onSelectTask?: (taskId: string) => void;
+  onToggleComplete?: (taskId: string, completed: boolean) => void;
+  onTogglePin?: (taskId: string, isPinned: boolean) => void;
+  onDeleteTask?: (taskId: string) => void;
   onUpdateTask?: (params: { taskId: string } & Partial<Task>) => void;
   onBatchAction?: (params: {
     taskIds: string[];
     action: "complete" | "delete" | "priority" | "dueDate";
     value?: any;
   }) => Promise<any>;
-  viewName: string;
+  viewName?: string;
 }
 
-export function TaskListView({
-  tasks,
-  selectedTaskId,
-  onSelectTask,
-  onToggleComplete,
-  onTogglePin,
-  onDeleteTask,
-  onUpdateTask,
-  onBatchAction,
-  viewName,
-}: TaskListViewProps) {
+export function TaskListView(props: TaskListViewProps = {}) {
+  const context = useContext(TickTickContext);
+
+  const tasks = props.tasks ?? context?.tasks ?? [];
+  const selectedTaskId = props.selectedTaskId !== undefined ? props.selectedTaskId : (context?.selectedTaskId ?? null);
+  const onSelectTask = props.onSelectTask ?? context?.setSelectedTaskId ?? (() => {});
+  const onToggleComplete = props.onToggleComplete ?? ((id, completed) => context?.toggleComplete({ taskId: id, completed }));
+  const onTogglePin = props.onTogglePin ?? ((id, isPinned) => context?.updateTask({ taskId: id, isPinned }));
+  const onDeleteTask = props.onDeleteTask ?? ((id) => context?.deleteTask({ taskId: id }));
+  const onUpdateTask = props.onUpdateTask ?? context?.updateTask;
+  const onBatchAction = props.onBatchAction ?? context?.batchAction;
+  const viewName = props.viewName ?? context?.currentListName ?? "Tasks";
   const today = getTodayISO();
   const tomorrow = addDays(today, 1);
   const next7Days = addDays(today, 7);

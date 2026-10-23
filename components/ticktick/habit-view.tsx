@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   Flame,
   Plus,
@@ -19,18 +19,19 @@ import {
 } from "lucide-react";
 import { Habit } from "@/hooks/use-ticktick";
 import { getTodayISO, getMondayOfWeek, getWeekDays } from "@/lib/date-utils";
+import { TickTickContext } from "@/context/ticktick-context";
 
 interface HabitViewProps {
-  habits: Habit[];
-  onToggleHabitCheck: (params: { habitId: string; date: string }) => void;
-  onAddHabit: (params: {
+  habits?: Habit[];
+  onToggleHabitCheck?: (params: { habitId: string; date: string }) => void;
+  onAddHabit?: (params: {
     title: string;
     icon?: string;
     color?: string;
     frequency?: string;
     targetDays?: number;
   }) => Promise<any>;
-  onDeleteHabit: (habitId: string) => Promise<any>;
+  onDeleteHabit?: (habitId: string) => Promise<any>;
 }
 
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -55,12 +56,14 @@ const COLOR_PALETTE = [
   "#10b981", // Emerald
 ];
 
-export function HabitView({
-  habits,
-  onToggleHabitCheck,
-  onAddHabit,
-  onDeleteHabit,
-}: HabitViewProps) {
+export function HabitView(props: HabitViewProps = {}) {
+  const context = useContext(TickTickContext);
+  const habits = props.habits ?? context?.habits ?? [];
+  const onToggleHabitCheck =
+    props.onToggleHabitCheck ?? context?.toggleHabitCheck ?? (() => {});
+  const onAddHabit = props.onAddHabit ?? context?.addHabit ?? (async () => {});
+  const onDeleteHabit = props.onDeleteHabit ?? context?.deleteHabit ?? (async () => {});
+
   const today = getTodayISO();
   const weekMonday = getMondayOfWeek(today);
   const weekDays = getWeekDays(weekMonday);

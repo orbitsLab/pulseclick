@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { playTaskCompleteSound, playPomodoroBellSound } from "@/lib/sound-utils";
+import { notify } from "@/components/ui/toast";
 
 export interface Subtask {
   id: string;
@@ -394,8 +395,9 @@ export function useTickTick(filters: {
       queryClient.setQueryData(tasksQueryKey, updated);
       return { prevTasks };
     },
-    onError: (_err, _vars, context) => {
+    onError: (_err: any, _vars, context) => {
       if (context?.prevTasks) queryClient.setQueryData(tasksQueryKey, context.prevTasks);
+      notify.error("Failed to toggle task", _err?.message || "Changes reverted.");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
@@ -437,7 +439,77 @@ export function useTickTick(filters: {
       if (!res.ok) throw new Error("Failed to add task");
       return res.json();
     },
-    onSuccess: () => {
+    onMutate: async (newTask) => {
+      await queryClient.cancelQueries({ queryKey: tasksQueryKey });
+      const prevTasks = queryClient.getQueryData<Task[]>(tasksQueryKey) || [];
+      const currentLists = queryClient.getQueryData<{ lists: TaskList[] }>(["ticktick-lists"])?.lists || [];
+      const currentTags = queryClient.getQueryData<Tag[]>(["ticktick-tags"]) || [];
+
+      const listObj = newTask.listId ? currentLists.find((l) => l.id === newTask.listId) || null : null;
+      const taskTags: TaskTag[] = (newTask.tags || []).map((tagName) => {
+        const existing = currentTags.find((t) => t.name.toLowerCase() === tagName.toLowerCase());
+        return {
+          taskId: `temp-${Date.now()}`,
+          tagId: existing?.id || `temp-tag-${Date.now()}`,
+          tag: {
+            id: existing?.id || `temp-tag-${Date.now()}`,
+            name: tagName,
+            color: existing?.color || "#3b82f6",
+          },
+        };
+      });
+
+      const tempTask: Task = {
+        id: `temp-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+        userId: "current-user",
+        title: newTask.title,
+        description: newTask.description || null,
+        completed: false,
+        dueDate: newTask.dueDate || null,
+        dueTime: newTask.dueTime || null,
+        priority: newTask.priority ?? 0,
+        recurrence: newTask.recurrence || "NONE",
+        recurrenceInterval: newTask.recurrenceInterval,
+        recurrenceWeekdays: newTask.recurrenceWeekdays || null,
+        recurrenceEndDate: newTask.recurrenceEndDate || null,
+        reminder: newTask.reminder || "NONE",
+        isPinned: false,
+        isTrash: false,
+        kanbanStatus: (newTask.kanbanStatus as any) || "TODO",
+        pomodoroCount: 0,
+        order: 0,
+        startDate: newTask.startDate || null,
+        startTime: newTask.startTime || null,
+        endDate: newTask.endDate || null,
+        endTime: newTask.endTime || null,
+        durationMinutes: newTask.durationMinutes,
+        timeZone: newTask.timeZone || null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        list: listObj,
+        subtasks: (newTask.subtasks || []).map((st: any, idx: number) => ({
+          id: `temp-subtask-${idx}`,
+          taskId: `temp-${Date.now()}`,
+          title: typeof st === "string" ? st : st.title,
+          completed: false,
+          order: idx,
+        })),
+        tags: taskTags,
+      };
+
+      queryClient.setQueryData(tasksQueryKey, [tempTask, ...prevTasks]);
+      return { prevTasks, tempId: tempTask.id };
+    },
+    onError: (err: any, _vars, context) => {
+      if (context?.prevTasks) queryClient.setQueryData(tasksQueryKey, context.prevTasks);
+      notify.error("Failed to add task", err?.message || "Task could not be saved.");
+    },
+    onSuccess: (data, _vars, context) => {
+      if (data?.task && context?.tempId) {
+        const prevTasks = queryClient.getQueryData<Task[]>(tasksQueryKey) || [];
+        const reconciled = prevTasks.map((t) => (t.id === context.tempId ? data.task : t));
+        queryClient.setQueryData(tasksQueryKey, reconciled);
+      }
       queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
       queryClient.invalidateQueries({ queryKey: ["ticktick-lists"] });
       queryClient.invalidateQueries({ queryKey: ["ticktick-tags"] });
@@ -463,8 +535,9 @@ export function useTickTick(filters: {
       queryClient.setQueryData(tasksQueryKey, updated);
       return { prevTasks };
     },
-    onError: (_err, _vars, context) => {
+    onError: (err: any, _vars, context) => {
       if (context?.prevTasks) queryClient.setQueryData(tasksQueryKey, context.prevTasks);
+      notify.error("Failed to update task", err?.message || "Changes reverted.");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
@@ -491,8 +564,9 @@ export function useTickTick(filters: {
       );
       return { prevTasks };
     },
-    onError: (_err, _vars, context) => {
+    onError: (err: any, _vars, context) => {
       if (context?.prevTasks) queryClient.setQueryData(tasksQueryKey, context.prevTasks);
+      notify.error("Failed to delete task", err?.message || "Task could not be deleted.");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
@@ -545,6 +619,10 @@ export function useTickTick(filters: {
       queryClient.setQueryData(tasksQueryKey, updated);
       return { prevTasks };
     },
+    onError: (err: any, _vars, context) => {
+      if (context?.prevTasks) queryClient.setQueryData(tasksQueryKey, context.prevTasks);
+      notify.error("Batch action failed", err?.message || "Operations reverted.");
+    },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
       queryClient.invalidateQueries({ queryKey: ["ticktick-lists"] });
@@ -562,6 +640,9 @@ export function useTickTick(filters: {
       if (!res.ok) throw new Error("Failed to create list");
       return res.json();
     },
+    onError: (err: any) => {
+      notify.error("Failed to create list", err?.message || "Could not create list.");
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ticktick-lists"] });
     },
@@ -578,6 +659,9 @@ export function useTickTick(filters: {
       if (!res.ok) throw new Error("Failed to update list");
       return res.json();
     },
+    onError: (err: any) => {
+      notify.error("Failed to update list", err?.message || "Could not update list.");
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ticktick-lists"] });
       queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
@@ -590,6 +674,9 @@ export function useTickTick(filters: {
       const res = await fetch(`/api/tasks/lists/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete list");
       return res.json();
+    },
+    onError: (err: any) => {
+      notify.error("Failed to delete list", err?.message || "Could not delete list.");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ticktick-lists"] });
@@ -608,6 +695,9 @@ export function useTickTick(filters: {
       if (!res.ok) throw new Error("Failed to create tag");
       return res.json();
     },
+    onError: (err: any) => {
+      notify.error("Failed to create tag", err?.message || "Could not create tag.");
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ticktick-tags"] });
     },
@@ -619,6 +709,9 @@ export function useTickTick(filters: {
       const res = await fetch(`/api/tasks/tags/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete tag");
       return res.json();
+    },
+    onError: (err: any) => {
+      notify.error("Failed to delete tag", err?.message || "Could not delete tag.");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ticktick-tags"] });
@@ -661,7 +754,36 @@ export function useTickTick(filters: {
       if (!res.ok) throw new Error("Failed to add habit");
       return res.json();
     },
-    onSuccess: () => {
+    onMutate: async (newHabit) => {
+      await queryClient.cancelQueries({ queryKey: ["ticktick-habits"] });
+      const prevHabits = queryClient.getQueryData<Habit[]>(["ticktick-habits"]) || [];
+      const tempHabit: Habit = {
+        id: `temp-habit-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        userId: "current-user",
+        title: newHabit.title,
+        icon: newHabit.icon || "Flame",
+        color: newHabit.color || "#14b8a6",
+        frequency: newHabit.frequency || "DAILY",
+        targetDays: newHabit.targetDays || 7,
+        streak: 0,
+        isCompletedToday: false,
+        logs: [],
+      };
+      queryClient.setQueryData(["ticktick-habits"], [...prevHabits, tempHabit]);
+      return { prevHabits, tempId: tempHabit.id };
+    },
+    onError: (err: any, _vars, context) => {
+      if (context?.prevHabits) queryClient.setQueryData(["ticktick-habits"], context.prevHabits);
+      notify.error("Failed to create habit", err?.message || "Habit could not be saved.");
+    },
+    onSuccess: (data, _vars, context) => {
+      if (data?.habit && context?.tempId) {
+        const prev = queryClient.getQueryData<Habit[]>(["ticktick-habits"]) || [];
+        queryClient.setQueryData(
+          ["ticktick-habits"],
+          prev.map((h) => (h.id === context.tempId ? data.habit : h))
+        );
+      }
       queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
     },
   });
@@ -682,6 +804,7 @@ export function useTickTick(filters: {
       await queryClient.cancelQueries({ queryKey: ["ticktick-habits"] });
       const prevHabits = queryClient.getQueryData<Habit[]>(["ticktick-habits"]) || [];
 
+      const todayStr = new Date().toISOString().split("T")[0];
       const updated = prevHabits.map((h) => {
         if (h.id !== habitId) return h;
         const exists = h.logs?.some((l) => l.date === date && l.completed);
@@ -691,21 +814,26 @@ export function useTickTick(filters: {
         } else {
           nextLogs = [...nextLogs, { id: `temp-${Date.now()}`, habitId, date, completed: true }];
         }
+        const isCompletedToday = date === todayStr ? !exists : h.isCompletedToday;
+        const nextStreak = exists ? Math.max(0, h.streak - 1) : h.streak + 1;
         return {
           ...h,
           logs: nextLogs,
-          isCompletedToday: date === new Date().toISOString().split("T")[0] ? !exists : h.isCompletedToday,
+          streak: nextStreak,
+          isCompletedToday,
         };
       });
 
       queryClient.setQueryData(["ticktick-habits"], updated);
       return { prevHabits };
     },
-    onError: (_err, _vars, context) => {
+    onError: (err: any, _vars, context) => {
       if (context?.prevHabits) queryClient.setQueryData(["ticktick-habits"], context.prevHabits);
+      notify.error("Failed to update habit check-in", err?.message || "Changes reverted.");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
+      queryClient.invalidateQueries({ queryKey: ["ticktick-stats"] });
     },
   });
 
@@ -716,8 +844,22 @@ export function useTickTick(filters: {
       if (!res.ok) throw new Error("Failed to delete habit");
       return res.json();
     },
-    onSuccess: () => {
+    onMutate: async (habitId: string) => {
+      await queryClient.cancelQueries({ queryKey: ["ticktick-habits"] });
+      const prevHabits = queryClient.getQueryData<Habit[]>(["ticktick-habits"]) || [];
+      queryClient.setQueryData(
+        ["ticktick-habits"],
+        prevHabits.filter((h) => h.id !== habitId)
+      );
+      return { prevHabits };
+    },
+    onError: (err: any, _vars, context) => {
+      if (context?.prevHabits) queryClient.setQueryData(["ticktick-habits"], context.prevHabits);
+      notify.error("Failed to delete habit", err?.message || "Habit could not be deleted.");
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
+      queryClient.invalidateQueries({ queryKey: ["ticktick-stats"] });
     },
   });
 

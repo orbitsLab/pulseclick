@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState, useContext } from "react";
 import {
   Plus,
   Calendar,
@@ -18,13 +18,14 @@ import {
 import { TaskList, Tag } from "@/hooks/use-ticktick";
 import { getTodayISO, addDays } from "@/lib/date-utils";
 import { parseTaskInput } from "@/lib/nlp";
+import { TickTickContext } from "@/context/ticktick-context";
 
 interface TaskInputBarProps {
-  currentListName: string;
-  currentListId: string | null;
-  lists: TaskList[];
-  tags: Tag[];
-  onAddTask: (task: {
+  currentListName?: string;
+  currentListId?: string | null;
+  lists?: TaskList[];
+  tags?: Tag[];
+  onAddTask?: (task: {
     title: string;
     listId?: string | null;
     dueDate?: string | null;
@@ -40,13 +41,14 @@ interface TaskInputBarProps {
   }) => Promise<any>;
 }
 
-export function TaskInputBar({
-  currentListName,
-  currentListId,
-  lists,
-  tags,
-  onAddTask,
-}: TaskInputBarProps) {
+export function TaskInputBar(props: TaskInputBarProps = {}) {
+  const context = useContext(TickTickContext);
+  const currentListName = props.currentListName ?? context?.currentListName ?? "Tasks";
+  const currentListId = props.currentListId !== undefined ? props.currentListId : (context?.activeListId ?? null);
+  const lists = props.lists ?? context?.lists ?? [];
+  const tags = props.tags ?? context?.tags ?? [];
+  const onAddTask = props.onAddTask ?? context?.addTask ?? (async () => {});
+
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState<string | null>(null);
   const [dueTime, setDueTime] = useState<string | null>(null);
