@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-23T18:55:00Z",
+  "title": "Design System: PulseTick",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Calm Blue",
+        "canonical": "#4772fa",
+        "tonalRamp": ["#0d1f4c", "#12308e", "#173f9e", "#1f50c0", "#2772e6", "#3f86f0", "#6b9ff5", "#a9c6fa"]
+      },
+      "accent-strong": {
+        "role": "primary",
+        "displayName": "Deep Calm Blue",
+        "canonical": "#3e64dc",
+        "tonalRamp": ["#12265c", "#1a3585", "#23419f", "#2b51bc", "#3466d8", "#4a80e2", "#7792e8", "#a9c6f5"]
+      },
+      "night-surface": {
+        "role": "neutral",
+        "displayName": "Night Surface",
+        "canonical": "#0f1115",
+        "tonalRamp": ["#0a0b0e", "#0d0f13", "#11131a", "#151823", "#1a1e2b", "#222736", "#2c3548", "#3a4257"]
+      },
+      "raised-surface": {
+        "role": "neutral",
+        "displayName": "Raised Surface",
+        "canonical": "#171a21",
+        "tonalRamp": ["#101216", "#13161d", "#171b23", "#1c2130", "#21263a", "#2a3040", "#36405a", "#4a5470"]
+      },
+      "lifted-surface": {
+        "role": "neutral",
+        "displayName": "Lifted Surface",
+        "canonical": "#1f232c",
+        "tonalRamp": ["#16191f", "#191d25", "#1f232c", "#262c3a", "#2d3444", "#374052", "#48536c", "#61718c"]
+      },
+      "daylight-text": {
+        "role": "neutral",
+        "displayName": "Daylight Text",
+        "canonical": "#eef1f6",
+        "tonalRamp": ["#1c1f27", "#242836", "#2d3342", "#374052", "#424a62", "#5a6478", "#79839c", "#a6afc4"]
+      },
+      "soft-slate": {
+        "role": "neutral",
+        "displayName": "Soft Slate",
+        "canonical": "#8b94a7",
+        "tonalRamp": ["#2b2f39", "#363b48", "#444a5c", "#545b70", "#66708a", "#8490a8", "#a7b0c2", "#c6cddd"]
+      },
+      "hairline-slate": {
+        "role": "neutral",
+        "displayName": "Hairline Slate",
+        "canonical": "#262b36",
+        "tonalRamp": ["#1c2029", "#21262f", "#262b36", "#2d3342", "#35405a", "#435067", "#5b6780", "#8290aa"]
+      },
+      "quiet-paper": {
+        "role": "neutral",
+        "displayName": "Quiet Paper",
+        "canonical": "#f7f8fa",
+        "tonalRamp": ["#e3e6ea", "#ccd2da", "#b8bfcc", "#a4abd9", "#9199b0", "#7f87a0", "#67708c", "#4a556e"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Module titles — one per screen, highest prominence." },
+      "heading": { "displayName": "Heading", "purpose": "Task, habit and countdown names." },
+      "title": { "displayName": "Title", "purpose": "Panel and card titles." },
+      "body": { "displayName": "Body", "purpose": "Running text, descriptions, subtitles." },
+      "label": { "displayName": "Label", "purpose": "Buttons, controls, nav rows, secondary list text." },
+      "meta": { "displayName": "Meta", "purpose": "Dates, counts, badges, timestamps." },
+      "figure": { "displayName": "Figure", "purpose": "The single big KPI number a surface leads with." }
+    },
+    "shadows": [
+      {
+        "name": "overlay",
+        "value": "0 10px 30px rgba(0,0,0,0.45)",
+        "purpose": "Floating overlays (dialogs, popovers, menus)."
+      }
+    ],
+    "motion": [],
+    "breakpoints": [{ "name": "sm", "value": "640px" }]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary action: Calm Blue fill with white text; Deep Calm Blue when white text needs 4.5:1 contrast. Radius 10px, padding 12px 16px, label typography.",
+      "html": "<button class=\"ds-btn-primary\">SAVE</button>",
+      "css": ".ds-btn-primary { background: #4772fa; color: #ffffff; padding: 12px 16px; border-radius: 10px; font-family: Onest, ui-sans-serif, system-ui, sans-serif; font-size: 12px; font-weight: 600; line-height: 1.45; border: none; transition: background 0.2s; } .ds-btn-primary:hover { background: #3e64dc; } .ds-btn-primary:active { background: #3e64dc; }"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Tinted filter/chip row: Lifted Surface background, accent text at the accent-text tone, hairline accent border at ~40%. Selected: Deep Calm Blue fill, white text.",
+      "html": "<button class=\"ds-chip\">ALL</button>",
+      "css": ".ds-chip { background: #1f232c; color: #7b9dfb; border: 1px solid rgba(71, 114, 250, 0.4); border-radius: 8px; padding: 6px 12px; font-family: Onest, ui-sans-serif, system-ui, sans-serif; font-size: 12px; font-weight: 600; line-height: 1.45; }"
+    },
+    {
+      "name": "Task Row",
+      "kind": "custom",
+      "refersTo": "task-row",
+      "description": "Signature component: horizontal rhythm of checkbox, priority signal (flag/dot), title, metadata. Priority via flag/dot, never card-edge stripe.",
+      "html": "<div class=\"ds-task-row\">…</div>",
+      "css": ".ds-task-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 14px; background: #171a21; border: 1px solid #262b36; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Day",
+    "overview": "PulseTick's design system is named for the day it serves. The owner of the deployment sits down with the product to capture a thought, place it on a day, keep a practice going, and read what the week actually looked like. The visual system exists to answer 'what now?' quietly and precisely, without narrating the process. Mood is calm plus precise: flat-tonal surfaces, restrained type, an accent that appears only when a decision is needed.",
+    "keyCharacteristics": [
+      "The module title is always display type (Instrument Serif, 26px) — one per screen, no exceptions.",
+      "Body text always routes through a named role (tt-body 13px → tt-heading 15px → tt-title 17px → tt-display 26px); ad-hoc sizes are banned.",
+      "Depth is tonal at rest, never shadow-based for in-app surfaces."
+    ],
+    "rules": [
+      {
+        "name": "The Flat-By-Default Rule",
+        "body": "Surfaces are flat at rest; elevation is expressed through tonal steps (Night → Raised → Lifted) rather than shadows. Shadows appear only for floating overlays, which use the shadcn card/popover tokens.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Single-Source Rule",
+        "body": "Every product typeface and size routes through the @utility role set (tt-display, tt-title, tt-heading, tt-body, tt-label, tt-meta, tt-overline, tt-figure) or the shadcn primitives mapped onto those roles. Ad-hoc font-size utilities (text-[Npx], text-xs, text-sm) are banned from product surfaces.",
+        "section": "typography"
+      }
+    ],
+    "dos": [
+      "Do use the tt-* role utilities (or mapped shadcn primitives) for all product typography.",
+      "Do keep the module title as display type and let smaller roles carry the rest of the hierarchy.",
+      "Do express priority and state through text/icon/dot signals before fill."
+    ],
+    "donts": [
+      "Don't use a side-tab (border-l-4 / stripe) on cards or task rows.",
+      "Don't mix type voices within one element.",
+      "Don't introduce ad-hoc font sizes into product surfaces.",
+      "Don't use shadow for in-app depth; stay tonal."
+    ]
+  }
+}

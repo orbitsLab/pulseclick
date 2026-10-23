@@ -1,0 +1,192 @@
+"use client";
+
+import React, { useState } from "react";
+import { Plus, Check, Calendar, CheckCircle2 } from "lucide-react";
+import { Task } from "@/hooks/use-ticktick";
+import { getTodayISO } from "@/lib/date-utils";
+
+interface EisenhowerMatrixViewProps {
+  tasks: Task[];
+  selectedTaskId: string | null;
+  onSelectTask: (taskId: string) => void;
+  onToggleComplete: (taskId: string, completed: boolean) => void;
+  onAddTask: (task: { title: string; priority: number; dueDate?: string | null }) => Promise<any>;
+}
+
+export function EisenhowerMatrixView({
+  tasks,
+  selectedTaskId,
+  onSelectTask,
+  onToggleComplete,
+  onAddTask,
+}: EisenhowerMatrixViewProps) {
+  const today = getTodayISO();
+  const [quickInput, setQuickInput] = useState<{ [quad: string]: string }>({});
+
+  // Classify incomplete tasks into the 4 quadrants based on Priority (Important) & Due Date (Urgent)
+  const incompleteTasks = tasks.filter((t) => !t.completed);
+
+  // Q1: Urgent & Important (High Priority + Due Today or Overdue)
+  const q1Tasks = incompleteTasks.filter(
+    (t) => t.priority === 3 || (t.priority === 2 && t.dueDate && t.dueDate <= today)
+  );
+
+  // Q2: Not Urgent & Important (Medium Priority or High Priority with future/no date)
+  const q2Tasks = incompleteTasks.filter(
+    (t) =>
+      !q1Tasks.includes(t) &&
+      (t.priority === 2 || (t.priority === 3 && (!t.dueDate || t.dueDate > today)))
+  );
+
+  // Q3: Urgent & Not Important (Low Priority + Due Today or soon)
+  const q3Tasks = incompleteTasks.filter(
+    (t) => !q1Tasks.includes(t) && !q2Tasks.includes(t) && (t.priority === 1 || (t.dueDate && t.dueDate <= today))
+  );
+
+  // Q4: Neither (None Priority / No urgent date)
+  const q4Tasks = incompleteTasks.filter(
+    (t) => !q1Tasks.includes(t) && !q2Tasks.includes(t) && !q3Tasks.includes(t)
+  );
+
+  const quadrants = [
+    {
+      id: "q1",
+      title: "Urgent & Important",
+      subtitle: "Do First • Crises & Deadlines",
+      color: "border-rose-500/60 bg-rose-500/5 text-rose-500",
+      accent: "#ef4444",
+      tasks: q1Tasks,
+      defaultPriority: 3,
+      defaultDueDate: today,
+    },
+    {
+      id: "q2",
+      title: "Not Urgent & Important",
+      subtitle: "Schedule • Strategic Planning & Growth",
+      color: "border-amber-500/60 bg-amber-500/5 text-amber-500",
+      accent: "#f59e0b",
+      tasks: q2Tasks,
+      defaultPriority: 2,
+      defaultDueDate: null,
+    },
+    {
+      id: "q3",
+      title: "Urgent & Not Important",
+      subtitle: "Delegate • Interruptions & Busywork",
+      color: "border-blue-500/60 bg-blue-500/5 text-blue-400",
+      accent: "#3b82f6",
+      tasks: q3Tasks,
+      defaultPriority: 1,
+      defaultDueDate: today,
+    },
+    {
+      id: "q4",
+      title: "Not Urgent & Not Important",
+      subtitle: "Eliminate • Distractions & Time Wasters",
+      color: "border-[var(--tt-border)]/60 bg-[var(--tt-panel-alt)]/5 text-[var(--tt-muted)]",
+      accent: "#94a3b8",
+      tasks: q4Tasks,
+      defaultPriority: 0,
+      defaultDueDate: null,
+    },
+  ];
+
+  async function handleQuickAdd(quadId: string, priority: number, dueDate?: string | null) {
+    const text = (quickInput[quadId] || "").trim();
+    if (!text) return;
+
+    await onAddTask({
+      title: text,
+      priority,
+      dueDate,
+    });
+
+    setQuickInput((prev) => ({ ...prev, [quadId]: "" }));
+  }
+
+  return (
+    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 pb-4">
+      {quadrants.map((quad) => (
+        <div
+          key={quad.id}
+          className={`flex flex-col rounded-2xl border-2 p-3.5 sm:p-4 transition-all ${quad.color} dark:bg-[var(--tt-rail)]/60 min-h-[300px]`}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between pb-2 mb-2 border-b border-current/20">
+            <div>
+              <h3 className="tt-overline font-semibold">{quad.title}</h3>
+              <p className="tt-meta opacity-80">{quad.subtitle}</p>
+            </div>
+            <span className="rounded-full px-2 py-0.5 tt-label font-semibold bg-current/10">
+              {quad.tasks.length}
+            </span>
+          </div>
+
+          {/* Quick Input Form */}
+          <div className="flex items-center gap-1.5 mb-3">
+            <input
+              type="text"
+              value={quickInput[quad.id] || ""}
+              onChange={(e) => setQuickInput({ ...quickInput, [quad.id]: e.target.value })}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleQuickAdd(quad.id, quad.defaultPriority, quad.defaultDueDate);
+                }
+              }}
+              placeholder="+ Add task to this quadrant..."
+              className="flex-1 rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel)] px-2.5 py-1.5 tt-label text-[var(--tt-text)] placeholder-[var(--tt-muted)] focus:outline-none focus:border-current"
+            />
+            <button
+              type="button"
+              onClick={() => handleQuickAdd(quad.id, quad.defaultPriority, quad.defaultDueDate)}
+              className="rounded-lg p-1.5 bg-current/15 hover:bg-current/25 transition-colors"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Tasks in Quadrant */}
+          <div className="flex-1 space-y-1.5 overflow-y-auto max-h-[340px]">
+            {quad.tasks.length === 0 ? (
+              <div className="py-8 text-center tt-label opacity-50">No tasks in this quadrant</div>
+            ) : (
+              quad.tasks.map((task) => {
+                const isSelected = selectedTaskId === task.id;
+                return (
+                  <div
+                    key={task.id}
+                    onClick={() => onSelectTask(task.id)}
+                    className={`flex items-center justify-between gap-2 rounded-xl border p-2.5 cursor-pointer transition-all ${ isSelected ? "border-[var(--tt-accent)] bg-[var(--tt-accent)]/10 ring-1 ring-[var(--tt-accent)]" : "border-[var(--tt-border)] bg-[var(--tt-panel)] dark:border-[var(--tt-border)] dark:bg-[var(--tt-bg)]/80 hover:border-[var(--tt-border)]" }`}
+                  >
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onToggleComplete(task.id, !task.completed);
+                        }}
+                        className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border border-[var(--tt-border)] hover:border-[var(--tt-accent)]"
+                      >
+                        {task.completed && <Check className="h-3 w-3 text-[var(--tt-accent-text)]" />}
+                      </button>
+                      <span className="tt-heading font-semibold text-[var(--tt-text)] truncate">
+                        {task.title}
+                      </span>
+                    </div>
+
+                    {task.dueDate && (
+                      <span className="tt-meta text-[var(--tt-muted)] flex items-center gap-1 flex-shrink-0">
+                        <Calendar className="h-2.5 w-2.5" />
+                        {task.dueDate}
+                      </span>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}

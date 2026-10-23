@@ -1,0 +1,296 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  themeId   String   @default("midnight")
+  timezone  String   @default("UTC")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // TickTick Task & Productivity models
+  taskLists         TaskList[]
+  tasks             Task[]
+  tags              Tag[]
+  pomodoroSessions  PomodoroSession[]
+  habits            Habit[]
+  filters           Filter[]
+  countdowns        Countdown[]
+  memberships       ListMember[]
+  calendarSubscriptions CalendarSubscription[]
+}
+
+model TaskList {
+  id         String   @id @default(cuid())
+  userId     String
+  name       String
+  color      String   @default("#4772fa")
+  icon       String?  @default("Folder")
+  background String?  @default("none") // list background preset id
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks   Task[]
+  members ListMember[]
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  userId    String
+  name      String
+  color     String    @default("#818cf8")
+  createdAt DateTime  @default(now())
+
+  user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks TaskTag[]
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model Task {
+  id             String    @id @default(cuid())
+  userId         String
+  listId         String?   // null represents Inbox
+  title          String
+  description    String?   @db.Text
+  completed      Boolean   @default(false)
+  completedAt    DateTime?
+  dueDate        String?   // ISO string YYYY-MM-DD
+  dueTime        String?   // HH:mm
+  priority       Int       @default(0) // 0: None, 1: Low (blue), 2: Medium (yellow), 3: High (red)
+  recurrence     String?   @default("NONE") // NONE, DAILY, WEEKLY, MONTHLY, YEARLY, CUSTOM
+  reminder       String?   @default("NONE") // NONE, AT_TIME, 5_MIN, 15_MIN, 30_MIN, 1_HOUR, 1_DAY
+  isPinned       Boolean   @default(false)
+  isTrash        Boolean   @default(false)
+  kanbanStatus   String    @default("TODO") // TODO, IN_PROGRESS, DONE
+  pomodoroCount  Int       @default(0)
+  order          Int       @default(0)
+
+  // Timeline / scheduling
+  startDate       String? // YYYY-MM-DD
+  startTime       String? // HH:mm
+  endDate         String? // YYYY-MM-DD
+  endTime         String? // HH:mm
+  durationMinutes Int     @default(0)
+  timeZone        String?
+
+  // Recurrence detail
+  recurrenceInterval Int     @default(1)
+  recurrenceEndDate  String?
+  recurrenceWeekdays String? // comma separated 0-6 (Sun-Sat)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  list             TaskList?         @relation(fields: [listId], references: [id], onDelete: SetNull)
+  subtasks         Subtask[]
+  tags             TaskTag[]
+  pomodoroSessions PomodoroSession[]
+  reminders        Reminder[]
+  assignees        TaskAssignee[]
+
+  @@index([userId, completed])
+  @@index([userId, dueDate])
+  @@index([userId, listId])
+  @@index([userId, isTrash])
+  @@index([userId, startDate])
+}
+
+model Subtask {
+  id        String   @id @default(cuid())
+  taskId    String
+  title     String
+  completed Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+}
+
+model TaskTag {
+  taskId String
+  tagId  String
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, tagId])
+}
+
+model PomodoroSession {
+  id              String   @id @default(cuid())
+  userId          String
+  taskId          String?
+  durationMinutes Int      @default(25)
+  completedAt     DateTime @default(now())
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task Task? @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@index([userId, completedAt])
+  @@index([taskId])
+}
+
+model Habit {
+  id         String     @id @default(cuid())
+  userId     String
+  title      String
+  icon       String     @default("Flame")
+  color      String     @default("#14b8a6")
+  frequency  String     @default("DAILY") // DAILY, WEEKLY
+  targetDays Int        @default(1)
+  order      Int        @default(0)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  user User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs HabitLog[]
+
+  @@index([userId])
+}
+
+model HabitLog {
+  id        String   @id @default(cuid())
+  habitId   String
+  date      String   // YYYY-MM-DD
+  completed Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@unique([habitId, date])
+  @@index([habitId])
+  @@index([date])
+}
+
+// ---------------------------------------------------------------------------
+// Smart filters (ticktick.com/features -> "Filter: Use smart filters")
+// ---------------------------------------------------------------------------
+model Filter {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  icon      String   @default("Filter")
+  color     String   @default("#4772fa")
+  query     String   @default("{}") // JSON encoded FilterQuery
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Multiple / constant reminders (ticktick.com/features -> "Notification",
+// "Constant Reminder", "Repeat Reminder")
+// ---------------------------------------------------------------------------
+model Reminder {
+  id            String   @id @default(cuid())
+  taskId        String
+  type          String   @default("AT_TIME") // AT_TIME, 5_MIN, 15_MIN, 30_MIN, 1_HOUR, 1_DAY, CONSTANT
+  remindAt      String?  // HH:mm for AT_TIME, otherwise null
+  minutesBefore Int?
+  enabled       Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+}
+
+// ---------------------------------------------------------------------------
+// Collaboration: shared lists and task assignment
+// (ticktick.com/features -> "Collaboration: Share lists ... assign tasks")
+// ---------------------------------------------------------------------------
+model ListMember {
+  id          String   @id @default(cuid())
+  listId      String
+  userId      String?
+  email       String
+  displayName String
+  role        String   @default("EDITOR") // OWNER, EDITOR, VIEWER
+  status      String   @default("INVITED") // INVITED, ACCEPTED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  list       TaskList       @relation(fields: [listId], references: [id], onDelete: Cascade)
+  member     User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  assignments TaskAssignee[]
+
+  @@index([listId])
+}
+
+model TaskAssignee {
+  taskId   String
+  memberId String
+
+  task   Task       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  member ListMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, memberId])
+  @@index([memberId])
+}
+
+// ---------------------------------------------------------------------------
+// Countdown events (ticktick.com/features -> "Countdown")
+// ---------------------------------------------------------------------------
+model Countdown {
+  id         String   @id @default(cuid())
+  userId     String
+  title      String
+  targetDate String // YYYY-MM-DD
+  color      String   @default("#4772fa")
+  emoji      String?
+  repeat     String   @default("NONE") // NONE, YEARLY
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Subscribed calendars (ticktick.com/features -> "Integration: Subscribe to
+// calendars")
+// ---------------------------------------------------------------------------
+model CalendarSubscription {
+  id           String    @id @default(cuid())
+  userId       String
+  name         String
+  url          String
+  color        String    @default("#4772fa")
+  listId       String?
+  lastSyncedAt DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
