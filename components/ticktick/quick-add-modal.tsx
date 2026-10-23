@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState, useEffect } from "react";
 import {
   X,
   Calendar,
@@ -16,8 +16,9 @@ import {
   Repeat,
 } from "lucide-react";
 import { TaskList, Tag } from "@/hooks/use-ticktick";
-import { getTodayISO, addDays } from "@/lib/date-utils";
+import { getTodayISO, addDays, formatShortDate, parseISODate } from "@/lib/date-utils";
 import { parseTaskInput } from "@/lib/nlp";
+import { TaskDatePickerPopover } from "./task-date-picker-popover";
 
 interface QuickAddModalProps {
   isOpen: boolean;
@@ -37,6 +38,9 @@ interface QuickAddModalProps {
     reminder?: string;
     tags?: string[];
     durationMinutes?: number;
+    startDate?: string | null;
+    endDate?: string | null;
+    endTime?: string | null;
   }) => Promise<any>;
 }
 
@@ -53,7 +57,22 @@ export function QuickAddModal({
   const [description, setDescription] = useState("");
   const [listId, setListId] = useState<string>("inbox");
   const [dueDate, setDueDate] = useState<string>(today);
+  const [endDate, setEndDate] = useState<string>("");
   const [dueTime, setDueTime] = useState<string>("");
+  const [endTime, setEndTime] = useState<string>("");
+  const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+  const datePickerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showDatePicker) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (datePickerRef.current && !datePickerRef.current.contains(e.target as Node)) {
+        setShowDatePicker(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showDatePicker]);
   const [priority, setPriority] = useState<number>(0);
   const [recurrence, setRecurrence] = useState<string>("NONE");
   const [reminder, setReminder] = useState<string>("NONE");
@@ -116,23 +135,40 @@ export function QuickAddModal({
 
     const result = parseTaskInput(title);
 
+    let durationMinutes = result.durationMinutes ?? undefined;
+    if (dueDate && endDate && endDate !== dueDate) {
+      const start = parseISODate(dueDate);
+      const end = parseISODate(endDate);
+      if (start && end) {
+        const diff = Math.round((end.getTime() - start.getTime()) / 86400000) + 1;
+        durationMinutes = diff * 24 * 60;
+      }
+    }
+
     await onAddTask({
       title: result.title || title.trim(),
       description: description.trim() || undefined,
       listId: listId === "inbox" ? null : listId,
-      dueDate: dueDate || null,
+      dueDate: endDate || dueDate || null,
+      startDate: dueDate || null,
+      endDate: endDate || null,
       dueTime: dueTime || null,
+      endTime: endTime || null,
       priority,
       recurrence,
       recurrenceInterval: result.recurrenceInterval ?? 1,
       recurrenceWeekdays: result.recurrenceWeekdays ?? null,
       reminder,
       tags: selectedTagIds,
-      durationMinutes: result.durationMinutes ?? undefined,
+      durationMinutes,
     });
 
     setTitle("");
     setDescription("");
+    setDueDate(today);
+    setEndDate("");
+    setDueTime("");
+    setEndTime("");
     manual.current.clear();
     onClose();
   }
@@ -282,28 +318,67 @@ export function QuickAddModal({
           {/* Attributes Grid */}
           <div className="grid grid-cols-2 gap-3 tt-label pt-1">
             {/* Due Date & Time */}
-            <div>
+            <div className="col-span-2 relative" ref={datePickerRef}>
               <label className="block tt-overline font-semibold text-[var(--tt-muted)] mb-1">
-                Due Date
+                Due Date &amp; Time
               </label>
-              <input
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className="w-full rounded-xl border border-[var(--tt-border)] bg-[var(--tt-bg)] px-2.5 py-1.5 tt-label text-white focus:outline-none focus:border-[var(--tt-accent)]"
-              />
-            </div>
+              <button
+                type="button"
+                onClick={() => setShowDatePicker(!showDatePicker)}
+                className="flex w-full items-center justify-between rounded-xl border border-[var(--tt-border)] bg-[var(--tt-bg)] px-3 py-2 tt-label text-white hover:bg-[var(--tt-panel-alt)] transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-[var(--tt-muted)]" />
+                  <span>
+                    {dueDate && endDate && endDate !== dueDate ? (
+                      <span className="font-semibold text-primary">
+                        {formatShortDate(dueDate)} – {formatShortDate(endDate)}
+                        <span className="ml-1.5 text-xs px-1.5 py-0.5 rounded bg-primary/20 text-primary font-mono font-medium">
+                          {Math.round((parseISODate(endDate).getTime() - parseISODate(dueDate).getTime()) / 86400000) + 1}d
+                        </span>
+                      </span>
+                    ) : dueDate ? (
+                      <>
+                        <span className="font-medium">{dueDate === today ? "Today" : formatShortDate(dueDate)}</span>
+                        {dueTime && <span className="opacity-75 font-mono ml-1.5">@{dueTime}</span>}
+                      </>
+                    ) : (
+                      <span className="text-[var(--tt-muted)]">No date set</span>
+                    )}
+                  </span>
+                </div>
+                {dueDate && (
+                  <X
+                    className="h-3.5 w-3.5 text-[var(--tt-muted)] hover:text-rose-400"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDueDate("");
+                      setEndDate("");
+                      setDueTime("");
+                      setEndTime("");
+                    }}
+                  />
+                )}
+              </button>
 
-            <div>
-              <label className="block tt-overline font-semibold text-[var(--tt-muted)] mb-1">
-                Due Time
-              </label>
-              <input
-                type="time"
-                value={dueTime}
-                onChange={(e) => setDueTime(e.target.value)}
-                className="w-full rounded-xl border border-[var(--tt-border)] bg-[var(--tt-bg)] px-2.5 py-1.5 tt-label text-white focus:outline-none focus:border-[var(--tt-accent)]"
-              />
+              {showDatePicker && (
+                <div className="absolute left-0 top-16 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <TaskDatePickerPopover
+                    dueDate={dueDate || null}
+                    endDate={endDate || null}
+                    dueTime={dueTime || null}
+                    endTime={endTime || null}
+                    defaultMode={endDate && endDate !== dueDate ? "range" : "single"}
+                    onSelect={(d, t, endD, endT) => {
+                      setDueDate(d || "");
+                      setDueTime(t || "");
+                      setEndDate(endD || "");
+                      setEndTime(endT || "");
+                    }}
+                    onClose={() => setShowDatePicker(false)}
+                  />
+                </div>
+              )}
             </div>
 
             {/* List & Priority */}

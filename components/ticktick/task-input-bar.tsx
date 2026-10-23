@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useRef, useState, useContext } from "react";
+import React, { useMemo, useRef, useState, useEffect, useContext } from "react";
 import {
   Plus,
   Calendar,
@@ -8,17 +8,16 @@ import {
   Folder,
   Tag as TagIcon,
   X,
-  Clock,
-  Sparkles,
   Mic,
   MicOff,
   Repeat,
   Wand2,
 } from "lucide-react";
 import { TaskList, Tag } from "@/hooks/use-ticktick";
-import { getTodayISO, addDays } from "@/lib/date-utils";
+import { getTodayISO, addDays, formatShortDate, parseISODate } from "@/lib/date-utils";
 import { parseTaskInput } from "@/lib/nlp";
 import { TickTickContext } from "@/context/ticktick-context";
+import { TaskDatePickerPopover } from "./task-date-picker-popover";
 
 interface TaskInputBarProps {
   currentListName?: string;
@@ -38,6 +37,8 @@ interface TaskInputBarProps {
     durationMinutes?: number;
     startDate?: string | null;
     endDate?: string | null;
+    startTime?: string | null;
+    endTime?: string | null;
   }) => Promise<any>;
 }
 
@@ -51,7 +52,9 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
 
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null);
   const [dueTime, setDueTime] = useState<string | null>(null);
+  const [endTime, setEndTime] = useState<string | null>(null);
   const [priority, setPriority] = useState<number>(0);
   const [listId, setListId] = useState<string | null>(currentListId);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
@@ -68,10 +71,24 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
   const [showListPicker, setShowListPicker] = useState(false);
   const [showTagPicker, setShowTagPicker] = useState(false);
+  const datePickerContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showDatePicker) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        datePickerContainerRef.current &&
+        !datePickerContainerRef.current.contains(e.target as Node)
+      ) {
+        setShowDatePicker(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showDatePicker]);
 
   const today = getTodayISO();
   const tomorrow = addDays(today, 1);
-  const nextWeek = addDays(today, 7);
 
   // Natural language parse of the current input.
   const parsed = useMemo(() => parseTaskInput(title), [title]);
@@ -138,22 +155,37 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
 
     setIsSubmitting(true);
     try {
+      let durationMinutes = result.durationMinutes ?? undefined;
+      if (dueDate && endDate && endDate !== dueDate) {
+        const start = parseISODate(dueDate);
+        const end = parseISODate(endDate);
+        if (start && end) {
+          const diff = Math.round((end.getTime() - start.getTime()) / 86400000) + 1;
+          durationMinutes = diff * 24 * 60;
+        }
+      }
+
       await onAddTask({
         title: cleanTitle,
         listId: listId || currentListId,
-        dueDate,
+        dueDate: endDate || dueDate,
+        startDate: dueDate,
+        endDate: endDate || null,
         dueTime,
+        endTime: endTime || null,
         priority,
         tags: selectedTagIds,
         recurrence: recurrence !== "NONE" ? recurrence : undefined,
         recurrenceInterval: result.recurrenceInterval ?? 1,
         recurrenceWeekdays: result.recurrenceWeekdays ?? null,
-        durationMinutes: result.durationMinutes ?? undefined,
+        durationMinutes,
       });
 
       setTitle("");
       setDueDate(null);
+      setEndDate(null);
       setDueTime(null);
+      setEndTime(null);
       setPriority(0);
       setSelectedTagIds([]);
       setRecurrence("NONE");
@@ -258,94 +290,64 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--tt-border)] pt-2.5">
           <div className="flex flex-wrap items-center gap-1.5">
             {/* Due Date Trigger */}
-            <div className="relative">
+            <div className="relative" ref={datePickerContainerRef}>
               <button
                 type="button"
                 onClick={() => setShowDatePicker(!showDatePicker)}
-                className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 tt-label font-medium transition-colors ${ dueDate ? "bg-[var(--tt-accent)]/15 text-[var(--tt-accent-text)] dark:text-[var(--tt-accent-text)]" : "text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)] dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]" }`}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 tt-label font-medium transition-colors ${ dueDate ? "bg-[var(--tt-accent)]/15 text-[var(--tt-accent-text)] dark:text-[var(--tt-accent-text)] font-semibold" : "text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)] dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]" }`}
               >
                 <Calendar className="h-3.5 w-3.5" />
                 <span>
-                  {dueDate === today
-                    ? "Today"
-                    : dueDate === tomorrow
-                    ? "Tomorrow"
-                    : dueDate || "Date"}
+                  {dueDate && endDate && endDate !== dueDate ? (
+                    `${formatShortDate(dueDate)} – ${formatShortDate(endDate)}`
+                  ) : dueDate === today ? (
+                    "Today"
+                  ) : dueDate === tomorrow ? (
+                    "Tomorrow"
+                  ) : dueDate ? (
+                    formatShortDate(dueDate)
+                  ) : (
+                    "Date"
+                  )}
                 </span>
-                {dueTime && <span className="opacity-75">@{dueTime}</span>}
+                {dueDate && endDate && endDate !== dueDate && (
+                  <span className="text-xs px-1.5 py-0.5 rounded bg-[var(--tt-accent)]/20 text-[var(--tt-accent-text)] font-mono font-medium">
+                    {Math.round((parseISODate(endDate).getTime() - parseISODate(dueDate).getTime()) / 86400000) + 1}d
+                  </span>
+                )}
+                {dueTime && <span className="opacity-75 font-mono text-xs">@{dueTime}</span>}
                 {dueDate && (
                   <X
                     className="h-3 w-3 hover:text-rose-400 ml-0.5"
                     onClick={(e) => {
                       e.stopPropagation();
                       setDueDate(null);
+                      setEndDate(null);
                       setDueTime(null);
+                      setEndTime(null);
                     }}
                   />
                 )}
               </button>
 
               {showDatePicker && (
-                <div className="absolute left-0 top-8 z-30 w-52 rounded-xl border border-[var(--tt-border)] bg-[var(--tt-rail)] p-2.5 shadow-xl tt-label space-y-1.5 animate-in fade-in zoom-in-95 duration-150">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDueDate(today);
-                      setShowDatePicker(false);
+                <div className="absolute left-0 top-9 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <TaskDatePickerPopover
+                    dueDate={dueDate}
+                    endDate={endDate}
+                    dueTime={dueTime}
+                    endTime={endTime}
+                    defaultMode={endDate && endDate !== dueDate ? "range" : "single"}
+                    onSelect={(d, t, endD, endT) => {
+                      manual.current.add("dueDate");
+                      if (t) manual.current.add("dueTime");
+                      setDueDate(d);
+                      setDueTime(t);
+                      setEndDate(endD ?? null);
+                      setEndTime(endT ?? null);
                     }}
-                    className="flex w-full items-center justify-between rounded-lg p-1.5 hover:bg-[var(--tt-panel-alt)] text-[var(--tt-text)]"
-                  >
-                    <span>Today</span>
-                    <span className="tt-meta text-[var(--tt-muted)]">{today.slice(5)}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDueDate(tomorrow);
-                      setShowDatePicker(false);
-                    }}
-                    className="flex w-full items-center justify-between rounded-lg p-1.5 hover:bg-[var(--tt-panel-alt)] text-[var(--tt-text)]"
-                  >
-                    <span>Tomorrow</span>
-                    <span className="tt-meta text-[var(--tt-muted)]">{tomorrow.slice(5)}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDueDate(nextWeek);
-                      setShowDatePicker(false);
-                    }}
-                    className="flex w-full items-center justify-between rounded-lg p-1.5 hover:bg-[var(--tt-panel-alt)] text-[var(--tt-text)]"
-                  >
-                    <span>Next Week</span>
-                    <span className="tt-meta text-[var(--tt-muted)]">{nextWeek.slice(5)}</span>
-                  </button>
-
-                  <div className="border-t border-[var(--tt-border)] pt-1.5">
-                    <label className="block tt-meta uppercase font-bold text-[var(--tt-muted)] mb-1">
-                      Pick Custom Date &amp; Time
-                    </label>
-                    <div className="flex gap-1.5">
-                      <input
-                        type="date"
-                        value={dueDate || ""}
-                        onChange={(e) => {
-                          manual.current.add("dueDate");
-                          setDueDate(e.target.value || null);
-                        }}
-                        className="flex-1 rounded border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-1.5 py-1 tt-meta text-white"
-                      />
-                      <input
-                        type="time"
-                        value={dueTime || ""}
-                        onChange={(e) => {
-                          manual.current.add("dueTime");
-                          setDueTime(e.target.value || null);
-                        }}
-                        className="w-20 rounded border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-1 py-1 tt-meta text-white"
-                      />
-                    </div>
-                  </div>
+                    onClose={() => setShowDatePicker(false)}
+                  />
                 </div>
               )}
             </div>

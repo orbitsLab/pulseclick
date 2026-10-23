@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   X,
   Check,
@@ -16,9 +16,10 @@ import {
   Bell,
 } from "lucide-react";
 import { Task, TaskList, Tag, TaskReminder, ListMember } from "@/hooks/use-ticktick";
-import { getTodayISO, addDays, formatFullDate } from "@/lib/date-utils";
+import { getTodayISO, addDays, formatFullDate, formatShortDate, parseISODate } from "@/lib/date-utils";
 import { TaskReminders } from "./task-reminders";
 import { CollaboratorsPanel } from "./collaborators-panel";
+import { TaskDatePickerPopover } from "./task-date-picker-popover";
 
 interface TaskInspectorProps {
   task: Task | null;
@@ -73,16 +74,31 @@ export function TaskInspector({
   onRemoveMember,
   onAssign,
 }: TaskInspectorProps) {
-  if (!task) return null;
-
-  const [title, setTitle] = useState(task.title);
-  const [description, setDescription] = useState(task.description || "");
+  const [title, setTitle] = useState(task?.title || "");
+  const [description, setDescription] = useState(task?.description || "");
   const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const datePickerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setTitle(task.title);
-    setDescription(task.description || "");
-  }, [task.id, task.title, task.description]);
+    if (!showDatePicker) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (datePickerRef.current && !datePickerRef.current.contains(e.target as Node)) {
+        setShowDatePicker(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showDatePicker]);
+
+  useEffect(() => {
+    if (task) {
+      setTitle(task.title);
+      setDescription(task.description || "");
+    }
+  }, [task?.id, task?.title, task?.description]);
+
+  if (!task) return null;
 
   const today = getTodayISO();
 
@@ -241,16 +257,68 @@ export function TaskInspector({
 
         {/* Due Date & Recurrence Row */}
         <div className="grid grid-cols-2 gap-2 tt-label">
-          <div>
+          {/* Due Date & Duration */}
+          <div className="relative" ref={datePickerRef}>
             <label className="block tt-overline font-semibold text-[var(--tt-muted)] mb-1">
-              Due Date
+              Date & Duration
             </label>
-            <input
-              type="date"
-              value={task.dueDate || ""}
-              onChange={(e) => onUpdateTask({ taskId: task.id, dueDate: e.target.value || null })}
-              className="w-full rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-2 py-1.5 tt-label text-[var(--tt-text)] focus:outline-none"
-            />
+            <button
+              type="button"
+              onClick={() => setShowDatePicker(!showDatePicker)}
+              className="flex w-full items-center justify-between rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-2.5 py-1.5 tt-label text-[var(--tt-text)] hover:bg-[var(--tt-panel)] transition-colors"
+            >
+              <span className="truncate">
+                {task.startDate && task.endDate && task.startDate !== task.endDate ? (
+                  <span className="font-semibold text-primary">
+                    {formatShortDate(task.startDate)} – {formatShortDate(task.endDate)}
+                    <span className="ml-1.5 text-xs px-1.5 py-0.5 rounded bg-primary/20 text-primary font-mono font-medium">
+                      {Math.round((parseISODate(task.endDate).getTime() - parseISODate(task.startDate).getTime()) / 86400000) + 1}d
+                    </span>
+                  </span>
+                ) : task.dueDate ? (
+                  formatShortDate(task.dueDate)
+                ) : (
+                  "No date"
+                )}
+                {task.dueTime && <span className="opacity-75 font-mono ml-1.5">@{task.dueTime}</span>}
+              </span>
+              <Calendar className="h-3.5 w-3.5 text-[var(--tt-muted)] shrink-0 ml-1.5" />
+            </button>
+            {showDatePicker && (
+              <div className="absolute right-0 top-14 z-50 animate-in fade-in zoom-in-95 duration-150">
+                <TaskDatePickerPopover
+                  dueDate={task.startDate || task.dueDate || null}
+                  endDate={task.endDate || null}
+                  dueTime={task.startTime || task.dueTime || null}
+                  endTime={task.endTime || null}
+                  defaultMode={task.endDate && task.endDate !== task.startDate ? "range" : "single"}
+                  allowPastDates={true}
+                  onSelect={(d, t, endD, endT) => {
+                    let durationMinutes = task.durationMinutes;
+                    if (d && endD && endD !== d) {
+                      const start = parseISODate(d);
+                      const end = parseISODate(endD);
+                      if (start && end) {
+                        durationMinutes = (Math.round((end.getTime() - start.getTime()) / 86400000) + 1) * 24 * 60;
+                      }
+                    } else if (!endD) {
+                      durationMinutes = 0;
+                    }
+
+                    onUpdateTask({
+                      taskId: task.id,
+                      dueDate: endD || d,
+                      startDate: d,
+                      endDate: endD || null,
+                      dueTime: t,
+                      endTime: endT || null,
+                      durationMinutes,
+                    });
+                  }}
+                  onClose={() => setShowDatePicker(false)}
+                />
+              </div>
+            )}
           </div>
 
           <div>
@@ -417,12 +485,14 @@ export function TaskInspector({
             <label className="block tt-overline font-semibold text-[var(--tt-muted)] mb-1 flex items-center gap-1">
               <Clock className="h-3 w-3" /> Time
             </label>
-            <input
-              type="time"
-              value={task.dueTime || ""}
-              onChange={(e) => onUpdateTask({ taskId: task.id, dueTime: e.target.value || null })}
-              className="w-full rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-2 py-1.5 tt-label text-[var(--tt-text)] focus:outline-none"
-            />
+            <button
+              type="button"
+              onClick={() => setShowDatePicker(!showDatePicker)}
+              className="flex w-full items-center justify-between rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-2.5 py-1.5 tt-label text-[var(--tt-text)] hover:bg-[var(--tt-panel)] transition-colors"
+            >
+              <span>{task.dueTime || "No time"}</span>
+              <Clock className="h-3.5 w-3.5 text-[var(--tt-muted)]" />
+            </button>
           </div>
 
           <div>

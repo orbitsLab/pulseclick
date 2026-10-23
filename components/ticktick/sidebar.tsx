@@ -45,7 +45,7 @@ interface SidebarProps {
   allCount?: number;
   filters?: { id: string; name: string; icon: string; color: string }[];
   activeFilterId?: string | null;
-  onSelectFilter?: (filterId: string | null) => void;
+  onSelectFilter?: (filterId: string) => void;
   onOpenFilterPanel?: () => void;
 }
 
@@ -211,7 +211,7 @@ export function TickTickSidebar(props: SidebarProps = {}) {
         </div>
 
         {/* Smart Filters */}
-        {(filters.length > 0 || onOpenFilterPanel) && (
+        {(filters.length > 0 || Boolean(props.onOpenFilterPanel || context?.setIsFilterPanelOpen)) && (
           <div className="space-y-0.5">
             <div className="flex items-center justify-between px-2.5 pb-1">
               <span className="tt-overline font-semibold text-[var(--tt-muted)]">
