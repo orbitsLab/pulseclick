@@ -246,8 +246,9 @@ export function MotionDateRangeTimePicker({
     setViewDate((prev) => addMonths(prev, 1))
   }
 
-  // 8 Presets matching the reference image exactly
+  // Presets matching the reference image plus Tomorrow
   const presets = React.useMemo(() => {
+    const tomorrow = addDays(today, 1)
     const yesterday = subDays(today, 1)
     const last7 = subDays(today, 6)
     const last30 = subDays(today, 29)
@@ -266,6 +267,13 @@ export function MotionDateRangeTimePicker({
         label: "Today",
         from: todayISO,
         to: todayISO,
+        isSingle: true,
+      },
+      {
+        id: "tomorrow",
+        label: "Tomorrow",
+        from: toISODate(tomorrow),
+        to: toISODate(tomorrow),
         isSingle: true,
       },
       {
@@ -486,7 +494,7 @@ export function MotionDateRangeTimePicker({
         {/* ---------------------------------------------------------------- */}
         {/* Panel 1 (Left): Presets List matching screenshot                 */}
         {/* ---------------------------------------------------------------- */}
-        <div className="w-[136px] min-w-[136px] shrink-0 py-3 px-2.5 border-r border-zinc-800 flex flex-col gap-0.5 bg-[#121214]">
+        <div className="w-[136px] min-w-[136px] shrink-0 py-2.5 px-2 border-r border-zinc-800 flex flex-col gap-0.5 bg-[#121214] overflow-y-auto">
           {presets.map((preset) => {
             const isActive = activePresetId === preset.id
 

@@ -102,20 +102,38 @@ function TaskCard({
     return task.dueDate < today;
   }, [task.dueDate, task.completed, today]);
 
+  // Priority and completion card styling
+  const priorityCardStyles = useMemo(() => {
+    if (task.completed) {
+      return "bg-[var(--tt-panel-alt)]/50 border-[var(--tt-border)]/60 text-[var(--tt-muted)]";
+    }
+    if (task.priority === 3) {
+      return "border-rose-500/35 bg-rose-500/10 hover:bg-rose-500/15";
+    }
+    if (task.priority === 2) {
+      return "border-amber-500/35 bg-amber-500/10 hover:bg-amber-500/15";
+    }
+    if (task.priority === 1) {
+      return "border-sky-500/35 bg-sky-500/10 hover:bg-sky-500/15";
+    }
+    return "border-[var(--tt-border)] bg-[var(--tt-panel)] hover:border-[var(--tt-border)]/80";
+  }, [task.completed, task.priority]);
+
   const cardContent = (
     <Card
       size="sm"
       onClick={onSelect}
       className={cn(
-        "group/card flex flex-col gap-2.5 rounded-xl border border-[var(--tt-border)] bg-[var(--tt-panel)] p-3 text-left transition-all",
+        "group/card flex flex-col gap-2.5 rounded-xl border p-3 text-left transition-all",
+        priorityCardStyles,
         asHandle && !isOverlay && "cursor-grab active:cursor-grabbing",
         isSelected &&
-          "ring-2 ring-[var(--tt-accent)] border-[var(--tt-accent)] bg-[var(--tt-panel)] shadow-sm",
+          "ring-2 ring-[var(--tt-accent)] border-[var(--tt-accent)] shadow-sm",
         isOverlay &&
-          "rotate-1 shadow-2xl border-[var(--tt-accent)] ring-2 ring-[var(--tt-accent)]/30 cursor-grabbing bg-[var(--tt-panel)]",
+          "rotate-1 shadow-2xl border-[var(--tt-accent)] ring-2 ring-[var(--tt-accent)]/30 cursor-grabbing",
         !isSelected &&
           !isOverlay &&
-          "hover:border-[var(--tt-border)]/80 hover:shadow-xs"
+          "hover:shadow-xs"
       )}
     >
       <CardContent className="flex flex-col gap-2.5 p-0">
@@ -225,7 +243,7 @@ function TaskCard({
                         key={i}
                         className="size-4.5 border border-[var(--tt-panel)]"
                       >
-                        <AvatarFallback className="text-[9px] bg-[var(--tt-panel-alt)] text-[var(--tt-text)] font-semibold">
+                        <AvatarFallback className="tt-meta bg-[var(--tt-panel-alt)] text-[var(--tt-text)] font-semibold">
                           {name.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
@@ -258,7 +276,7 @@ function TaskCard({
           {task.dueDate && (
             <div
               className={cn(
-                "flex items-center gap-1 rounded px-1.5 py-0.5 font-medium tabular-nums text-[10px]",
+                "flex items-center gap-1 rounded px-1.5 py-0.5 font-medium tabular-nums tt-meta",
                 isOverdue
                   ? "bg-rose-500/15 text-rose-400 border border-rose-500/30 font-bold"
                   : task.dueDate === today
@@ -285,7 +303,7 @@ function TaskCard({
                   e.stopPropagation();
                   onMoveStatus("TODO");
                 }}
-                className="rounded px-1.5 py-0.5 text-[10px] font-medium text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)] hover:text-[var(--tt-text)] transition-colors flex items-center gap-0.5 cursor-pointer"
+                className="rounded px-1.5 py-0.5 tt-meta font-medium text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)] hover:text-[var(--tt-text)] transition-colors flex items-center gap-0.5 cursor-pointer"
               >
                 <ArrowLeft className="h-2.5 w-2.5" /> To Do
               </button>
@@ -297,7 +315,7 @@ function TaskCard({
                   e.stopPropagation();
                   onMoveStatus("IN_PROGRESS");
                 }}
-                className="rounded px-1.5 py-0.5 text-[10px] font-medium text-amber-500 hover:bg-amber-500/10 transition-colors cursor-pointer"
+                className="rounded px-1.5 py-0.5 tt-meta font-medium text-amber-500 hover:bg-amber-500/10 transition-colors cursor-pointer"
               >
                 In Progress
               </button>
@@ -309,7 +327,7 @@ function TaskCard({
                   e.stopPropagation();
                   onMoveStatus("DONE");
                 }}
-                className="rounded px-1.5 py-0.5 text-[10px] font-medium text-emerald-500 hover:bg-emerald-500/10 transition-colors flex items-center gap-0.5 cursor-pointer"
+                className="rounded px-1.5 py-0.5 tt-meta font-medium text-emerald-500 hover:bg-emerald-500/10 transition-colors flex items-center gap-0.5 cursor-pointer"
               >
                 Done <ArrowRight className="h-2.5 w-2.5" />
               </button>

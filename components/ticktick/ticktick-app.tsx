@@ -399,16 +399,6 @@ function TickTickWorkspace({
         )}
       </div>
 
-      {/* Floating Global Quick Add Button (TickTick Signature) */}
-      <button
-        type="button"
-        onClick={() => setIsQuickAddOpen(true)}
-        title="Quick Add Task (+)"
-        className="fixed bottom-6 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--tt-accent-strong)] text-white shadow-xl shadow-[var(--tt-accent)]/35 hover:bg-[var(--tt-accent-strong)] active:scale-90 transition-all hover:rotate-90 duration-200 cursor-pointer"
-      >
-        <Plus className="h-6 w-6 stroke-[2.5]" />
-      </button>
-
       {/* Quick Add Modal */}
       <QuickAddModal
         isOpen={isQuickAddOpen}

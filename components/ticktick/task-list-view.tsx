@@ -22,6 +22,7 @@ import {
 import { Task } from "@/hooks/use-ticktick";
 import { getTodayISO, addDays, formatShortDate } from "@/lib/date-utils";
 import { TickTickContext } from "@/context/ticktick-context";
+import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 
 interface TaskListViewProps {
   tasks?: Task[];
@@ -59,7 +60,8 @@ export function TaskListView(props: TaskListViewProps = {}) {
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<"default" | "date" | "priority" | "title">("default");
   const [groupBy, setGroupBy] = useState<"date" | "priority" | "list" | "none">("date");
-  const [showCompleted, setShowCompleted] = useState<boolean>(true);
+  const [showCompleted, setShowCompleted] = useState<boolean>(false);
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
   // Sorting
   const sortedTasks = [...tasks].sort((a, b) => {
@@ -272,10 +274,10 @@ export function TaskListView(props: TaskListViewProps = {}) {
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              onDeleteTask(task.id);
+              setTaskToDelete(task);
             }}
             title="Move to trash"
-            className="rounded p-1 text-[var(--tt-muted)] hover:text-rose-500 transition-colors"
+            className="rounded p-1 text-[var(--tt-muted)] hover:text-rose-500 transition-colors cursor-pointer"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
@@ -425,21 +427,24 @@ export function TaskListView(props: TaskListViewProps = {}) {
 
             {/* Completed Tasks section with toggle */}
             {completedTasks.length > 0 && (
-              <div className="space-y-1.5 pt-2">
+              <div className="space-y-1.5 pt-4 border-t border-[var(--tt-border)]/60">
                 <button
                   type="button"
                   onClick={() => setShowCompleted(!showCompleted)}
-                  className="flex items-center gap-1.5 tt-overline font-semibold text-[var(--tt-muted)] hover:text-[var(--tt-muted)]"
+                  className="flex items-center gap-1.5 tt-overline font-semibold text-[var(--tt-muted)] hover:text-[var(--tt-text)] transition-colors cursor-pointer"
                 >
                   {showCompleted ? (
                     <ChevronDown className="h-3.5 w-3.5" />
                   ) : (
                     <ChevronRight className="h-3.5 w-3.5" />
                   )}
-                  <span>Completed ({completedTasks.length})</span>
+                  <span>Completed & Won&apos;t Do</span>
+                  <span className="rounded-full bg-[var(--tt-panel-alt)] px-1.5 py-0.2 tt-meta text-[var(--tt-muted)]">
+                    {completedTasks.length}
+                  </span>
                 </button>
                 {showCompleted && (
-                  <div className="space-y-1.5">{completedTasks.map(renderTaskItem)}</div>
+                  <div className="space-y-1.5 pt-1">{completedTasks.map(renderTaskItem)}</div>
                 )}
               </div>
             )}
@@ -514,6 +519,20 @@ export function TaskListView(props: TaskListViewProps = {}) {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmDialog
+        open={Boolean(taskToDelete)}
+        onOpenChange={(open) => !open && setTaskToDelete(null)}
+        title="Delete Task"
+        description={`Are you sure you want to delete "${taskToDelete?.title}"? This task will be moved to trash.`}
+        onConfirm={() => {
+          if (taskToDelete) {
+            onDeleteTask(taskToDelete.id);
+            setTaskToDelete(null);
+          }
+        }}
+      />
     </div>
   );
 }

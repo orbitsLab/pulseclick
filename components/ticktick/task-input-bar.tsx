@@ -12,12 +12,29 @@ import {
   MicOff,
   Repeat,
   Wand2,
+  ChevronDown,
+  Paperclip,
+  FileText,
+  Bookmark,
+  ChevronRight,
+  Check,
 } from "lucide-react";
 import { TaskList, Tag } from "@/hooks/use-ticktick";
 import { getTodayISO, addDays, formatShortDate, parseISODate } from "@/lib/date-utils";
 import { parseTaskInput } from "@/lib/nlp";
 import { TickTickContext } from "@/context/ticktick-context";
 import { TaskDatePickerPopover } from "./task-date-picker-popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 interface TaskInputBarProps {
   currentListName?: string;
@@ -50,8 +67,17 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
   const tags = props.tags ?? context?.tags ?? [];
   const onAddTask = props.onAddTask ?? context?.addTask ?? (async () => {});
 
+  const today = getTodayISO();
+  const tomorrow = addDays(today, 1);
+
+  function getDefaultDueDate(view?: string): string | null {
+    if (view === "today") return today;
+    if (view === "tomorrow") return tomorrow;
+    return null;
+  }
+
   const [title, setTitle] = useState("");
-  const [dueDate, setDueDate] = useState<string | null>(null);
+  const [dueDate, setDueDate] = useState<string | null>(() => getDefaultDueDate(context?.activeView));
   const [endDate, setEndDate] = useState<string | null>(null);
   const [dueTime, setDueTime] = useState<string | null>(null);
   const [endTime, setEndTime] = useState<string | null>(null);
@@ -68,9 +94,7 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
 
   // Popover toggles
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showPriorityPicker, setShowPriorityPicker] = useState(false);
-  const [showListPicker, setShowListPicker] = useState(false);
-  const [showTagPicker, setShowTagPicker] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const datePickerContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -87,8 +111,13 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showDatePicker]);
 
-  const today = getTodayISO();
-  const tomorrow = addDays(today, 1);
+  // Sync default date when active view changes (e.g. today -> tomorrow)
+  useEffect(() => {
+    if (!manual.current.has("dueDate") && !title.trim()) {
+      setDueDate(getDefaultDueDate(context?.activeView));
+      setEndDate(null);
+    }
+  }, [context?.activeView]);
 
   // Natural language parse of the current input.
   const parsed = useMemo(() => parseTaskInput(title), [title]);
@@ -182,7 +211,7 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
       });
 
       setTitle("");
-      setDueDate(null);
+      setDueDate(getDefaultDueDate(context?.activeView));
       setEndDate(null);
       setDueTime(null);
       setEndTime(null);
@@ -191,294 +220,309 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
       setRecurrence("NONE");
       manual.current.clear();
       setShowDatePicker(false);
-      setShowPriorityPicker(false);
-      setShowListPicker(false);
-      setShowTagPicker(false);
+      setIsDropdownOpen(false);
     } finally {
       setIsSubmitting(false);
     }
   }
 
-  // Priority color flags
-  const priorityColors = [
-    { level: 0, label: "No Priority", color: "text-[var(--tt-muted)]" },
-    { level: 1, label: "Low Priority", color: "text-blue-400" },
-    { level: 2, label: "Medium Priority", color: "text-amber-400" },
-    { level: 3, label: "High Priority", color: "text-rose-500" },
-  ];
-
   const targetList = lists.find((l) => l.id === (listId || currentListId));
 
   return (
-    <div className="relative rounded-2xl border border-[var(--tt-border)] bg-[var(--tt-panel)] p-3 shadow-sm transition-colors sm:p-4">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-2.5">
-        <div className="flex items-center gap-2.5">
-          <Plus className="h-4.5 w-4.5 text-[var(--tt-muted)] flex-shrink-0" />
+    <div className="flex flex-col gap-2">
+      {/* Main Single-line Input Bar (Image 4 & 5 Style) */}
+      <form
+        onSubmit={handleSubmit}
+        className="group relative flex items-center justify-between rounded-xl border border-[var(--tt-border)] bg-[var(--tt-panel-alt)]/60 px-3.5 py-2.5 shadow-xs transition-all focus-within:border-[var(--tt-accent)] focus-within:ring-1 focus-within:ring-[var(--tt-accent)]"
+      >
+        <div className="flex flex-1 items-center gap-2.5 min-w-0">
+          <Plus className="h-4 w-4 text-[var(--tt-muted)] shrink-0" />
           <input
             type="text"
             required
             value={title}
             onChange={(e) => handleTitleChange(e.target.value)}
             placeholder={`Add task to "${targetList?.name || currentListName}", press Enter to save`}
-            className="flex-1 bg-transparent tt-body text-[var(--tt-text)] placeholder-[var(--tt-muted)] focus:outline-none"
+            className="flex-1 bg-transparent tt-body text-sm text-[var(--tt-text)] placeholder-[var(--tt-muted)]/70 focus:outline-none"
           />
+        </div>
+
+        {/* Right-side Controls: Voice, Date, and Menu Dropdown */}
+        <div className="flex items-center gap-1.5 shrink-0 ml-2">
+          {/* Active Date Label Pill if set */}
+          {dueDate && (
+            <span className="flex items-center gap-1 rounded-md bg-[var(--tt-accent)]/15 px-2 py-0.5 tt-meta font-medium text-[var(--tt-accent-text)]">
+              <span>
+                {dueDate === today ? "Today" : dueDate === tomorrow ? "Tomorrow" : formatShortDate(dueDate)}
+              </span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDueDate(null);
+                  setEndDate(null);
+                  setDueTime(null);
+                  setEndTime(null);
+                  manual.current.add("dueDate");
+                }}
+                className="hover:text-rose-400"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+
+          {/* Voice Input */}
           <button
             type="button"
             onClick={toggleVoiceInput}
             title={isListening ? "Stop dictation" : "Dictate a task"}
             aria-label={isListening ? "Stop dictation" : "Dictate a task"}
-            className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg transition-colors ${ isListening ? "bg-rose-500/15 text-rose-500" : "text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)] hover:text-[var(--tt-text)] dark:hover:text-[var(--tt-text)]" }`}
+            className={cn(
+              "flex h-7 w-7 items-center justify-center rounded-lg transition-colors cursor-pointer",
+              isListening
+                ? "bg-rose-500/15 text-rose-500"
+                : "text-[var(--tt-muted)] hover:bg-[var(--tt-panel)] hover:text-[var(--tt-text)]"
+            )}
           >
-            {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            {isListening ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
           </button>
-        </div>
 
-        {/* Natural language preview */}
-        {(parsed.dueDate ||
-          parsed.dueTime ||
-          parsed.recurrence ||
-          parsed.priority !== null &&
-            parsed.priority !== undefined ||
-          parsed.tags?.length ||
-          parsed.durationMinutes) && (
-          <div className="flex flex-wrap items-center gap-1.5 tt-meta">
-            <span className="flex items-center gap-1 font-bold uppercase tracking-wider text-[var(--tt-muted)]">
-              <Wand2 className="h-3 w-3" />
-              Understood
-            </span>
-            {parsed.dueDate && (
-              <span className="rounded-md bg-[var(--tt-accent)]/10 px-1.5 py-0.5 font-semibold text-[var(--tt-accent-text)]">
-                {parsed.dueDate}
-              </span>
-            )}
-            {parsed.dueTime && (
-              <span className="rounded-md bg-[var(--tt-accent)]/10 px-1.5 py-0.5 font-semibold text-[var(--tt-accent-text)]">
-                {parsed.dueTime}
-              </span>
-            )}
-            {parsed.recurrence && parsed.recurrence !== "NONE" && (
-              <span className="flex items-center gap-1 rounded-md bg-violet-500/10 px-1.5 py-0.5 font-semibold text-violet-500">
-                <Repeat className="h-3 w-3" />
-                {parsed.recurrence.toLowerCase()}
-                {parsed.recurrenceInterval && parsed.recurrenceInterval > 1
-                  ? ` ×${parsed.recurrenceInterval}`
-                  : ""}
-              </span>
-            )}
-            {parsed.priority !== null && parsed.priority !== undefined && (
-              <span className="rounded-md bg-amber-500/10 px-1.5 py-0.5 font-semibold text-amber-500">
-                P{parsed.priority}
-              </span>
-            )}
-            {parsed.tags?.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-md bg-indigo-500/10 px-1.5 py-0.5 font-semibold text-indigo-500"
-              >
-                #{tag}
-              </span>
-            ))}
-            {parsed.durationMinutes ? (
-              <span className="rounded-md bg-emerald-500/10 px-1.5 py-0.5 font-semibold text-emerald-500">
-                {parsed.durationMinutes}m
-              </span>
-            ) : null}
-          </div>
-        )}
-
-        {/* Quick action pill buttons */}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--tt-border)] pt-2.5">
-          <div className="flex flex-wrap items-center gap-1.5">
-            {/* Due Date Trigger */}
-            <div className="relative" ref={datePickerContainerRef}>
-              <button
-                type="button"
-                onClick={() => setShowDatePicker(!showDatePicker)}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 tt-label font-medium transition-colors ${ dueDate ? "bg-[var(--tt-accent)]/15 text-[var(--tt-accent-text)] dark:text-[var(--tt-accent-text)] font-semibold" : "text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)] dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]" }`}
-              >
-                <Calendar className="h-3.5 w-3.5" />
-                <span>
-                  {dueDate && endDate && endDate !== dueDate ? (
-                    `${formatShortDate(dueDate)} – ${formatShortDate(endDate)}`
-                  ) : dueDate === today ? (
-                    "Today"
-                  ) : dueDate === tomorrow ? (
-                    "Tomorrow"
-                  ) : dueDate ? (
-                    formatShortDate(dueDate)
-                  ) : (
-                    "Date"
-                  )}
-                </span>
-                {dueDate && endDate && endDate !== dueDate && (
-                  <span className="text-xs px-1.5 py-0.5 rounded bg-[var(--tt-accent)]/20 text-[var(--tt-accent-text)] font-mono font-medium">
-                    {Math.round((parseISODate(endDate).getTime() - parseISODate(dueDate).getTime()) / 86400000) + 1}d
-                  </span>
-                )}
-                {dueTime && <span className="opacity-75 font-mono text-xs">@{dueTime}</span>}
-                {dueDate && (
-                  <X
-                    className="h-3 w-3 hover:text-rose-400 ml-0.5"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDueDate(null);
-                      setEndDate(null);
-                      setDueTime(null);
-                      setEndTime(null);
-                    }}
-                  />
-                )}
-              </button>
-
-              {showDatePicker && (
-                <div className="absolute left-0 top-9 z-50 animate-in fade-in zoom-in-95 duration-150">
-                  <TaskDatePickerPopover
-                    dueDate={dueDate}
-                    endDate={endDate}
-                    dueTime={dueTime}
-                    endTime={endTime}
-                    defaultMode={endDate && endDate !== dueDate ? "range" : "single"}
-                    onSelect={(d, t, endD, endT) => {
-                      manual.current.add("dueDate");
-                      if (t) manual.current.add("dueTime");
-                      setDueDate(d);
-                      setDueTime(t);
-                      setEndDate(endD ?? null);
-                      setEndTime(endT ?? null);
-                    }}
-                    onClose={() => setShowDatePicker(false)}
-                  />
-                </div>
+          {/* Calendar Trigger */}
+          <div className="relative" ref={datePickerContainerRef}>
+            <button
+              type="button"
+              onClick={() => setShowDatePicker(!showDatePicker)}
+              className={cn(
+                "flex h-7 w-7 items-center justify-center rounded-lg transition-colors cursor-pointer",
+                dueDate
+                  ? "text-[var(--tt-accent-text)] bg-[var(--tt-accent)]/15"
+                  : "text-[var(--tt-muted)] hover:bg-[var(--tt-panel)] hover:text-[var(--tt-text)]"
               )}
-            </div>
+              title="Set date"
+            >
+              <Calendar className="h-4 w-4" />
+            </button>
 
-            {/* Priority Trigger */}
-            <div className="relative">
+            {/* Date Picker Popover */}
+            {showDatePicker && (
+              <div className="absolute right-0 top-full mt-2 z-50">
+                <TaskDatePickerPopover
+                  dueDate={dueDate}
+                  endDate={endDate}
+                  dueTime={dueTime}
+                  endTime={endTime}
+                  onSelect={(d, dt, ed, et) => {
+                    manual.current.add("dueDate");
+                    setDueDate(d);
+                    setDueTime(dt);
+                    setEndDate(ed || null);
+                    setEndTime(et || null);
+                    setShowDatePicker(false);
+                  }}
+                  onClose={() => setShowDatePicker(false)}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Options Dropdown (Image 5 Pattern) */}
+          <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+            <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                onClick={() => setShowPriorityPicker(!showPriorityPicker)}
-                className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 tt-label font-medium transition-colors ${ priority > 0 ? priority === 3 ? "bg-rose-500/15 text-rose-500 font-bold" : priority === 2 ? "bg-amber-500/15 text-amber-500 font-bold" : "bg-blue-500/15 text-blue-400 font-bold" : "text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)] dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]" }`}
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--tt-muted)] hover:bg-[var(--tt-panel)] hover:text-[var(--tt-text)] transition-colors cursor-pointer"
+                title="Task options"
               >
-                <Flag className="h-3.5 w-3.5" />
-                <span>{priority === 0 ? "Priority" : `P${4 - priority}`}</span>
+                <ChevronDown className="h-4 w-4" />
               </button>
-
-              {showPriorityPicker && (
-                <div className="absolute left-0 top-8 z-30 w-36 rounded-xl border border-[var(--tt-border)] bg-[var(--tt-rail)] p-1.5 shadow-xl tt-label space-y-0.5 animate-in fade-in zoom-in-95 duration-150">
-                  {priorityColors.map((p) => (
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="w-56 bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)] p-2 shadow-xl"
+            >
+              {/* Priority Flags Header */}
+              <div className="px-2 py-1.5">
+                <span className="block tt-overline font-semibold text-[var(--tt-muted)] mb-1.5">
+                  Priority
+                </span>
+                <div className="flex items-center justify-between gap-1">
+                  {[
+                    { level: 3, label: "High", color: "text-rose-500", bg: "hover:bg-rose-500/15" },
+                    { level: 2, label: "Medium", color: "text-amber-500", bg: "hover:bg-amber-500/15" },
+                    { level: 1, label: "Low", color: "text-sky-500", bg: "hover:bg-sky-500/15" },
+                    { level: 0, label: "None", color: "text-[var(--tt-muted)]", bg: "hover:bg-[var(--tt-panel-alt)]" },
+                  ].map((p) => (
                     <button
                       key={p.level}
                       type="button"
                       onClick={() => {
                         manual.current.add("priority");
                         setPriority(p.level);
-                        setShowPriorityPicker(false);
                       }}
-                      className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-[var(--tt-panel-alt)] font-medium ${p.color}`}
+                      title={`${p.label} Priority`}
+                      className={cn(
+                        "flex h-8 w-11 items-center justify-center rounded-md border transition-all cursor-pointer",
+                        p.color,
+                        p.bg,
+                        priority === p.level
+                          ? "border-[var(--tt-accent)] bg-[var(--tt-accent)]/10 font-bold"
+                          : "border-transparent"
+                      )}
                     >
-                      <Flag className="h-3.5 w-3.5" />
-                      <span>{p.label}</span>
+                      <Flag className={cn("h-4 w-4", p.level > 0 && "fill-current")} />
                     </button>
                   ))}
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* List Selector Trigger */}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setShowListPicker(!showListPicker)}
-                className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 tt-label font-medium transition-colors ${ targetList ? "bg-[var(--tt-accent)]/15 text-[var(--tt-accent-text)]" : "text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)] dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]" }`}
-              >
-                <Folder className="h-3.5 w-3.5" />
-                <span>{targetList ? targetList.name : "Inbox"}</span>
-              </button>
+              <DropdownMenuSeparator className="bg-[var(--tt-border)] my-1" />
 
-              {showListPicker && (
-                <div className="absolute left-0 top-8 z-30 w-44 rounded-xl border border-[var(--tt-border)] bg-[var(--tt-rail)] p-1.5 shadow-xl tt-label space-y-0.5 animate-in fade-in zoom-in-95 duration-150">
-                  <button
-                    type="button"
+              {/* List Selector Submenu */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="cursor-pointer">
+                  <Folder className="h-4 w-4 mr-2" style={{ color: targetList?.color || undefined }} />
+                  <span className="truncate flex-1">{targetList?.name || "Inbox"}</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)] min-w-36">
+                  <DropdownMenuItem
                     onClick={() => {
                       setListId(null);
-                      setShowListPicker(false);
                     }}
-                    className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-[var(--tt-panel-alt)] text-[var(--tt-muted)]"
+                    className="cursor-pointer"
                   >
-                    <span>📥 Inbox</span>
-                  </button>
+                    <Folder className="h-3.5 w-3.5 mr-2 text-slate-400" />
+                    <span>Inbox</span>
+                  </DropdownMenuItem>
                   {lists.map((l) => (
-                    <button
+                    <DropdownMenuItem
                       key={l.id}
-                      type="button"
                       onClick={() => {
                         setListId(l.id);
-                        setShowListPicker(false);
                       }}
-                      className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-[var(--tt-panel-alt)] text-[var(--tt-muted)]"
+                      className="cursor-pointer flex items-center justify-between"
                     >
-                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: l.color }} />
-                      <span className="truncate">{l.name}</span>
-                    </button>
+                      <span className="flex items-center gap-2">
+                        <span
+                          className="h-2 w-2 rounded-full shrink-0"
+                          style={{ backgroundColor: l.color || "#4772fa" }}
+                        />
+                        <span>{l.name}</span>
+                      </span>
+                      {listId === l.id && <Check className="h-3.5 w-3.5 text-emerald-500" />}
+                    </DropdownMenuItem>
                   ))}
-                </div>
-              )}
-            </div>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
 
-            {/* Tag Trigger */}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setShowTagPicker(!showTagPicker)}
-                className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 tt-label font-medium transition-colors ${ selectedTagIds.length > 0 ? "bg-indigo-500/15 text-indigo-400 font-bold" : "text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)] dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]" }`}
-              >
-                <TagIcon className="h-3.5 w-3.5" />
-                <span>{selectedTagIds.length > 0 ? `${selectedTagIds.length} tags` : "Tag"}</span>
-              </button>
-
-              {showTagPicker && (
-                <div className="absolute left-0 top-8 z-30 w-44 rounded-xl border border-[var(--tt-border)] bg-[var(--tt-rail)] p-2 shadow-xl tt-label space-y-1 animate-in fade-in zoom-in-95 duration-150">
+              {/* Tags Submenu */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="cursor-pointer">
+                  <TagIcon className="h-4 w-4 mr-2" />
+                  <span>Tags</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)] min-w-36">
                   {tags.length === 0 ? (
-                    <div className="tt-meta text-[var(--tt-muted)] py-1">No tags created yet</div>
+                    <div className="p-2 tt-meta text-[var(--tt-muted)]">No tags yet</div>
                   ) : (
                     tags.map((t) => {
                       const isSelected = selectedTagIds.includes(t.id);
                       return (
-                        <button
+                        <DropdownMenuItem
                           key={t.id}
-                          type="button"
                           onClick={() => {
                             setSelectedTagIds((prev) =>
                               isSelected ? prev.filter((id) => id !== t.id) : [...prev, t.id]
                             );
                           }}
-                          className={`flex w-full items-center justify-between rounded-lg p-1.5 tt-label transition-colors ${ isSelected ? "bg-indigo-500/25 text-indigo-300 font-bold" : "text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)]" }`}
+                          className="cursor-pointer flex items-center justify-between"
                         >
-                          <span style={{ color: t.color }}>#{t.name}</span>
-                          {isSelected && <span>✓</span>}
-                        </button>
+                          <span className="flex items-center gap-1.5">
+                            <span
+                              className="h-2 w-2 rounded-full"
+                              style={{ backgroundColor: t.color || "#4772fa" }}
+                            />
+                            <span>{t.name}</span>
+                          </span>
+                          {isSelected && <Check className="h-3.5 w-3.5 text-emerald-500" />}
+                        </DropdownMenuItem>
                       );
                     })
                   )}
-                </div>
-              )}
-            </div>
-          </div>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
 
-          <div className="flex items-center gap-2">
-            <span className="hidden sm:inline tt-label text-[var(--tt-muted)] italic">
-              Tip: type "today", "!high", or "#tag"
-            </span>
-            <button
-              type="submit"
-              disabled={!title.trim() || isSubmitting}
-              className="rounded-xl bg-[var(--tt-accent-strong)] px-4 py-1.5 tt-label font-semibold text-white shadow-md shadow-[var(--tt-accent)]/20 hover:bg-[var(--tt-accent-strong)] active:scale-95 disabled:opacity-40 transition-all"
-            >
-              Add Task
-            </button>
-          </div>
+              {/* Action items matching Image 5 */}
+              <DropdownMenuItem className="cursor-pointer text-[var(--tt-muted)]">
+                <Paperclip className="h-4 w-4 mr-2" />
+                <span>Attachment</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem className="cursor-pointer text-[var(--tt-muted)]">
+                <Bookmark className="h-4 w-4 mr-2" />
+                <span>Add from Template</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem className="cursor-pointer text-[var(--tt-muted)]">
+                <FileText className="h-4 w-4 mr-2" />
+                <span>Convert to Note</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </form>
+
+      {/* Natural Language Understood Preview Bar */}
+      {(parsed.dueDate ||
+        parsed.dueTime ||
+        parsed.recurrence ||
+        (parsed.priority !== null && parsed.priority !== undefined) ||
+        parsed.tags?.length ||
+        parsed.durationMinutes) && (
+        <div className="flex flex-wrap items-center gap-1.5 px-1 tt-meta animate-in fade-in duration-150">
+          <span className="flex items-center gap-1 font-bold uppercase tracking-wider text-[var(--tt-muted)]">
+            <Wand2 className="h-3 w-3" />
+            Understood
+          </span>
+          {parsed.dueDate && (
+            <span className="rounded-md bg-[var(--tt-accent)]/10 px-1.5 py-0.5 font-semibold text-[var(--tt-accent-text)]">
+              {parsed.dueDate}
+            </span>
+          )}
+          {parsed.dueTime && (
+            <span className="rounded-md bg-[var(--tt-accent)]/10 px-1.5 py-0.5 font-semibold text-[var(--tt-accent-text)]">
+              {parsed.dueTime}
+            </span>
+          )}
+          {parsed.recurrence && parsed.recurrence !== "NONE" && (
+            <span className="flex items-center gap-1 rounded-md bg-violet-500/10 px-1.5 py-0.5 font-semibold text-violet-500">
+              <Repeat className="h-3 w-3" />
+              {parsed.recurrence.toLowerCase()}
+              {parsed.recurrenceInterval && parsed.recurrenceInterval > 1
+                ? ` ×${parsed.recurrenceInterval}`
+                : ""}
+            </span>
+          )}
+          {parsed.priority !== null && parsed.priority !== undefined && (
+            <span className="rounded-md bg-amber-500/10 px-1.5 py-0.5 font-semibold text-amber-500">
+              P{parsed.priority}
+            </span>
+          )}
+          {parsed.tags?.map((tag) => (
+            <span
+              key={tag}
+              className="rounded-md bg-indigo-500/10 px-1.5 py-0.5 font-semibold text-indigo-500"
+            >
+              #{tag}
+            </span>
+          ))}
+          {parsed.durationMinutes ? (
+            <span className="rounded-md bg-emerald-500/10 px-1.5 py-0.5 font-semibold text-emerald-500">
+              {parsed.durationMinutes}m
+            </span>
+          ) : null}
+        </div>
+      )}
     </div>
   );
 }

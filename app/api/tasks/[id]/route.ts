@@ -138,12 +138,18 @@ export async function PATCH(
     // Tags update
     if (body.tags && Array.isArray(body.tags)) {
       await prisma.taskTag.deleteMany({ where: { taskId: id } });
-      await prisma.taskTag.createMany({
-        data: body.tags.map((tId: string) => ({
-          taskId: id,
-          tagId: tId,
-        })),
-      });
+      const tagIds = body.tags
+        .map((t: any) => (typeof t === "string" ? t : t?.tagId || t?.id))
+        .filter(Boolean);
+
+      if (tagIds.length > 0) {
+        await prisma.taskTag.createMany({
+          data: tagIds.map((tId: string) => ({
+            taskId: id,
+            tagId: tId,
+          })),
+        });
+      }
     }
 
     // Assignees update

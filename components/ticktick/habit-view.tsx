@@ -20,6 +20,7 @@ import {
 import { Habit } from "@/hooks/use-ticktick";
 import { getTodayISO, getMondayOfWeek, getWeekDays } from "@/lib/date-utils";
 import { TickTickContext } from "@/context/ticktick-context";
+import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 
 interface HabitViewProps {
   habits?: Habit[];
@@ -70,6 +71,7 @@ export function HabitView(props: HabitViewProps = {}) {
 
   // New Habit Dialog State
   const [showAddModal, setShowAddModal] = useState(false);
+  const [habitToDelete, setHabitToDelete] = useState<{ id: string; title: string } | null>(null);
   const [title, setTitle] = useState("");
   const [selectedIcon, setSelectedIcon] = useState("Flame");
   const [selectedColor, setSelectedColor] = useState("#14b8a6");
@@ -227,13 +229,9 @@ export function HabitView(props: HabitViewProps = {}) {
                   {/* Delete Button on hover */}
                   <button
                     type="button"
-                    onClick={() => {
-                      if (confirm(`Delete habit "${habit.title}"?`)) {
-                        onDeleteHabit(habit.id);
-                      }
-                    }}
+                    onClick={() => setHabitToDelete({ id: habit.id, title: habit.title })}
                     title="Delete habit"
-                    className="ml-2 rounded-lg p-1.5 text-[var(--tt-muted)] opacity-0 group-hover:opacity-100 hover:text-rose-500 hover:bg-[var(--tt-panel-alt)] transition-all"
+                    className="ml-2 rounded-lg p-1.5 text-[var(--tt-muted)] opacity-0 group-hover:opacity-100 hover:text-rose-500 hover:bg-[var(--tt-panel-alt)] transition-all cursor-pointer"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -353,6 +351,20 @@ export function HabitView(props: HabitViewProps = {}) {
           </div>
         </div>
       )}
+
+      {/* Delete Habit Confirmation Dialog */}
+      <DeleteConfirmDialog
+        open={!!habitToDelete}
+        onOpenChange={(open) => !open && setHabitToDelete(null)}
+        title="Delete Habit"
+        description={`Are you sure you want to delete habit "${habitToDelete?.title}"? All streak history and logs for this habit will be removed.`}
+        onConfirm={async () => {
+          if (habitToDelete) {
+            await onDeleteHabit(habitToDelete.id);
+            setHabitToDelete(null);
+          }
+        }}
+      />
     </div>
   );
 }

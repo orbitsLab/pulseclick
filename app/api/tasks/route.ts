@@ -25,9 +25,7 @@ export async function GET(req: Request) {
       isTrash: view === "trash",
     };
 
-    if (view !== "trash" && view !== "completed") {
-      where.completed = false;
-    } else if (view === "completed") {
+    if (view === "completed") {
       where.completed = true;
     }
 

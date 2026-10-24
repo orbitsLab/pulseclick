@@ -19,6 +19,7 @@ import { TaskList, Tag } from "@/hooks/use-ticktick";
 import { getTodayISO, addDays, formatShortDate, parseISODate } from "@/lib/date-utils";
 import { parseTaskInput } from "@/lib/nlp";
 import { TaskDatePickerPopover } from "./task-date-picker-popover";
+import { useTickTickContext } from "@/context/ticktick-context";
 
 interface QuickAddModalProps {
   isOpen: boolean;
@@ -51,17 +52,30 @@ export function QuickAddModal({
   tags,
   onAddTask,
 }: QuickAddModalProps) {
+  const context = useTickTickContext();
   const today = getTodayISO();
+  const tomorrow = addDays(today, 1);
+  const defaultDueDate = context?.activeView === "tomorrow" ? tomorrow : today;
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [listId, setListId] = useState<string>("inbox");
-  const [dueDate, setDueDate] = useState<string>(today);
+  const [dueDate, setDueDate] = useState<string>(defaultDueDate);
   const [endDate, setEndDate] = useState<string>("");
   const [dueTime, setDueTime] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
   const datePickerRef = useRef<HTMLDivElement>(null);
+
+  // Sync date when opening modal
+  useEffect(() => {
+    if (isOpen) {
+      setDueDate(context?.activeView === "tomorrow" ? tomorrow : today);
+      if (context?.activeListId) {
+        setListId(context.activeListId);
+      }
+    }
+  }, [isOpen, context?.activeView, context?.activeListId, today, tomorrow]);
 
   useEffect(() => {
     if (!showDatePicker) return;
@@ -165,7 +179,7 @@ export function QuickAddModal({
 
     setTitle("");
     setDescription("");
-    setDueDate(today);
+    setDueDate(defaultDueDate);
     setEndDate("");
     setDueTime("");
     setEndTime("");

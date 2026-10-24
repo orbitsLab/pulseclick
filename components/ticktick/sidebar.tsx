@@ -23,6 +23,7 @@ import {
 import { TaskList, Tag } from "@/hooks/use-ticktick";
 import { toISODate, getTodayISO } from "@/lib/date-utils";
 import { TickTickContext } from "@/context/ticktick-context";
+import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 
 interface SidebarProps {
   activeView?: string;
@@ -100,6 +101,10 @@ export function TickTickSidebar(props: SidebarProps = {}) {
   const [newTagName, setNewTagName] = useState("");
   const [newTagColor, setNewTagColor] = useState("#818cf8");
 
+  // Delete confirmation modals
+  const [tagToDelete, setTagToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [listToDelete, setListToDelete] = useState<{ id: string; name: string } | null>(null);
+
   async function handleCreateList(e: React.FormEvent) {
     e.preventDefault();
     if (!newListName.trim()) return;
@@ -121,13 +126,9 @@ export function TickTickSidebar(props: SidebarProps = {}) {
     setEditingList(null);
   }
 
-  async function handleDeleteListClick(e: React.MouseEvent, listId: string, listName: string) {
+  function handleDeleteListClick(e: React.MouseEvent, listId: string, listName: string) {
     e.stopPropagation();
-    if (confirm(`Are you sure you want to delete list "${listName}"? Tasks will be moved to Inbox.`)) {
-      if (onDeleteList) {
-        await onDeleteList(listId);
-      }
-    }
+    setListToDelete({ id: listId, name: listName });
   }
 
   async function handleCreateTag(e: React.FormEvent) {
@@ -138,13 +139,9 @@ export function TickTickSidebar(props: SidebarProps = {}) {
     setShowAddTag(false);
   }
 
-  async function handleDeleteTagClick(e: React.MouseEvent, tagId: string, tagName: string) {
+  function handleDeleteTagClick(e: React.MouseEvent, tagId: string, tagName: string) {
     e.stopPropagation();
-    if (confirm(`Remove tag #${tagName}?`)) {
-      if (onDeleteTag) {
-        await onDeleteTag(tagId);
-      }
-    }
+    setTagToDelete({ id: tagId, name: tagName });
   }
 
   const smartLists = [
@@ -595,6 +592,41 @@ export function TickTickSidebar(props: SidebarProps = {}) {
           </div>
         </div>
       )}
+      {/* Delete Tag Confirmation Dialog */}
+      <DeleteConfirmDialog
+        open={!!tagToDelete}
+        onOpenChange={(open) => !open && setTagToDelete(null)}
+        title="Delete Tag"
+        description={`Are you sure you want to delete #${tagToDelete?.name}? This tag will be removed from all associated tasks.`}
+        onConfirm={() => {
+          if (tagToDelete && onDeleteTag) {
+            const target = tagToDelete;
+            setTagToDelete(null);
+            if (activeTag === target.name) {
+              onSelectView("all");
+            }
+            onDeleteTag(target.id);
+          }
+        }}
+      />
+
+      {/* Delete List Confirmation Dialog */}
+      <DeleteConfirmDialog
+        open={!!listToDelete}
+        onOpenChange={(open) => !open && setListToDelete(null)}
+        title="Delete List"
+        description={`Are you sure you want to delete list "${listToDelete?.name}"? Tasks in this list will be moved to Inbox.`}
+        onConfirm={() => {
+          if (listToDelete && onDeleteList) {
+            const target = listToDelete;
+            setListToDelete(null);
+            if (activeListId === target.id) {
+              onSelectView("inbox");
+            }
+            onDeleteList(target.id);
+          }
+        }}
+      />
     </aside>
   );
 }
