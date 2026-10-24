@@ -23,6 +23,34 @@ import { Task } from "@/hooks/use-ticktick";
 import { getTodayISO, addDays, formatShortDate } from "@/lib/date-utils";
 import { TickTickContext } from "@/context/ticktick-context";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+
+export function TaskListSkeleton({ count = 5 }: { count?: number }) {
+  return (
+    <div className="space-y-2 py-1">
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className="flex items-center justify-between gap-3 rounded-xl border border-[var(--tt-border)]/60 bg-[var(--tt-panel)]/30 p-2.5 transition-opacity"
+          style={{ opacity: Math.max(0.35, 1 - i * 0.15) }}
+        >
+          <div className="flex items-center gap-2.5 flex-1 min-w-0">
+            <Skeleton className="h-4.5 w-4.5 rounded-md shrink-0 bg-[var(--tt-panel-alt)]" />
+            <Skeleton
+              className="h-4 rounded-md bg-[var(--tt-panel-alt)]"
+              style={{ width: `${Math.max(35, 75 - (i % 3) * 15)}%` }}
+            />
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Skeleton className="h-4.5 w-16 rounded-md bg-[var(--tt-panel-alt)]/70 hidden sm:block" />
+            <Skeleton className="h-4.5 w-20 rounded-md bg-[var(--tt-panel-alt)]/70" />
+            <Skeleton className="h-4 w-4 rounded-full bg-[var(--tt-panel-alt)]/60" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 interface TaskListViewProps {
   tasks?: Task[];
@@ -55,6 +83,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
   const today = getTodayISO();
   const tomorrow = addDays(today, 1);
   const next7Days = addDays(today, 7);
+  const isInitialLoading = (context?.isInitialLoadingTasks || (context?.isLoadingTasks && !context?.hasLoadedTasksOnce)) && tasks.length === 0;
 
   // Multi-select state
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
@@ -411,7 +440,9 @@ export function TaskListView(props: TaskListViewProps = {}) {
 
       {/* Task List */}
       <div className="flex-1 space-y-4 overflow-y-auto pr-1 pb-16">
-        {tasks.length === 0 ? (
+        {isInitialLoading ? (
+          <TaskListSkeleton count={5} />
+        ) : tasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center text-[var(--tt-muted)]">
             <h2 className="flex items-center gap-2 tt-heading font-semibold text-[var(--tt-text)]">
               <CheckCircle2 className="h-4 w-4 text-[var(--tt-accent-text)]" />

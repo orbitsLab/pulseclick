@@ -189,16 +189,28 @@ export function TaskCalendarView({
     onSelectTask?.(taskId);
   };
 
+  const isInitialLoading =
+    (context?.isInitialLoadingTasks || (context?.isLoadingTasks && !context?.hasLoadedTasksOnce)) &&
+    tasks.length === 0;
+
   return (
-    <EventCalendar
-      events={taskEvents}
-      lists={lists}
-      onEventAdd={handleEventAdd}
-      onEventDelete={handleEventDelete}
-      onEventUpdate={handleEventUpdate}
-      onEventToggleComplete={handleEventToggleComplete}
-      onOpenTaskDetails={handleOpenTaskDetails}
-      className="flex-1"
-    />
+    <div className="relative flex-1 flex flex-col h-full overflow-hidden">
+      {isInitialLoading && (
+        <div className="absolute top-2.5 right-3 z-30 flex items-center gap-2 rounded-lg border border-[var(--tt-border)]/80 bg-[var(--tt-panel)]/95 px-3 py-1.5 text-xs text-[var(--tt-muted)] shadow-md animate-pulse">
+          <div className="h-2 w-2 rounded-full bg-[var(--tt-accent)]" />
+          <span className="font-medium text-[var(--tt-text)]">Syncing calendar tasks…</span>
+        </div>
+      )}
+      <EventCalendar
+        events={taskEvents}
+        lists={lists}
+        onEventAdd={handleEventAdd}
+        onEventDelete={handleEventDelete}
+        onEventUpdate={handleEventUpdate}
+        onEventToggleComplete={handleEventToggleComplete}
+        onOpenTaskDetails={handleOpenTaskDetails}
+        className="flex-1"
+      />
+    </div>
   );
 }

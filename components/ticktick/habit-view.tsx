@@ -21,6 +21,34 @@ import { Habit } from "@/hooks/use-ticktick";
 import { getTodayISO, getMondayOfWeek, getWeekDays } from "@/lib/date-utils";
 import { TickTickContext } from "@/context/ticktick-context";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+
+export function HabitSkeleton({ count = 3 }: { count?: number }) {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[var(--tt-border)]/60 bg-[var(--tt-panel)]/40 p-3.5 transition-opacity"
+          style={{ opacity: Math.max(0.35, 1 - i * 0.25) }}
+        >
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-9 w-9 rounded-xl bg-[var(--tt-panel-alt)]" />
+            <div className="space-y-1.5">
+              <Skeleton className="h-4 w-32 rounded bg-[var(--tt-panel-alt)]" />
+              <Skeleton className="h-3 w-20 rounded bg-[var(--tt-panel-alt)]/60" />
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {Array.from({ length: 7 }).map((_, d) => (
+              <Skeleton key={d} className="h-7 w-7 rounded-full bg-[var(--tt-panel-alt)]" />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 interface HabitViewProps {
   habits?: Habit[];
@@ -68,6 +96,9 @@ export function HabitView(props: HabitViewProps = {}) {
   const today = getTodayISO();
   const weekMonday = getMondayOfWeek(today);
   const weekDays = getWeekDays(weekMonday);
+  const isInitialLoading =
+    (context?.isInitialLoadingHabits || (context?.isLoadingHabits && !context?.hasLoadedHabitsOnce)) &&
+    habits.length === 0;
 
   // New Habit Dialog State
   const [showAddModal, setShowAddModal] = useState(false);
@@ -144,7 +175,9 @@ export function HabitView(props: HabitViewProps = {}) {
 
       {/* Habits List */}
       <div className="flex-1 space-y-3 overflow-y-auto pr-1">
-        {habits.length === 0 ? (
+        {isInitialLoading ? (
+          <HabitSkeleton count={3} />
+        ) : habits.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center text-[var(--tt-muted)]">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--tt-accent)]/10 text-[var(--tt-accent-text)] mb-3">
               <Flame className="h-7 w-7" />

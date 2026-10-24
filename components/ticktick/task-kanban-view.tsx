@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   GripVerticalIcon,
   Plus,
@@ -421,12 +422,51 @@ function TaskCard({
   );
 }
 
+export function KanbanColumnSkeleton({ count = 3 }: { count?: number }) {
+  return (
+    <div className="flex flex-col gap-2.5 p-0.5">
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className="flex flex-col gap-2 rounded-xl border border-[var(--tt-border)]/60 bg-[var(--tt-panel)]/40 p-2.5"
+          style={{ opacity: Math.max(0.35, 1 - i * 0.25) }}
+        >
+          {/* Header: Checkbox + Title + Priority */}
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <Skeleton className="h-4 w-4 rounded-full shrink-0 bg-[var(--tt-panel-alt)]" />
+              <Skeleton
+                className="h-4 rounded bg-[var(--tt-panel-alt)]"
+                style={{ width: `${Math.max(40, 75 - i * 15)}%` }}
+              />
+            </div>
+            <Skeleton className="h-4.5 w-10 rounded-md bg-[var(--tt-panel-alt)]/70 shrink-0" />
+          </div>
+
+          {/* Description line placeholder */}
+          <Skeleton className="h-3 rounded w-1/2 bg-[var(--tt-panel-alt)]/50 ml-6" />
+
+          {/* Bottom metadata row */}
+          <div className="flex items-center justify-between gap-2 pt-1 border-t border-[var(--tt-border)]/40">
+            <div className="flex items-center gap-1.5">
+              <Skeleton className="h-4 w-16 rounded bg-[var(--tt-panel-alt)]/60" />
+              <Skeleton className="h-4 w-14 rounded bg-[var(--tt-panel-alt)]/60" />
+            </div>
+            <Skeleton className="h-4 w-16 rounded bg-[var(--tt-panel-alt)]/60" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 interface TaskColumnProps extends Omit<
   ComponentProps<typeof KanbanColumn>,
   "children"
 > {
   tasks: Task[];
   isOverlay?: boolean;
+  isLoading?: boolean;
   selectedTaskId: string | null;
   today: string;
   onSelectTask: (taskId: string) => void;
@@ -440,6 +480,7 @@ function TaskColumn({
   value,
   tasks,
   isOverlay,
+  isLoading,
   selectedTaskId,
   today,
   onSelectTask,
@@ -513,7 +554,9 @@ function TaskColumn({
               value={value}
               className="flex flex-col gap-2.5 min-h-[160px] pl-0.5 pr-3.5 pt-0.5 pb-3"
             >
-              {tasks.length === 0 ? (
+              {isLoading && tasks.length === 0 ? (
+                <KanbanColumnSkeleton count={2} />
+              ) : tasks.length === 0 ? (
                 <div className="flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-[var(--tt-border)]/60 p-6 text-center tt-meta text-[var(--tt-muted)] min-h-[140px] gap-2">
                   <span>No tasks in {config.title}</span>
                   <Button
@@ -622,6 +665,10 @@ export function TaskKanbanView({
     }
   };
 
+  const isInitialLoading =
+    (context?.isInitialLoadingTasks || (context?.isLoadingTasks && !context?.hasLoadedTasksOnce)) &&
+    tasks.length === 0;
+
   return (
     <div className="flex-1 h-full overflow-hidden flex flex-col">
       <Kanban
@@ -637,6 +684,7 @@ export function TaskKanbanView({
               key={columnValue}
               value={columnValue}
               tasks={colTasks}
+              isLoading={isInitialLoading}
               selectedTaskId={selectedTaskId}
               today={today}
               onSelectTask={onSelectTask}

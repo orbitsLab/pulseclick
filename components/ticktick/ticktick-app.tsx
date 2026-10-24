@@ -76,6 +76,8 @@ function TickTickWorkspace({
     setIsThemePickerOpen,
 
     tasks,
+    isLoadingTasks,
+    isInitialLoadingTasks,
     lists,
     inboxCount,
     todayCount,
@@ -305,6 +307,7 @@ function TickTickWorkspace({
 
           {activeModule === "timeline" && (
             <TimelineView
+              isLoading={isInitialLoadingTasks}
               tasks={tasks.map((t) => ({
                 id: t.id,
                 title: t.title,
@@ -360,6 +363,7 @@ function TickTickWorkspace({
           {activeModule === "matrix" && (
             <EisenhowerMatrixView
               tasks={tasks}
+              isLoading={isInitialLoadingTasks}
               selectedTaskId={selectedTaskId}
               onSelectTask={(id) => setSelectedTaskId(id)}
               onToggleComplete={(id, completed) => toggleComplete({ taskId: id, completed })}

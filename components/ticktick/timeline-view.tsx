@@ -46,6 +46,7 @@ export interface TimelineViewProps {
     startTime?: string | null;
     endTime?: string | null;
   }) => void;
+  isLoading?: boolean;
 }
 
 /* ------------------------------------------------------------------ */
@@ -206,7 +207,7 @@ function barColor(task: TimelineTask): string {
 /* component                                                           */
 /* ------------------------------------------------------------------ */
 
-export function TimelineView({ tasks, onSelectTask, onUpdateTask }: TimelineViewProps) {
+export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: TimelineViewProps) {
   const scheduled = useMemo(
     () => tasks.filter((task) => Boolean(task.startDate)),
     [tasks]
@@ -399,7 +400,14 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask }: TimelineView
         <div className="flex items-center gap-2.5">
           <CalendarDays className="h-5 w-5" style={{ color: ACCENT }} />
           <div className="flex flex-col">
-            <h2 className="tt-heading font-semibold text-[var(--tt-text)]">Timeline</h2>
+            <h2 className="tt-heading font-semibold text-[var(--tt-text)] flex items-center gap-2">
+              Timeline
+              {isLoading && tasks.length === 0 && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--tt-panel-alt)] px-2 py-0.5 tt-meta font-normal text-[var(--tt-muted)] animate-pulse">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--tt-accent)]" /> Syncing tasks…
+                </span>
+              )}
+            </h2>
             <span className="tt-label text-[var(--tt-muted)]">{rangeLabel}</span>
           </div>
         </div>

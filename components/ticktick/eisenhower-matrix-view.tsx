@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Plus, Check, Calendar, CheckCircle2 } from "lucide-react";
 import { Task } from "@/hooks/use-ticktick";
 import { getTodayISO } from "@/lib/date-utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface EisenhowerMatrixViewProps {
   tasks: Task[];
@@ -11,6 +12,7 @@ interface EisenhowerMatrixViewProps {
   onSelectTask: (taskId: string) => void;
   onToggleComplete: (taskId: string, completed: boolean) => void;
   onAddTask: (task: { title: string; priority: number; dueDate?: string | null }) => Promise<any>;
+  isLoading?: boolean;
 }
 
 export function EisenhowerMatrixView({
@@ -19,6 +21,7 @@ export function EisenhowerMatrixView({
   onSelectTask,
   onToggleComplete,
   onAddTask,
+  isLoading,
 }: EisenhowerMatrixViewProps) {
   const today = getTodayISO();
   const [quickInput, setQuickInput] = useState<{ [quad: string]: string }>({});
@@ -147,7 +150,18 @@ export function EisenhowerMatrixView({
 
           {/* Tasks in Quadrant */}
           <div className="flex-1 space-y-1.5 overflow-y-auto max-h-[340px]">
-            {quad.tasks.length === 0 ? (
+            {isLoading && tasks.length === 0 ? (
+              <div className="space-y-1.5 p-1">
+                <div className="flex items-center gap-2 rounded-xl border border-[var(--tt-border)]/40 bg-[var(--tt-panel)]/30 p-2.5">
+                  <Skeleton className="h-4 w-4 rounded-md bg-[var(--tt-panel-alt)] shrink-0" />
+                  <Skeleton className="h-4 w-3/4 rounded bg-[var(--tt-panel-alt)]" />
+                </div>
+                <div className="flex items-center gap-2 rounded-xl border border-[var(--tt-border)]/40 bg-[var(--tt-panel)]/30 p-2.5">
+                  <Skeleton className="h-4 w-4 rounded-md bg-[var(--tt-panel-alt)] shrink-0" />
+                  <Skeleton className="h-4 w-1/2 rounded bg-[var(--tt-panel-alt)]" />
+                </div>
+              </div>
+            ) : quad.tasks.length === 0 ? (
               <div className="py-8 text-center tt-label opacity-50">No tasks in this quadrant</div>
             ) : (
               quad.tasks.map((task) => {

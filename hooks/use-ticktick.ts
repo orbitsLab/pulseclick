@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { playTaskCompleteSound, playPomodoroBellSound } from "@/lib/sound-utils";
 import { notify } from "@/components/ui/toast";
@@ -210,6 +210,7 @@ export function useTickTick(filters: {
       const data = await res.json();
       return (data.tasks || []) as Task[];
     },
+    placeholderData: keepPreviousData,
   });
 
   // 2. Task Lists Query
@@ -227,6 +228,7 @@ export function useTickTick(filters: {
         allCount: (data.allCount || 0) as number,
       };
     },
+    placeholderData: keepPreviousData,
   });
 
   // 3. Tags Query
@@ -238,6 +240,7 @@ export function useTickTick(filters: {
       const data = await res.json();
       return (data.tags || []) as Tag[];
     },
+    placeholderData: keepPreviousData,
   });
 
   // 4. Pomodoro Stats Query
@@ -260,6 +263,7 @@ export function useTickTick(filters: {
       const data = await res.json();
       return (data.habits || []) as Habit[];
     },
+    placeholderData: keepPreviousData,
   });
 
   // 6. Smart Filters Query

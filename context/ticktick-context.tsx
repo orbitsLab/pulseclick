@@ -63,6 +63,8 @@ export interface TickTickContextType {
   // Domain Queries & States
   tasks: Task[];
   isLoadingTasks: boolean;
+  isInitialLoadingTasks: boolean;
+  hasLoadedTasksOnce: boolean;
   lists: TaskList[];
   inboxCount: number;
   todayCount: number;
@@ -72,6 +74,8 @@ export interface TickTickContextType {
   pomodoroStats: PomodoroStats;
   habits: Habit[];
   isLoadingHabits: boolean;
+  isInitialLoadingHabits: boolean;
+  hasLoadedHabitsOnce: boolean;
   filters: any[];
   countdowns: Countdown[];
   stats: StatisticsData | null;
@@ -190,6 +194,25 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
     assigneesTaskId: selectedTaskId,
   });
 
+  // Track if initial tasks & habits have resolved at least once
+  const [hasLoadedTasksOnce, setHasLoadedTasksOnce] = useState(false);
+  const [hasLoadedHabitsOnce, setHasLoadedHabitsOnce] = useState(false);
+
+  useEffect(() => {
+    if (!ticktick.isLoadingTasks || ticktick.tasks.length > 0) {
+      setHasLoadedTasksOnce(true);
+    }
+  }, [ticktick.isLoadingTasks, ticktick.tasks]);
+
+  useEffect(() => {
+    if (!ticktick.isLoadingHabits || ticktick.habits.length > 0) {
+      setHasLoadedHabitsOnce(true);
+    }
+  }, [ticktick.isLoadingHabits, ticktick.habits]);
+
+  const isInitialLoadingTasks = !hasLoadedTasksOnce && ticktick.isLoadingTasks;
+  const isInitialLoadingHabits = !hasLoadedHabitsOnce && ticktick.isLoadingHabits;
+
   // Calculate current list/view name
   const currentListName = useMemo(() => {
     if (activeListId) {
@@ -304,6 +327,8 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
     // Data from useTickTick
     tasks: ticktick.tasks,
     isLoadingTasks: ticktick.isLoadingTasks,
+    isInitialLoadingTasks,
+    hasLoadedTasksOnce,
     lists: ticktick.lists,
     inboxCount: ticktick.inboxCount,
     todayCount: ticktick.todayCount,
@@ -313,6 +338,8 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
     pomodoroStats: ticktick.pomodoroStats,
     habits: ticktick.habits,
     isLoadingHabits: ticktick.isLoadingHabits,
+    isInitialLoadingHabits,
+    hasLoadedHabitsOnce,
     filters: ticktick.filters,
     countdowns: ticktick.countdowns,
     stats: ticktick.stats,
