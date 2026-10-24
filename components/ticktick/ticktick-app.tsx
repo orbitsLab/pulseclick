@@ -22,11 +22,14 @@ import { ThemePicker } from "./theme-picker";
 import { SyncIndicator } from "./sync-indicator";
 import { TickTickProvider, useTickTickContext } from "@/context/ticktick-context";
 import { applyTheme, DEFAULT_THEME_ID } from "@/lib/themes";
+import { cn } from "@/lib/utils";
 import {
   ListTodo,
   Columns3,
   Search,
   Plus,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 
 interface TickTickAppProps {
@@ -74,18 +77,23 @@ function TickTickWorkspace({
     setIsFilterPanelOpen,
     isThemePickerOpen,
     setIsThemePickerOpen,
+    isSidebarOpen,
+    toggleSidebar,
 
     tasks,
     isLoadingTasks,
     isInitialLoadingTasks,
     lists,
+    isInitialLoadingLists,
     inboxCount,
     todayCount,
     tomorrowCount,
     allCount,
     tags,
+    isInitialLoadingTags,
     pomodoroStats,
     filters,
+    isInitialLoadingFilters,
     countdowns,
     stats,
     isLoadingStats,
@@ -176,6 +184,11 @@ function TickTickWorkspace({
             activeFilterId={activeFilterId}
             onSelectFilter={selectFilter}
             onOpenFilterPanel={() => setIsFilterPanelOpen(true)}
+            isCollapsed={!isSidebarOpen}
+            onToggleCollapse={toggleSidebar}
+            isInitialLoadingLists={isInitialLoadingLists}
+            isInitialLoadingTags={isInitialLoadingTags}
+            isInitialLoadingFilters={isInitialLoadingFilters}
           />
         )}
 
@@ -184,6 +197,27 @@ function TickTickWorkspace({
           {/* View Header */}
           <div className="flex items-center justify-between pb-3 mb-3 border-b border-[var(--tt-border)]/80">
             <div className="flex items-center gap-3">
+              {activeModule === "tasks" && (
+                <button
+                  type="button"
+                  onClick={toggleSidebar}
+                  title={isSidebarOpen ? "Collapse sidebar (Ctrl+B)" : "Expand sidebar (Ctrl+B)"}
+                  aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+                  className={cn(
+                    "p-1.5 rounded-lg border transition-all cursor-pointer shrink-0 flex items-center justify-center",
+                    isSidebarOpen
+                      ? "border-[var(--tt-border)] bg-[var(--tt-panel-alt)] text-[var(--tt-muted)] hover:text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/80"
+                      : "border-[var(--tt-accent)]/40 bg-[var(--tt-accent)]/10 text-[var(--tt-accent-text)] hover:bg-[var(--tt-accent)]/20 shadow-xs"
+                  )}
+                >
+                  {isSidebarOpen ? (
+                    <PanelLeftClose className="h-4 w-4" />
+                  ) : (
+                    <PanelLeftOpen className="h-4 w-4" />
+                  )}
+                </button>
+              )}
+
               <h1 className="tt-display text-[var(--tt-text)] capitalize">
                 {activeModule === "matrix"
                   ? "Eisenhower Matrix"

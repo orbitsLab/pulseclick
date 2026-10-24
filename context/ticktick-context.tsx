@@ -41,6 +41,13 @@ export interface TickTickContextType {
   selectedTask: Task | null;
   currentListName: string;
 
+  // Sidebar State
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleSidebar: () => void;
+  sidebarWidth: number;
+  setSidebarWidth: (width: number) => void;
+
   // View Navigation Helpers
   selectView: (view: string, listId?: string | null, tag?: string | null) => void;
   selectFilter: (filterId: string) => void;
@@ -66,17 +73,26 @@ export interface TickTickContextType {
   isInitialLoadingTasks: boolean;
   hasLoadedTasksOnce: boolean;
   lists: TaskList[];
+  isLoadingLists: boolean;
+  isInitialLoadingLists: boolean;
+  hasLoadedListsOnce: boolean;
   inboxCount: number;
   todayCount: number;
   tomorrowCount: number;
   allCount: number;
   tags: Tag[];
+  isLoadingTags: boolean;
+  isInitialLoadingTags: boolean;
+  hasLoadedTagsOnce: boolean;
   pomodoroStats: PomodoroStats;
   habits: Habit[];
   isLoadingHabits: boolean;
   isInitialLoadingHabits: boolean;
   hasLoadedHabitsOnce: boolean;
   filters: any[];
+  isLoadingFilters: boolean;
+  isInitialLoadingFilters: boolean;
+  hasLoadedFiltersOnce: boolean;
   countdowns: Countdown[];
   stats: StatisticsData | null;
   isLoadingStats: boolean;
@@ -173,6 +189,63 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
   const [taskLayout, setTaskLayout] = useState<"list" | "kanban">("list");
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
+  // Expandable Sidebar State
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("ticktick-sidebar-open");
+      return saved !== null ? saved === "true" : true;
+    }
+    return true;
+  });
+
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("ticktick-sidebar-width");
+      const num = Number(saved);
+      if (num >= 200 && num <= 450) return num;
+    }
+    return 260;
+  });
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev);
+  };
+
+  const handleSetSidebarWidth = (w: number) => {
+    const clamped = Math.max(200, Math.min(450, w));
+    setSidebarWidth(clamped);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("ticktick-sidebar-width", String(clamped));
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("ticktick-sidebar-open", String(isSidebarOpen));
+    }
+  }, [isSidebarOpen]);
+
+  // Global Ctrl+B / Cmd+B keyboard shortcut to toggle sidebar
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "b") {
+        const target = e.target as HTMLElement | null;
+        if (
+          target &&
+          (target.tagName === "INPUT" ||
+            target.tagName === "TEXTAREA" ||
+            target.isContentEditable)
+        ) {
+          return;
+        }
+        e.preventDefault();
+        toggleSidebar();
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // Modals State
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
@@ -194,9 +267,12 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
     assigneesTaskId: selectedTaskId,
   });
 
-  // Track if initial tasks & habits have resolved at least once
+  // Track if initial domain queries have resolved at least once
   const [hasLoadedTasksOnce, setHasLoadedTasksOnce] = useState(false);
   const [hasLoadedHabitsOnce, setHasLoadedHabitsOnce] = useState(false);
+  const [hasLoadedListsOnce, setHasLoadedListsOnce] = useState(false);
+  const [hasLoadedTagsOnce, setHasLoadedTagsOnce] = useState(false);
+  const [hasLoadedFiltersOnce, setHasLoadedFiltersOnce] = useState(false);
 
   useEffect(() => {
     if (!ticktick.isLoadingTasks || ticktick.tasks.length > 0) {
@@ -210,8 +286,29 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
     }
   }, [ticktick.isLoadingHabits, ticktick.habits]);
 
-  const isInitialLoadingTasks = !hasLoadedTasksOnce && ticktick.isLoadingTasks;
-  const isInitialLoadingHabits = !hasLoadedHabitsOnce && ticktick.isLoadingHabits;
+  useEffect(() => {
+    if (!ticktick.isLoadingLists || ticktick.lists.length > 0) {
+      setHasLoadedListsOnce(true);
+    }
+  }, [ticktick.isLoadingLists, ticktick.lists]);
+
+  useEffect(() => {
+    if (!ticktick.isLoadingTags || ticktick.tags.length > 0) {
+      setHasLoadedTagsOnce(true);
+    }
+  }, [ticktick.isLoadingTags, ticktick.tags]);
+
+  useEffect(() => {
+    if (!ticktick.isLoadingFilters || ticktick.filters.length > 0) {
+      setHasLoadedFiltersOnce(true);
+    }
+  }, [ticktick.isLoadingFilters, ticktick.filters]);
+
+  const isInitialLoadingTasks = !hasLoadedTasksOnce && ticktick.isLoadingTasks && ticktick.tasks.length === 0;
+  const isInitialLoadingHabits = !hasLoadedHabitsOnce && ticktick.isLoadingHabits && ticktick.habits.length === 0;
+  const isInitialLoadingLists = !hasLoadedListsOnce && ticktick.isLoadingLists && ticktick.lists.length === 0;
+  const isInitialLoadingTags = !hasLoadedTagsOnce && ticktick.isLoadingTags && ticktick.tags.length === 0;
+  const isInitialLoadingFilters = !hasLoadedFiltersOnce && ticktick.isLoadingFilters && ticktick.filters.length === 0;
 
   // Calculate current list/view name
   const currentListName = useMemo(() => {
@@ -308,6 +405,13 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
     selectedTask,
     currentListName,
 
+    // Sidebar State
+    isSidebarOpen,
+    setIsSidebarOpen,
+    toggleSidebar,
+    sidebarWidth,
+    setSidebarWidth: handleSetSidebarWidth,
+
     selectView,
     selectFilter,
     selectModule,
@@ -330,17 +434,26 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
     isInitialLoadingTasks,
     hasLoadedTasksOnce,
     lists: ticktick.lists,
+    isLoadingLists: ticktick.isLoadingLists,
+    isInitialLoadingLists,
+    hasLoadedListsOnce,
     inboxCount: ticktick.inboxCount,
     todayCount: ticktick.todayCount,
     tomorrowCount: ticktick.tomorrowCount,
     allCount: ticktick.allCount,
     tags: ticktick.tags,
+    isLoadingTags: ticktick.isLoadingTags,
+    isInitialLoadingTags,
+    hasLoadedTagsOnce,
     pomodoroStats: ticktick.pomodoroStats,
     habits: ticktick.habits,
     isLoadingHabits: ticktick.isLoadingHabits,
     isInitialLoadingHabits,
     hasLoadedHabitsOnce,
     filters: ticktick.filters,
+    isLoadingFilters: ticktick.isLoadingFilters,
+    isInitialLoadingFilters,
+    hasLoadedFiltersOnce,
     countdowns: ticktick.countdowns,
     stats: ticktick.stats,
     isLoadingStats: ticktick.isLoadingStats,

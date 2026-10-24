@@ -19,11 +19,52 @@ import {
   Pencil,
   X,
   Filter,
+  PanelLeftClose,
+  PanelLeft,
 } from "lucide-react";
 import { TaskList, Tag } from "@/hooks/use-ticktick";
 import { toISODate, getTodayISO } from "@/lib/date-utils";
 import { TickTickContext } from "@/context/ticktick-context";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+
+function SidebarItemSkeleton({
+  count = 3,
+  hasDot = true,
+  dotClass = "h-2.5 w-2.5 rounded-full",
+  widths = [80, 104, 68],
+}: {
+  count?: number;
+  hasDot?: boolean;
+  dotClass?: string;
+  widths?: number[];
+}) {
+  return (
+    <div className="space-y-1 py-0.5">
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className="flex items-center justify-between gap-2.5 rounded-lg px-2.5 py-1.5"
+          style={{ opacity: Math.max(0.35, 1 - i * 0.2) }}
+        >
+          <div className="flex items-center gap-2.5 flex-1 min-w-0">
+            {hasDot && (
+              <Skeleton className={cn(dotClass, "shrink-0 bg-[var(--tt-panel)]/80")} />
+            )}
+            <Skeleton
+              className="h-3.5 rounded bg-[var(--tt-panel)]/80"
+              style={{ width: `${widths[i % widths.length]}px` }}
+            />
+          </div>
+          {i % 2 === 0 && (
+            <Skeleton className="h-3 w-4 rounded-full bg-[var(--tt-panel)]/60 shrink-0" />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 interface SidebarProps {
   activeView?: string;
@@ -48,6 +89,13 @@ interface SidebarProps {
   activeFilterId?: string | null;
   onSelectFilter?: (filterId: string) => void;
   onOpenFilterPanel?: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
+  width?: number;
+  onWidthChange?: (width: number) => void;
+  isInitialLoadingLists?: boolean;
+  isInitialLoadingTags?: boolean;
+  isInitialLoadingFilters?: boolean;
 }
 
 export function TickTickSidebar(props: SidebarProps = {}) {
@@ -80,6 +128,38 @@ export function TickTickSidebar(props: SidebarProps = {}) {
   const activeFilterId = props.activeFilterId !== undefined ? props.activeFilterId : (context?.activeFilterId ?? null);
   const onSelectFilter = props.onSelectFilter ?? context?.selectFilter ?? (() => {});
   const onOpenFilterPanel = props.onOpenFilterPanel ?? (() => context?.setIsFilterPanelOpen(true));
+  const isSidebarOpen = props.isCollapsed !== undefined ? !props.isCollapsed : (context?.isSidebarOpen ?? true);
+  const onToggleCollapse = props.onToggleCollapse ?? context?.toggleSidebar ?? (() => {});
+  const sidebarWidth = props.width ?? context?.sidebarWidth ?? 260;
+  const onWidthChange = props.onWidthChange ?? context?.setSidebarWidth ?? (() => {});
+  const isInitialLoadingLists = props.isInitialLoadingLists ?? context?.isInitialLoadingLists ?? false;
+  const isInitialLoadingTags = props.isInitialLoadingTags ?? context?.isInitialLoadingTags ?? false;
+  const isInitialLoadingFilters = props.isInitialLoadingFilters ?? context?.isInitialLoadingFilters ?? false;
+
+  const [isResizing, setIsResizing] = useState(false);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+    const startX = e.clientX;
+    const startWidth = sidebarWidth;
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const newWidth = Math.max(200, Math.min(450, startWidth + deltaX));
+      onWidthChange(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+  };
+
   const today = getTodayISO();
   const [listsCollapsed, setListsCollapsed] = useState(false);
   const [tagsCollapsed, setTagsCollapsed] = useState(false);
@@ -166,22 +246,40 @@ export function TickTickSidebar(props: SidebarProps = {}) {
   const miniCalLabel = miniCalDate.toLocaleDateString("en-US", { month: "short", year: "numeric" });
 
   return (
-    <aside className="flex flex-col h-full w-64 border-r border-[var(--tt-border)] bg-[var(--tt-panel-alt)] select-none flex-shrink-0 overflow-y-auto">
-      {/* Search Input */}
-      <div className="p-3 border-b border-[var(--tt-border)]/80">
-        <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-[var(--tt-muted)]" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search tasks..."
-            className="w-full rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel)] py-1.5 pl-8 pr-3 tt-label text-[var(--tt-text)] placeholder-[var(--tt-muted)] focus:border-[var(--tt-accent)] focus:outline-none"
-          />
-        </div>
-      </div>
+    <aside
+      style={{ width: isSidebarOpen ? `${sidebarWidth}px` : 0 }}
+      className={cn(
+        "relative flex flex-col h-full border-r border-[var(--tt-border)] bg-[var(--tt-panel-alt)] select-none flex-shrink-0 overflow-hidden",
+        isResizing ? "transition-none select-none" : "transition-[width] duration-200 ease-out",
+        !isSidebarOpen && "border-r-0"
+      )}
+    >
+      <div style={{ width: `${sidebarWidth}px` }} className="flex flex-col h-full min-w-0">
+        {/* Search Input & Collapse Button */}
+        <div className="p-3 border-b border-[var(--tt-border)]/80 flex items-center gap-2">
+          <div className="relative flex-1 min-w-0">
+            <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-[var(--tt-muted)]" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder="Search tasks..."
+              className="w-full rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel)] py-1.5 pl-8 pr-3 tt-label text-[var(--tt-text)] placeholder-[var(--tt-muted)] focus:border-[var(--tt-accent)] focus:outline-none"
+            />
+          </div>
 
-      <div className="p-2 space-y-4 flex-1">
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            title="Collapse sidebar (Ctrl+B)"
+            aria-label="Collapse sidebar"
+            className="p-1.5 rounded-lg text-[var(--tt-muted)] hover:text-[var(--tt-text)] hover:bg-[var(--tt-panel)] border border-transparent hover:border-[var(--tt-border)] transition-colors cursor-pointer shrink-0"
+          >
+            <PanelLeftClose className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="p-2 space-y-4 flex-1 overflow-y-auto">
         {/* Smart Lists */}
         <div className="space-y-0.5">
           {smartLists.map((item) => {
@@ -227,7 +325,9 @@ export function TickTickSidebar(props: SidebarProps = {}) {
               )}
             </div>
 
-            {filters.length === 0 && (
+            {isInitialLoadingFilters ? (
+              <SidebarItemSkeleton count={2} dotClass="h-2 w-2 rounded-full" widths={[96, 76]} />
+            ) : filters.length === 0 ? (
               <button
                 type="button"
                 onClick={onOpenFilterPanel}
@@ -236,25 +336,25 @@ export function TickTickSidebar(props: SidebarProps = {}) {
                 <Filter className="h-4 w-4" />
                 <span>Create a filter</span>
               </button>
+            ) : (
+              filters.map((filter) => {
+                const isSelected = activeFilterId === filter.id;
+                return (
+                  <button
+                    key={filter.id}
+                    type="button"
+                    onClick={() => onSelectFilter?.(isSelected ? null : filter.id)}
+                    className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 tt-label font-medium transition-colors ${ isSelected ? "bg-[var(--tt-accent)]/10 text-[var(--tt-accent-text)] font-bold" : "text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/60 dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]/60" }`}
+                  >
+                    <span
+                      className="h-2 w-2 shrink-0 rounded-full"
+                      style={{ backgroundColor: filter.color }}
+                    />
+                    <span className="truncate">{filter.name}</span>
+                  </button>
+                );
+              })
             )}
-
-            {filters.map((filter) => {
-              const isSelected = activeFilterId === filter.id;
-              return (
-                <button
-                  key={filter.id}
-                  type="button"
-                  onClick={() => onSelectFilter?.(isSelected ? null : filter.id)}
-                  className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 tt-label font-medium transition-colors ${ isSelected ? "bg-[var(--tt-accent)]/10 text-[var(--tt-accent-text)] font-bold" : "text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/60 dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]/60" }`}
-                >
-                  <span
-                    className="h-2 w-2 shrink-0 rounded-full"
-                    style={{ backgroundColor: filter.color }}
-                  />
-                  <span className="truncate">{filter.name}</span>
-                </button>
-              );
-            })}
           </div>
         )}
 
@@ -281,59 +381,63 @@ export function TickTickSidebar(props: SidebarProps = {}) {
 
           {!listsCollapsed && (
             <div className="space-y-0.5 mt-1">
-              {lists.map((list) => {
-                const isSelected = activeListId === list.id;
-                const count = list._count?.tasks || 0;
-                return (
-                  <div
-                    key={list.id}
-                    onClick={() => onSelectView("list", list.id, null)}
-                    className={`group flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 tt-label font-medium transition-colors cursor-pointer ${ isSelected ? "bg-[var(--tt-accent)]/10 text-[var(--tt-accent-text)] dark:bg-[var(--tt-accent)]/15 font-bold" : "text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/60 dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]/60" }`}
-                  >
-                    <div className="flex items-center gap-2.5 truncate flex-1 min-w-0">
-                      <span
-                        className="h-2.5 w-2.5 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: list.color }}
-                      />
-                      <span className="truncate">{list.name}</span>
-                    </div>
+              {isInitialLoadingLists ? (
+                <SidebarItemSkeleton count={3} dotClass="h-2.5 w-2.5 rounded-full" widths={[80, 104, 68]} />
+              ) : (
+                lists.map((list) => {
+                  const isSelected = activeListId === list.id;
+                  const count = list._count?.tasks || 0;
+                  return (
+                    <div
+                      key={list.id}
+                      onClick={() => onSelectView("list", list.id, null)}
+                      className={`group flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 tt-label font-medium transition-colors cursor-pointer ${ isSelected ? "bg-[var(--tt-accent)]/10 text-[var(--tt-accent-text)] dark:bg-[var(--tt-accent)]/15 font-bold" : "text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/60 dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]/60" }`}
+                    >
+                      <div className="flex items-center gap-2.5 truncate flex-1 min-w-0">
+                        <span
+                          className="h-2.5 w-2.5 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: list.color }}
+                        />
+                        <span className="truncate">{list.name}</span>
+                      </div>
 
-                    <div className="flex items-center gap-1">
-                      {/* Count badge (hidden on group hover if actions exist) */}
-                      {count > 0 && (
-                        <span className="group-hover:hidden rounded-full bg-[var(--tt-panel-alt)]/80 px-1.5 py-0.5 tt-meta text-[var(--tt-text)] font-bold">
-                          {count}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-1">
+                        {/* Count badge (hidden on group hover if actions exist) */}
+                        {count > 0 && (
+                          <span className="group-hover:hidden rounded-full bg-[var(--tt-panel-alt)]/80 px-1.5 py-0.5 tt-meta text-[var(--tt-text)] font-bold">
+                            {count}
+                          </span>
+                        )}
 
-                      {/* Action buttons on hover */}
-                      <div className="hidden group-hover:flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingList(list);
-                            setEditListName(list.name);
-                            setEditListColor(list.color);
-                          }}
-                          title="Edit List"
-                          className="rounded p-0.5 text-[var(--tt-muted)] hover:text-white hover:bg-[var(--tt-panel-alt)]/50"
-                        >
-                          <Pencil className="h-3 w-3" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => handleDeleteListClick(e, list.id, list.name)}
-                          title="Delete List"
-                          className="rounded p-0.5 text-[var(--tt-muted)] hover:text-rose-400 hover:bg-[var(--tt-panel-alt)]/50"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </button>
+                        {/* Action buttons on hover */}
+                        <div className="hidden group-hover:flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingList(list);
+                              setEditListName(list.name);
+                              setEditListColor(list.color);
+                            }}
+                            title="Edit List"
+                            className="rounded p-0.5 text-[var(--tt-muted)] hover:text-white hover:bg-[var(--tt-panel-alt)]/50"
+                          >
+                            <Pencil className="h-3 w-3" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => handleDeleteListClick(e, list.id, list.name)}
+                            title="Delete List"
+                            className="rounded p-0.5 text-[var(--tt-muted)] hover:text-rose-400 hover:bg-[var(--tt-panel-alt)]/50"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           )}
         </div>
@@ -361,37 +465,41 @@ export function TickTickSidebar(props: SidebarProps = {}) {
 
           {!tagsCollapsed && (
             <div className="space-y-0.5 mt-1">
-              {tags.map((tag) => {
-                const isSelected = activeTag === tag.name;
-                const count = tag._count?.tasks || 0;
-                return (
-                  <div
-                    key={tag.id}
-                    onClick={() => onSelectView("tag", null, tag.name)}
-                    className={`group flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 tt-label font-medium transition-colors cursor-pointer ${ isSelected ? "bg-indigo-500/15 text-indigo-400 font-bold" : "text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/60 dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]/60" }`}
-                  >
-                    <div className="flex items-center gap-2 truncate flex-1 min-w-0">
-                      <TagIcon className="h-3 w-3 text-indigo-400 flex-shrink-0" />
-                      <span className="truncate">#{tag.name}</span>
-                    </div>
+              {isInitialLoadingTags ? (
+                <SidebarItemSkeleton count={3} dotClass="h-3 w-3 rounded" widths={[64, 88, 72]} />
+              ) : (
+                tags.map((tag) => {
+                  const isSelected = activeTag === tag.name;
+                  const count = tag._count?.tasks || 0;
+                  return (
+                    <div
+                      key={tag.id}
+                      onClick={() => onSelectView("tag", null, tag.name)}
+                      className={`group flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 tt-label font-medium transition-colors cursor-pointer ${ isSelected ? "bg-indigo-500/15 text-indigo-400 font-bold" : "text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/60 dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]/60" }`}
+                    >
+                      <div className="flex items-center gap-2 truncate flex-1 min-w-0">
+                        <TagIcon className="h-3 w-3 text-indigo-400 flex-shrink-0" />
+                        <span className="truncate">#{tag.name}</span>
+                      </div>
 
-                    <div className="flex items-center gap-1">
-                      {count > 0 && (
-                        <span className="group-hover:hidden tt-meta text-[var(--tt-muted)]">{count}</span>
-                      )}
+                      <div className="flex items-center gap-1">
+                        {count > 0 && (
+                          <span className="group-hover:hidden tt-meta text-[var(--tt-muted)]">{count}</span>
+                        )}
 
-                      <button
-                        type="button"
-                        onClick={(e) => handleDeleteTagClick(e, tag.id, tag.name)}
-                        title="Delete Tag"
-                        className="hidden group-hover:block rounded p-0.5 text-[var(--tt-muted)] hover:text-rose-400 hover:bg-[var(--tt-panel-alt)]/50"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
+                        <button
+                          type="button"
+                          onClick={(e) => handleDeleteTagClick(e, tag.id, tag.name)}
+                          title="Delete Tag"
+                          className="hidden group-hover:block rounded p-0.5 text-[var(--tt-muted)] hover:text-rose-400 hover:bg-[var(--tt-panel-alt)]/50"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           )}
         </div>
@@ -463,6 +571,7 @@ export function TickTickSidebar(props: SidebarProps = {}) {
           )}
         </div>
       </div>
+    </div>
 
       {/* New List Modal */}
       {showAddList && (
@@ -627,6 +736,17 @@ export function TickTickSidebar(props: SidebarProps = {}) {
           }
         }}
       />
+      {/* Draggable Resize Handle */}
+      {isSidebarOpen && (
+        <div
+          onMouseDown={handleMouseDown}
+          onDoubleClick={() => onWidthChange(260)}
+          title="Drag to resize, double-click to reset width"
+          className="absolute top-0 right-0 w-1.5 h-full cursor-col-resize hover:bg-[var(--tt-accent)]/50 active:bg-[var(--tt-accent)] transition-colors z-20 group"
+        >
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-full bg-[var(--tt-border)] group-hover:bg-[var(--tt-accent)] transition-colors opacity-0 group-hover:opacity-100" />
+        </div>
+      )}
     </aside>
   );
 }
