@@ -460,9 +460,12 @@ export function MotionDateRangeTimePicker({
 
     let dateText = ""
     const durationDays = getDurationDays(dueDate, endDate)
+    const tomorrowISO = toISODate(addDays(today, 1))
 
     if (dueDate === todayISO && (!endDate || endDate === todayISO)) {
       dateText = "Today"
+    } else if (dueDate === tomorrowISO && (!endDate || endDate === tomorrowISO)) {
+      dateText = "Tomorrow"
     } else if (endDate && endDate !== dueDate) {
       const toDate = parseISODate(endDate)
       const rangeStr = toDate
@@ -477,20 +480,20 @@ export function MotionDateRangeTimePicker({
       return `${dateText} • ${dueTime}`
     }
     return dateText
-  }, [dueDate, endDate, dueTime, todayISO])
+  }, [dueDate, endDate, dueTime, todayISO, today])
 
   return (
     <div
       className={cn(
         "flex flex-col select-none overflow-hidden rounded-2xl border border-zinc-800 bg-[#121214] text-zinc-100 shadow-2xl transition-all font-sans antialiased",
-        "w-[560px] min-w-[560px] max-w-[560px]",
+        "w-[560px] max-w-[calc(100vw-2rem)]",
         className
       )}
     >
       {/* ================================================================== */}
       {/* 3-Column Layout: [Presets] | [Calendar] | [Time Slots]              */}
       {/* ================================================================== */}
-      <div className="flex flex-row w-full h-[330px]">
+      <div className="flex flex-row w-full h-[330px] overflow-x-auto">
         {/* ---------------------------------------------------------------- */}
         {/* Panel 1 (Left): Presets List matching screenshot                 */}
         {/* ---------------------------------------------------------------- */}

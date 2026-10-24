@@ -353,7 +353,13 @@ export function QuickAddModal({
                       </span>
                     ) : dueDate ? (
                       <>
-                        <span className="font-medium">{dueDate === today ? "Today" : formatShortDate(dueDate)}</span>
+                        <span className="font-medium">
+                          {dueDate === today
+                            ? "Today"
+                            : dueDate === tomorrow
+                            ? "Tomorrow"
+                            : formatShortDate(dueDate)}
+                        </span>
                         {dueTime && <span className="opacity-75 font-mono ml-1.5">@{dueTime}</span>}
                       </>
                     ) : (

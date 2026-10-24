@@ -35,7 +35,7 @@ import {
   Check,
 } from "lucide-react";
 import { Task } from "@/hooks/use-ticktick";
-import { formatShortDate, getTodayISO } from "@/lib/date-utils";
+import { formatShortDate, getTodayISO, addDays } from "@/lib/date-utils";
 import { useTickTickContext } from "@/context/ticktick-context";
 import { cn } from "@/lib/utils";
 
@@ -116,6 +116,8 @@ function TaskCard({
     if (!task.dueDate || task.completed) return false;
     return task.dueDate < today;
   }, [task.dueDate, task.completed, today]);
+
+  const tomorrow = useMemo(() => addDays(today, 1), [today]);
 
   // Priority and completion card styling
   const priorityCardStyles = useMemo(() => {
@@ -294,12 +296,18 @@ function TaskCard({
                     ? "bg-rose-500/15 text-rose-400 border border-rose-500/30 font-bold"
                     : task.dueDate === today
                     ? "bg-[var(--tt-accent)]/15 text-[var(--tt-accent-text)] font-bold border border-[var(--tt-accent)]/30"
+                    : task.dueDate === tomorrow
+                    ? "bg-amber-500/15 text-amber-400 font-bold border border-amber-500/30"
                     : "bg-[var(--tt-panel-alt)] text-[var(--tt-muted)] border border-[var(--tt-border)]/60"
                 )}
               >
                 <Calendar className="h-2.5 w-2.5 shrink-0" />
                 <time className="whitespace-nowrap">
-                  {task.dueDate === today ? "Today" : formatShortDate(task.dueDate)}
+                  {task.dueDate === today
+                    ? "Today"
+                    : task.dueDate === tomorrow
+                    ? "Tomorrow"
+                    : formatShortDate(task.dueDate)}
                   {task.dueTime && ` · ${task.dueTime}`}
                 </time>
               </div>

@@ -22,7 +22,7 @@ import {
   XIcon,
 } from "lucide-react";
 import { Task, TaskList, Tag, TaskReminder, ListMember } from "@/hooks/use-ticktick";
-import { getTodayISO, formatShortDate, parseISODate } from "@/lib/date-utils";
+import { getTodayISO, formatShortDate, parseISODate, addDays } from "@/lib/date-utils";
 import { TaskDatePickerPopover } from "./task-date-picker-popover";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import { useTickTickContext } from "@/context/ticktick-context";
@@ -98,7 +98,6 @@ export function TaskInspector({
   const [isCreatingTag, setIsCreatingTag] = useState(false);
   const [tagToDelete, setTagToDelete] = useState<{ id: string; name: string } | null>(null);
   const [localTags, setLocalTags] = useState<{ id: string; name: string; color: string }[]>([]);
-  const datePickerRef = useRef<HTMLDivElement>(null);
   const newSubtaskInputRef = useRef<HTMLInputElement>(null);
 
   // Sync localTags from task.tags with fallback to global tags cache
@@ -216,17 +215,6 @@ export function TaskInspector({
   }
 
   useEffect(() => {
-    if (!showDatePicker) return;
-    function handleClickOutside(e: MouseEvent) {
-      if (datePickerRef.current && !datePickerRef.current.contains(e.target as Node)) {
-        setShowDatePicker(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showDatePicker]);
-
-  useEffect(() => {
     if (task) {
       setTitle(task.title);
       setDescription(task.description || "");
@@ -236,8 +224,10 @@ export function TaskInspector({
   if (!task) return null;
 
   const today = getTodayISO();
+  const tomorrow = addDays(today, 1);
   const isOverdue = task.dueDate && task.dueDate < today && !task.completed;
   const isDueToday = task.dueDate && task.dueDate === today;
+  const isDueTomorrow = task.dueDate && task.dueDate === tomorrow;
 
   function handleTitleBlur() {
     if (title.trim() && title !== task?.title) {
@@ -416,66 +406,80 @@ export function TaskInspector({
             {/* Vertical Divider */}
             <span className="h-3.5 w-px bg-[var(--tt-border)]/80" />
 
-            {/* Due Date Trigger Button */}
-            <div className="relative" ref={datePickerRef}>
-              <button
-                type="button"
-                onClick={() => setShowDatePicker((prev) => !prev)}
-                className={cn(
-                  "flex items-center gap-1.5 tt-meta font-medium rounded px-1.5 py-0.5 transition-colors cursor-pointer",
-                  isOverdue
-                    ? "text-rose-500 font-semibold hover:bg-rose-500/10"
-                    : isDueToday
-                    ? "text-rose-500 font-semibold hover:bg-rose-500/10"
-                    : task.dueDate
-                    ? "text-[var(--tt-accent-text)] hover:bg-[var(--tt-panel-alt)]"
-                    : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]"
-                )}
-                title="Change due date"
-              >
-                <Calendar
+            {/* Due Date Trigger Button with Popover */}
+            <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
                   className={cn(
-                    "h-3.5 w-3.5",
-                    isOverdue || isDueToday ? "text-rose-500" : undefined
-                  )}
-                />
-                <span>
-                  {task.dueDate
-                    ? isOverdue
-                      ? getOverdueLabel(task.dueDate)
+                    "flex items-center gap-1.5 tt-meta font-medium rounded px-1.5 py-0.5 transition-colors cursor-pointer",
+                    isOverdue
+                      ? "text-rose-500 font-semibold hover:bg-rose-500/10"
                       : isDueToday
-                      ? "Today"
-                      : formatShortDate(task.dueDate)
-                    : "Set date"}
-                  {task.dueTime ? ` ${task.dueTime}` : ""}
-                </span>
-              </button>
-
-              {/* Date Picker Popover */}
-              {showDatePicker && (
-                <div className="absolute left-0 top-full mt-1 z-50">
-                  <TaskDatePickerPopover
-                    dueDate={task.dueDate || null}
-                    endDate={task.endDate || null}
-                    dueTime={task.dueTime || null}
-                    endTime={task.endTime || null}
-                    onSelect={(dueDate, dueTime, endDate, endTime) => {
-                      onUpdateTask({
-                        taskId: task.id,
-                        dueDate,
-                        dueTime,
-                        endDate,
-                        endTime,
-                        startDate: dueDate,
-                        startTime: dueTime,
-                      });
-                      setShowDatePicker(false);
-                    }}
-                    onClose={() => setShowDatePicker(false)}
+                      ? "text-[var(--tt-accent-text)] font-semibold hover:bg-[var(--tt-panel-alt)]"
+                      : isDueTomorrow
+                      ? "text-amber-400 font-semibold hover:bg-amber-500/10"
+                      : task.dueDate
+                      ? "text-[var(--tt-accent-text)] hover:bg-[var(--tt-panel-alt)]"
+                      : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]"
+                  )}
+                  title="Change due date"
+                >
+                  <Calendar
+                    className={cn(
+                      "h-3.5 w-3.5",
+                      isOverdue
+                        ? "text-rose-500"
+                        : isDueToday
+                        ? "text-[var(--tt-accent-text)]"
+                        : isDueTomorrow
+                        ? "text-amber-400"
+                        : undefined
+                    )}
                   />
-                </div>
-              )}
-            </div>
+                  <span>
+                    {task.dueDate
+                      ? isOverdue
+                        ? getOverdueLabel(task.dueDate)
+                        : isDueToday
+                        ? "Today"
+                        : isDueTomorrow
+                        ? "Tomorrow"
+                        : formatShortDate(task.dueDate)
+                      : "Set date"}
+                    {task.dueTime ? ` ${task.dueTime}` : ""}
+                  </span>
+                </button>
+              </PopoverTrigger>
+
+              <PopoverContent
+                align="end"
+                side="bottom"
+                sideOffset={6}
+                collisionPadding={16}
+                className="w-auto p-0 border-0 bg-transparent shadow-2xl z-50 overflow-visible"
+              >
+                <TaskDatePickerPopover
+                  dueDate={task.dueDate || null}
+                  endDate={task.endDate || null}
+                  dueTime={task.dueTime || null}
+                  endTime={task.endTime || null}
+                  onSelect={(dueDate, dueTime, endDate, endTime) => {
+                    onUpdateTask({
+                      taskId: task.id,
+                      dueDate,
+                      dueTime,
+                      endDate,
+                      endTime,
+                      startDate: dueDate,
+                      startTime: dueTime,
+                    });
+                    setShowDatePicker(false);
+                  }}
+                  onClose={() => setShowDatePicker(false)}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div className="flex items-center gap-1">
