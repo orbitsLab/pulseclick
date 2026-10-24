@@ -20,6 +20,7 @@ import {
   ChevronRightIcon,
   PlusIcon,
   CalendarDays,
+  Folder,
 } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -77,6 +78,12 @@ export function EventCalendar({
   const [view, setView] = useState<CalendarView>(initialView);
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [selectedListId, setSelectedListId] = useState<string>("all");
+
+  const filteredEvents = useMemo(() => {
+    if (selectedListId === "all") return events;
+    return events.filter((e) => e.listId === selectedListId);
+  }, [events, selectedListId]);
 
   // Keyboard shortcuts for view switching
   useEffect(() => {
@@ -148,8 +155,12 @@ export function EventCalendar({
   };
 
   const handleEventSelect = (event: CalendarEvent) => {
-    setSelectedEvent(event);
-    setIsEventDialogOpen(true);
+    if (onOpenTaskDetails) {
+      onOpenTaskDetails(event.id);
+    } else {
+      setSelectedEvent(event);
+      setIsEventDialogOpen(true);
+    }
   };
 
   const handleEventCreate = (startTime: Date) => {
@@ -170,11 +181,17 @@ export function EventCalendar({
       end: addHoursToDate(startTime, 1),
       id: "",
       start: startTime,
-      title: "",
+      title: "New Task",
       color: "sky",
+      listId: selectedListId === "all" ? undefined : selectedListId,
     };
-    setSelectedEvent(newEvent);
-    setIsEventDialogOpen(true);
+
+    if (onEventAdd) {
+      onEventAdd(newEvent);
+    } else {
+      setSelectedEvent(newEvent);
+      setIsEventDialogOpen(true);
+    }
   };
 
   const handleEventSave = (event: CalendarEvent) => {
@@ -389,14 +406,55 @@ export function EventCalendar({
               </DropdownMenu>
             </div>
 
+            {/* List Filter Dropdown */}
+            {lists.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5 border-[var(--tt-border)] bg-[var(--tt-panel-alt)] text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/80 tt-label font-medium cursor-pointer"
+                  >
+                    <Folder className="h-3.5 w-3.5 text-[var(--tt-muted)]" />
+                    <span className="hidden sm:inline">
+                      {selectedListId === "all"
+                        ? "All Lists"
+                        : lists.find((l) => l.id === selectedListId)?.name || "List"}
+                    </span>
+                    <ChevronDownIcon aria-hidden="true" size={14} className="opacity-60" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="min-w-36 bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)]"
+                >
+                  <DropdownMenuItem onClick={() => setSelectedListId("all")} className="cursor-pointer">
+                    All Lists
+                  </DropdownMenuItem>
+                  {lists.map((l) => (
+                    <DropdownMenuItem
+                      key={l.id}
+                      onClick={() => setSelectedListId(l.id)}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <span
+                        className="h-2 w-2 rounded-full shrink-0"
+                        style={{ backgroundColor: l.color || "#4772fa" }}
+                      />
+                      <span>{l.name}</span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
             {/* New Task Button */}
             <Button
               onClick={() => {
-                setSelectedEvent(null);
-                setIsEventDialogOpen(true);
+                handleEventCreate(new Date());
               }}
               size="sm"
-              className="bg-[var(--tt-accent-strong)] text-white hover:bg-[var(--tt-accent-strong)]/90 gap-1.5 rounded-lg shadow-sm"
+              className="bg-[var(--tt-accent-strong)] text-white hover:bg-[var(--tt-accent-strong)]/90 gap-1.5 rounded-lg shadow-sm cursor-pointer"
             >
               <PlusIcon aria-hidden="true" size={16} />
               <span className="hidden sm:inline">New task</span>
@@ -409,38 +467,42 @@ export function EventCalendar({
           {view === "month" && (
             <MonthView
               currentDate={currentDate}
-              events={events}
+              events={filteredEvents}
               onEventCreate={handleEventCreate}
               onEventSelect={handleEventSelect}
+              onEventToggleComplete={onEventToggleComplete}
             />
           )}
           {view === "week" && (
             <WeekView
               currentDate={currentDate}
-              events={events}
+              events={filteredEvents}
               onEventCreate={handleEventCreate}
               onEventSelect={handleEventSelect}
+              onEventToggleComplete={onEventToggleComplete}
             />
           )}
           {view === "day" && (
             <DayView
               currentDate={currentDate}
-              events={events}
+              events={filteredEvents}
               onEventCreate={handleEventCreate}
               onEventSelect={handleEventSelect}
+              onEventToggleComplete={onEventToggleComplete}
             />
           )}
           {view === "agenda" && (
             <AgendaView
               currentDate={currentDate}
-              events={events}
+              events={filteredEvents}
               onEventSelect={handleEventSelect}
+              onEventToggleComplete={onEventToggleComplete}
             />
           )}
           {view === "year" && (
             <YearView
               currentDate={currentDate}
-              events={events}
+              events={filteredEvents}
               onEventSelect={handleEventSelect}
               onSelectDate={(date) => {
                 setCurrentDate(date);

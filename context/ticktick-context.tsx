@@ -177,9 +177,12 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
 
   // TanStack Query Hook integration
   const ticktick = useTickTick({
-    view: activeModule === "timeline" ? "timeline" : activeView,
-    listId: activeListId,
-    tag: activeTag,
+    view:
+      activeModule === "timeline" || activeModule === "calendar"
+        ? activeModule
+        : activeView,
+    listId: activeModule === "calendar" ? undefined : activeListId,
+    tag: activeModule === "calendar" ? undefined : activeTag,
     search: searchQuery,
     filterId: activeFilterId,
     statsRange,

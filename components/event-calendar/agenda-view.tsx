@@ -15,12 +15,14 @@ interface AgendaViewProps {
   currentDate: Date;
   events: CalendarEvent[];
   onEventSelect: (event: CalendarEvent) => void;
+  onEventToggleComplete?: (eventId: string, completed: boolean) => void;
 }
 
 export function AgendaView({
   currentDate,
   events,
   onEventSelect,
+  onEventToggleComplete,
 }: AgendaViewProps) {
   // Show events for the next days based on constant
   const days = useMemo(() => {
@@ -66,7 +68,7 @@ export function AgendaView({
               key={day.toString()}
             >
               <span
-                className="-top-3 absolute left-0 flex h-6 items-center bg-background pe-4 text-[10px] uppercase data-today:font-medium sm:pe-4 sm:text-xs"
+                className="-top-3 absolute left-0 flex h-6 items-center bg-background pe-4 tt-meta uppercase data-today:font-medium sm:pe-4 sm:tt-label"
                 data-today={isToday(day) || undefined}
               >
                 {format(day, "d MMM, EEEE")}
@@ -77,6 +79,7 @@ export function AgendaView({
                     event={event}
                     key={event.id}
                     onClick={(e) => handleEventClick(event, e)}
+                    onToggleComplete={onEventToggleComplete}
                     view="agenda"
                   />
                 ))}

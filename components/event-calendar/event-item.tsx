@@ -2,8 +2,9 @@
 
 import type { DraggableAttributes } from "@dnd-kit/core";
 import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
-import { differenceInMinutes, format, getMinutes, isPast } from "date-fns";
-import { useMemo } from "react";
+import { differenceInMinutes, format, getMinutes } from "date-fns";
+import { Check } from "lucide-react";
+import React, { useMemo } from "react";
 
 import {
   type CalendarEvent,
@@ -19,6 +20,50 @@ import { cn } from "@/lib/utils";
 const formatTimeWithOptionalMinutes = (date: Date) => {
   return format(date, getMinutes(date) === 0 ? "ha" : "h:mma").toLowerCase();
 };
+
+interface EventCheckboxProps {
+  completed?: boolean;
+  priority?: number;
+  title: string;
+  onToggle?: (e: React.MouseEvent) => void;
+  size?: "sm" | "md";
+}
+
+function EventCheckbox({ completed, priority, title, onToggle, size = "sm" }: EventCheckboxProps) {
+  const isCompleted = Boolean(completed);
+  const sizeClasses = size === "sm" ? "h-3.5 w-3.5 rounded-[4px]" : "h-4 w-4 rounded-md";
+  const iconSize = size === "sm" ? "h-2.5 w-2.5" : "h-3 w-3";
+
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={isCompleted}
+      aria-label={`Mark "${title}" as ${isCompleted ? "incomplete" : "complete"}`}
+      onClick={(e) => {
+        e.stopPropagation();
+        onToggle?.(e);
+      }}
+      onMouseDown={(e) => e.stopPropagation()}
+      onTouchStart={(e) => e.stopPropagation()}
+      className={cn(
+        "flex shrink-0 items-center justify-center border transition-all active:scale-90 cursor-pointer focus-visible:outline-none focus-visible:ring-1.5 focus-visible:ring-[var(--tt-accent)]",
+        sizeClasses,
+        isCompleted
+          ? "border-emerald-500 bg-emerald-500 text-white shadow-xs"
+          : priority === 3
+          ? "border-rose-500 bg-rose-500/15 hover:bg-rose-500/30 text-rose-500"
+          : priority === 2
+          ? "border-amber-500 bg-amber-500/15 hover:bg-amber-500/30 text-amber-500"
+          : priority === 1
+          ? "border-sky-500 bg-sky-500/15 hover:bg-sky-500/30 text-sky-500"
+          : "border-[var(--tt-border)] bg-[var(--tt-panel)]/80 hover:border-[var(--tt-accent)] text-[var(--tt-muted)]"
+      )}
+    >
+      {isCompleted && <Check className={cn(iconSize, "stroke-[3]")} />}
+    </button>
+  );
+}
 
 interface EventWrapperProps {
   event: CalendarEvent;
@@ -53,9 +98,11 @@ function EventWrapper({
   const isCompleted = Boolean(event.completed);
 
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       className={cn(
-        "flex size-full select-none overflow-hidden px-1.5 text-left font-medium outline-none transition focus-visible:border-ring focus-visible:ring-[2px] focus-visible:ring-ring/50 data-dragging:cursor-grabbing data-dragging:shadow-lg sm:px-2",
+        "flex size-full select-none overflow-hidden px-1.5 text-left font-medium outline-none transition focus-visible:border-ring focus-visible:ring-[2px] focus-visible:ring-ring/50 data-dragging:cursor-grabbing data-dragging:shadow-lg sm:px-2 cursor-pointer",
         getEventColorClasses(event.color, isCompleted),
         getBorderRadiusClasses(isFirstDay, isLastDay),
         isCompleted && "line-through opacity-60",
@@ -64,14 +111,19 @@ function EventWrapper({
       data-dragging={isDragging || undefined}
       data-completed={isCompleted || undefined}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick?.(e as any);
+        }
+      }}
       onMouseDown={onMouseDown}
       onTouchStart={onTouchStart}
-      type="button"
       {...dndListeners}
       {...dndAttributes}
     >
       {children}
-    </button>
+    </div>
   );
 }
 
@@ -80,6 +132,7 @@ interface EventItemProps {
   view: "month" | "week" | "day" | "agenda";
   isDragging?: boolean;
   onClick?: (e: React.MouseEvent) => void;
+  onToggleComplete?: (eventId: string, completed: boolean) => void;
   showTime?: boolean;
   currentTime?: Date; // For updating time during drag
   isFirstDay?: boolean;
@@ -97,6 +150,7 @@ export function EventItem({
   view,
   isDragging,
   onClick,
+  onToggleComplete,
   showTime,
   currentTime,
   isFirstDay = true,
@@ -145,7 +199,7 @@ export function EventItem({
     return (
       <EventWrapper
         className={cn(
-          "mt-[var(--event-gap)] h-[var(--event-height)] items-center text-[11px] sm:text-xs",
+          "mt-[var(--event-gap)] h-[var(--event-height)] items-center tt-meta sm:tt-label",
           className,
         )}
         currentTime={currentTime}
@@ -160,27 +214,22 @@ export function EventItem({
         onTouchStart={onTouchStart}
       >
         {children || (
-          <div className="flex items-center gap-1.5 w-full truncate">
-            {event.completed ? (
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
-            ) : event.priority && event.priority > 0 ? (
-              <span
-                className={cn(
-                  "inline-block h-1.5 w-1.5 rounded-full shrink-0",
-                  event.priority === 3
-                    ? "bg-rose-500"
-                    : event.priority === 2
-                    ? "bg-amber-500"
-                    : "bg-sky-500"
-                )}
-              />
-            ) : null}
+          <div className="flex items-center gap-1.5 w-full min-w-0">
+            <EventCheckbox
+              completed={event.completed}
+              priority={event.priority}
+              title={event.title}
+              size="sm"
+              onToggle={() => onToggleComplete?.(event.id, !event.completed)}
+            />
             {!event.allDay && (
               <span className="font-mono tt-meta opacity-75 shrink-0">
                 {formatTimeWithOptionalMinutes(displayStart)}
               </span>
             )}
-            <span className="truncate">{event.title}</span>
+            <span className={cn("truncate min-w-0 font-medium", event.completed && "line-through text-[var(--tt-muted)]")}>
+              {event.title}
+            </span>
           </div>
         )}
       </EventWrapper>
@@ -193,7 +242,7 @@ export function EventItem({
         className={cn(
           "py-1",
           durationMinutes < 45 ? "items-center" : "flex-col",
-          view === "week" ? "text-[11px] sm:text-xs" : "text-xs",
+          view === "week" ? "tt-meta sm:tt-label" : "tt-label",
           className,
         )}
         currentTime={currentTime}
@@ -208,49 +257,39 @@ export function EventItem({
         onTouchStart={onTouchStart}
       >
         {durationMinutes < 45 ? (
-          <div className="flex items-center gap-1.5 truncate">
-            {event.completed ? (
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
-            ) : event.priority && event.priority > 0 ? (
-              <span
-                className={cn(
-                  "inline-block h-1.5 w-1.5 rounded-full shrink-0",
-                  event.priority === 3
-                    ? "bg-rose-500"
-                    : event.priority === 2
-                    ? "bg-amber-500"
-                    : "bg-sky-500"
-                )}
-              />
-            ) : null}
-            <span className="truncate">{event.title}</span>
+          <div className="flex items-center gap-1.5 w-full min-w-0">
+            <EventCheckbox
+              completed={event.completed}
+              priority={event.priority}
+              title={event.title}
+              size="sm"
+              onToggle={() => onToggleComplete?.(event.id, !event.completed)}
+            />
+            <span className={cn("truncate min-w-0 font-medium", event.completed && "line-through text-[var(--tt-muted)]")}>
+              {event.title}
+            </span>
             {showTime && (
-              <span className="opacity-75 font-mono text-[10px]">
+              <span className="opacity-75 font-mono tt-meta shrink-0 ml-auto">
                 {formatTimeWithOptionalMinutes(displayStart)}
               </span>
             )}
           </div>
         ) : (
           <>
-            <div className="flex items-center gap-1.5 truncate font-medium">
-              {event.completed ? (
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
-              ) : event.priority && event.priority > 0 ? (
-                <span
-                  className={cn(
-                    "inline-block h-1.5 w-1.5 rounded-full shrink-0",
-                    event.priority === 3
-                      ? "bg-rose-500"
-                      : event.priority === 2
-                      ? "bg-amber-500"
-                      : "bg-sky-500"
-                  )}
-                />
-              ) : null}
-              <span className="truncate">{event.title}</span>
+            <div className="flex items-center gap-1.5 w-full min-w-0 font-medium">
+              <EventCheckbox
+                completed={event.completed}
+                priority={event.priority}
+                title={event.title}
+                size="sm"
+                onToggle={() => onToggleComplete?.(event.id, !event.completed)}
+              />
+              <span className={cn("truncate min-w-0 font-medium", event.completed && "line-through text-[var(--tt-muted)]")}>
+                {event.title}
+              </span>
             </div>
             {showTime && (
-              <div className="truncate font-mono opacity-75 text-[10px]">
+              <div className="truncate font-mono opacity-75 tt-meta pl-5">
                 {getEventTime()}
               </div>
             )}
@@ -264,37 +303,39 @@ export function EventItem({
   const isCompleted = Boolean(event.completed);
 
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       className={cn(
-        "flex w-full flex-col gap-1.5 rounded-xl border p-3 text-left outline-none transition focus-visible:border-ring focus-visible:ring-[2px] focus-visible:ring-ring/50",
+        "flex w-full flex-col gap-1.5 rounded-xl border p-3 text-left outline-none transition focus-visible:border-ring focus-visible:ring-[2px] focus-visible:ring-ring/50 cursor-pointer",
         getEventColorClasses(eventColor, isCompleted),
         isCompleted && "line-through opacity-60",
         className,
       )}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick?.(e as any);
+        }
+      }}
       onMouseDown={onMouseDown}
       onTouchStart={onTouchStart}
-      type="button"
       {...dndListeners}
       {...dndAttributes}
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 font-medium tt-heading truncate">
-          {event.completed ? (
-            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
-          ) : event.priority && event.priority > 0 ? (
-            <span
-              className={cn(
-                "inline-block h-2 w-2 rounded-full shrink-0",
-                event.priority === 3
-                  ? "bg-rose-500"
-                  : event.priority === 2
-                  ? "bg-amber-500"
-                  : "bg-sky-500"
-              )}
-            />
-          ) : null}
-          <span className="truncate">{event.title}</span>
+        <div className="flex items-center gap-2.5 font-medium tt-heading truncate min-w-0">
+          <EventCheckbox
+            completed={event.completed}
+            priority={event.priority}
+            title={event.title}
+            size="md"
+            onToggle={() => onToggleComplete?.(event.id, !event.completed)}
+          />
+          <span className={cn("truncate", isCompleted && "line-through text-[var(--tt-muted)]")}>
+            {event.title}
+          </span>
         </div>
         {event.listName && (
           <span className="tt-meta rounded-md bg-[var(--tt-panel-alt)] border border-[var(--tt-border)] px-2 py-0.5 text-[var(--tt-muted)] shrink-0 font-medium">
@@ -302,7 +343,7 @@ export function EventItem({
           </span>
         )}
       </div>
-      <div className="flex items-center gap-2 tt-meta text-[var(--tt-muted)]">
+      <div className="flex items-center gap-2 tt-meta text-[var(--tt-muted)] pl-6.5">
         {event.allDay ? (
           <span>All day</span>
         ) : (
@@ -326,10 +367,10 @@ export function EventItem({
         ) : null}
       </div>
       {event.description && (
-        <div className="tt-body text-[var(--tt-muted)] line-clamp-2 mt-0.5">
+        <div className="tt-body text-[var(--tt-muted)] line-clamp-2 mt-0.5 pl-6.5">
           {event.description}
         </div>
       )}
-    </button>
+    </div>
   );
 }

@@ -15,6 +15,7 @@ interface EventsPopupProps {
   position: { top: number; left: number };
   onClose: () => void;
   onEventSelect: (event: CalendarEvent) => void;
+  onEventToggleComplete?: (eventId: string, completed: boolean) => void;
 }
 
 export function EventsPopup({
@@ -23,6 +24,7 @@ export function EventsPopup({
   position,
   onClose,
   onEventSelect,
+  onEventToggleComplete,
 }: EventsPopupProps) {
   const popupRef = useRef<HTMLDivElement>(null);
 
@@ -127,6 +129,7 @@ export function EventsPopup({
                   event={event}
                   isFirstDay={isFirstDay}
                   isLastDay={isLastDay}
+                  onToggleComplete={onEventToggleComplete}
                   view="agenda"
                 />
               </div>

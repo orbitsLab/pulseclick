@@ -10,26 +10,27 @@ import type {
  */
 export function getEventColorClasses(color?: EventColor | string, completed?: boolean): string {
   if (completed) {
-    return "bg-[var(--tt-panel-alt)]/60 text-[var(--tt-muted)] border border-[var(--tt-border)]/60 hover:bg-[var(--tt-panel-alt)]/80 line-through opacity-60";
+    return "bg-[var(--tt-panel-alt)]/50 text-[var(--tt-muted)] border border-[var(--tt-border)]/60 hover:bg-[var(--tt-panel-alt)]/70 line-through opacity-60";
   }
 
-  const eventColor = color || "sky";
+  const eventColor = color || "slate";
 
   switch (eventColor) {
-    case "sky":
-      return "bg-sky-500/15 hover:bg-sky-500/25 text-sky-700 dark:text-sky-300 border border-sky-500/30";
-    case "amber":
-      return "bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 border border-amber-500/30";
-    case "violet":
-      return "bg-violet-500/15 hover:bg-violet-500/25 text-violet-700 dark:text-violet-300 border border-violet-500/30";
     case "rose":
-      return "bg-rose-500/15 hover:bg-rose-500/25 text-rose-700 dark:text-rose-300 border border-rose-500/30";
+      return "bg-rose-500/15 hover:bg-rose-500/25 text-rose-700 dark:text-rose-300 border border-rose-500/35";
+    case "amber":
+      return "bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 border border-amber-500/35";
+    case "sky":
+      return "bg-sky-500/15 hover:bg-sky-500/25 text-sky-700 dark:text-sky-300 border border-sky-500/35";
     case "emerald":
-      return "bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30";
+      return "bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-700 dark:text-emerald-300 border border-emerald-500/35";
+    case "violet":
+      return "bg-violet-500/15 hover:bg-violet-500/25 text-violet-700 dark:text-violet-300 border border-violet-500/35";
     case "orange":
-      return "bg-orange-500/15 hover:bg-orange-500/25 text-orange-700 dark:text-orange-300 border border-orange-500/30";
+      return "bg-orange-500/15 hover:bg-orange-500/25 text-orange-700 dark:text-orange-300 border border-orange-500/35";
+    case "slate":
     default:
-      return "bg-sky-500/15 hover:bg-sky-500/25 text-sky-700 dark:text-sky-300 border border-sky-500/30";
+      return "bg-[var(--tt-panel-alt)] hover:bg-[var(--tt-panel-alt)]/80 text-[var(--tt-text)] border border-[var(--tt-border)]";
   }
 }
 

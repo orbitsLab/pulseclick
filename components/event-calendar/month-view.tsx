@@ -40,6 +40,7 @@ interface MonthViewProps {
   events: CalendarEvent[];
   onEventSelect: (event: CalendarEvent) => void;
   onEventCreate: (startTime: Date) => void;
+  onEventToggleComplete?: (eventId: string, completed: boolean) => void;
 }
 
 export function MonthView({
@@ -47,6 +48,7 @@ export function MonthView({
   events,
   onEventSelect,
   onEventCreate,
+  onEventToggleComplete,
 }: MonthViewProps) {
   const days = useMemo(() => {
     const monthStart = startOfMonth(currentDate);
@@ -179,6 +181,7 @@ export function MonthView({
                                 isFirstDay={isFirstDay}
                                 isLastDay={isLastDay}
                                 onClick={(e) => handleEventClick(event, e)}
+                                onToggleComplete={onEventToggleComplete}
                                 view="month"
                               >
                                 <div aria-hidden={true} className="invisible">
@@ -208,6 +211,7 @@ export function MonthView({
                               isFirstDay={isFirstDay}
                               isLastDay={isLastDay}
                               onClick={(e) => handleEventClick(event, e)}
+                              onToggleComplete={onEventToggleComplete}
                               view="month"
                             />
                           </div>
@@ -218,7 +222,7 @@ export function MonthView({
                         <Popover modal>
                           <PopoverTrigger asChild>
                             <button
-                              className="mt-(--event-gap) flex h-(--event-height) w-full select-none items-center overflow-hidden px-1 text-left text-[10px] text-muted-foreground outline-none backdrop-blur-md transition hover:bg-muted/50 hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:px-2 sm:text-xs"
+                              className="mt-(--event-gap) flex h-(--event-height) w-full select-none items-center overflow-hidden px-1 text-left tt-meta text-muted-foreground outline-none backdrop-blur-md transition hover:bg-muted/50 hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:px-2 sm:tt-label cursor-pointer"
                               onClick={(e) => e.stopPropagation()}
                               type="button"
                             >
@@ -257,6 +261,7 @@ export function MonthView({
                                       onClick={(e) =>
                                         handleEventClick(event, e)
                                       }
+                                      onToggleComplete={onEventToggleComplete}
                                       view="month"
                                     />
                                   );

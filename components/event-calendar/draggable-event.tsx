@@ -16,6 +16,7 @@ interface DraggableEventProps {
   view: "month" | "week" | "day";
   showTime?: boolean;
   onClick?: (e: React.MouseEvent) => void;
+  onToggleComplete?: (eventId: string, completed: boolean) => void;
   height?: number;
   isMultiDay?: boolean;
   multiDayWidth?: number;
@@ -29,6 +30,7 @@ export function DraggableEvent({
   view,
   showTime,
   onClick,
+  onToggleComplete,
   height,
   isMultiDay,
   multiDayWidth,
@@ -131,6 +133,7 @@ export function DraggableEvent({
         isFirstDay={isFirstDay}
         isLastDay={isLastDay}
         onClick={onClick}
+        onToggleComplete={onToggleComplete}
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
         showTime={showTime}

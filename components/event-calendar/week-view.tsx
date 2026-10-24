@@ -39,6 +39,7 @@ interface WeekViewProps {
   events: CalendarEvent[];
   onEventSelect: (event: CalendarEvent) => void;
   onEventCreate: (startTime: Date) => void;
+  onEventToggleComplete?: (eventId: string, completed: boolean) => void;
 }
 
 interface PositionedEvent {
@@ -55,6 +56,7 @@ export function WeekView({
   events,
   onEventSelect,
   onEventCreate,
+  onEventToggleComplete,
 }: WeekViewProps) {
   const days = useMemo(() => {
     const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
@@ -246,7 +248,7 @@ export function WeekView({
         <div className="border-border/70 border-b bg-muted/50">
           <div className="grid grid-cols-8">
             <div className="relative border-border/70 border-r">
-              <span className="absolute bottom-0 left-0 h-6 w-16 max-w-full pe-2 text-right text-[10px] text-muted-foreground/70 sm:pe-4 sm:text-xs">
+              <span className="absolute bottom-0 left-0 h-6 w-16 max-w-full pe-2 text-right tt-meta text-muted-foreground/70 sm:pe-4 sm:tt-label">
                 All day
               </span>
             </div>
@@ -285,6 +287,7 @@ export function WeekView({
                         isLastDay={isLastDay}
                         key={`spanning-${event.id}`}
                         onClick={(e) => handleEventClick(event, e)}
+                        onToggleComplete={onEventToggleComplete}
                         view="month"
                       >
                         {/* Show title if it's the first day of the event or the first visible day in the week */}
@@ -315,7 +318,7 @@ export function WeekView({
               key={hour.toString()}
             >
               {index > 0 && (
-                <span className="-top-3 absolute left-0 flex h-6 w-16 max-w-full items-center justify-end bg-background pe-2 text-[10px] text-muted-foreground/70 sm:pe-4 sm:text-xs">
+                <span className="-top-3 absolute left-0 flex h-6 w-16 max-w-full items-center justify-end bg-background pe-2 tt-meta text-muted-foreground/70 sm:pe-4 sm:tt-label">
                   {format(hour, "h a")}
                 </span>
               )}
@@ -348,6 +351,7 @@ export function WeekView({
                     event={positionedEvent.event}
                     height={positionedEvent.height}
                     onClick={(e) => handleEventClick(positionedEvent.event, e)}
+                    onToggleComplete={onEventToggleComplete}
                     showTime
                     view="week"
                   />

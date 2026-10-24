@@ -41,8 +41,8 @@ export async function GET(req: Request) {
       where.dueDate = tomorrow;
     } else if (view === "next7") {
       where.dueDate = { gte: today, lte: next7Days };
-    } else if (view === "timeline") {
-      // The timeline shows the whole schedule, including finished work.
+    } else if (view === "timeline" || view === "calendar") {
+      // The timeline and calendar show the schedule, including finished work.
       delete where.completed;
     }
 
