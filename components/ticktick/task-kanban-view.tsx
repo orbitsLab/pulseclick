@@ -627,10 +627,10 @@ export function TaskKanbanView({
   }, [tasks]);
 
   const handleToggleComplete = (taskId: string, completed: boolean) => {
+    const nextStatus = completed ? "DONE" : "TODO";
+    onUpdateStatus(taskId, nextStatus);
     if (context.toggleComplete) {
       context.toggleComplete({ taskId, completed });
-    } else {
-      onUpdateStatus(taskId, completed ? "DONE" : "TODO");
     }
   };
 

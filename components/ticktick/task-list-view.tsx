@@ -212,6 +212,35 @@ export function TaskListView(props: TaskListViewProps = {}) {
               >
                 {task.title}
               </span>
+
+              {!task.completed && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const nextStatus =
+                      task.kanbanStatus === "IN_PROGRESS" ? "TODO" : "IN_PROGRESS";
+                    onUpdateTask?.({ taskId: task.id, kanbanStatus: nextStatus });
+                  }}
+                  title={`Status: ${task.kanbanStatus === "IN_PROGRESS" ? "In Progress" : "To Do"}. Click to toggle.`}
+                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 tt-meta font-medium transition-colors cursor-pointer ${
+                    task.kanbanStatus === "IN_PROGRESS"
+                      ? "bg-amber-500/15 text-amber-500 hover:bg-amber-500/25 border border-amber-500/30"
+                      : "bg-[var(--tt-panel-alt)] text-[var(--tt-muted)] hover:text-[var(--tt-text)] hover:border-[var(--tt-border)] border border-[var(--tt-border)]/60"
+                  }`}
+                >
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full shrink-0 ${
+                      task.kanbanStatus === "IN_PROGRESS"
+                        ? "bg-amber-500"
+                        : "bg-slate-400"
+                    }`}
+                  />
+                  <span>
+                    {task.kanbanStatus === "IN_PROGRESS" ? "In Progress" : "To Do"}
+                  </span>
+                </button>
+              )}
             </div>
 
             {/* Badges row: List, Subtasks, Pomodoro, Due Date, Tags */}

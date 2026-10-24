@@ -65,7 +65,22 @@ export async function PATCH(
     if (body.reminder !== undefined) updateData.reminder = body.reminder;
     if (body.isPinned !== undefined) updateData.isPinned = Boolean(body.isPinned);
     if (body.isTrash !== undefined) updateData.isTrash = Boolean(body.isTrash);
-    if (body.kanbanStatus !== undefined) updateData.kanbanStatus = body.kanbanStatus;
+    if (body.kanbanStatus !== undefined) {
+      updateData.kanbanStatus = body.kanbanStatus;
+      if (body.completed === undefined) {
+        if (body.kanbanStatus === "DONE") {
+          updateData.completed = true;
+          updateData.completedAt = new Date();
+        } else if (
+          body.kanbanStatus === "TODO" ||
+          body.kanbanStatus === "IN_PROGRESS" ||
+          body.kanbanStatus === "WONT_DO"
+        ) {
+          updateData.completed = false;
+          updateData.completedAt = null;
+        }
+      }
+    }
     if (body.listId !== undefined) updateData.listId = body.listId === "inbox" ? null : body.listId;
     if (body.pomodoroCount !== undefined) updateData.pomodoroCount = Number(body.pomodoroCount);
     if (body.startDate !== undefined) updateData.startDate = body.startDate || null;
@@ -117,6 +132,8 @@ export async function PATCH(
         updateData.completedAt = nextCompleted ? new Date() : null;
         if (nextCompleted) {
           updateData.kanbanStatus = "DONE";
+        } else if (body.kanbanStatus === undefined) {
+          updateData.kanbanStatus = "TODO";
         }
       }
     }

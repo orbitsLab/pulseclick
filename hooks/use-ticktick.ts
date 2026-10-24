@@ -374,7 +374,10 @@ export function useTickTick(filters: {
       const res = await fetch(`/api/tasks/${taskId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ completed }),
+        body: JSON.stringify({
+          completed,
+          kanbanStatus: completed ? "DONE" : "TODO",
+        }),
       });
       if (!res.ok) throw new Error("Failed to toggle task");
       return res.json();
@@ -392,7 +395,7 @@ export function useTickTick(filters: {
           ? {
               ...t,
               completed,
-              kanbanStatus: completed ? ("DONE" as const) : t.kanbanStatus,
+              kanbanStatus: completed ? ("DONE" as const) : ("TODO" as const),
             }
           : t
       );
@@ -560,7 +563,34 @@ export function useTickTick(filters: {
           }
         }
 
-        return { ...t, ...updates, tags: nextTags };
+        let nextCompleted = t.completed;
+        let nextCompletedAt = t.completedAt;
+        if (updates.kanbanStatus !== undefined && updates.completed === undefined) {
+          if (updates.kanbanStatus === "DONE") {
+            nextCompleted = true;
+            nextCompletedAt = new Date().toISOString();
+          } else if (
+            updates.kanbanStatus === "TODO" ||
+            updates.kanbanStatus === "IN_PROGRESS" ||
+            updates.kanbanStatus === "WONT_DO"
+          ) {
+            nextCompleted = false;
+            nextCompletedAt = null;
+          }
+        }
+
+        return {
+          ...t,
+          ...updates,
+          completed: updates.completed !== undefined ? updates.completed : nextCompleted,
+          completedAt:
+            updates.completed !== undefined
+              ? updates.completed
+                ? t.completedAt || new Date().toISOString()
+                : null
+              : nextCompletedAt,
+          tags: nextTags,
+        };
       });
 
       queryClient.setQueryData(tasksQueryKey, updated);

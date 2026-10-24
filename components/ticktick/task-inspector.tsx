@@ -323,7 +323,14 @@ export function TaskInspector({
               <ContextMenuTrigger className="inline-flex items-center justify-center">
                 <button
                   type="button"
-                  onClick={() => onUpdateTask({ taskId: task.id, completed: !task.completed })}
+                  onClick={() => {
+                    const nextCompleted = !task.completed;
+                    onUpdateTask({
+                      taskId: task.id,
+                      completed: nextCompleted,
+                      kanbanStatus: nextCompleted ? "DONE" : "TODO",
+                    });
+                  }}
                   className={cn(
                     "flex h-4.5 w-4.5 items-center justify-center rounded border transition-all active:scale-90 cursor-pointer",
                     task.completed
