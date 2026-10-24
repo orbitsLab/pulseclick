@@ -251,4 +251,27 @@
   p {
     text-wrap: pretty;
   }
+
+  /* Sleek custom scrollbars matching TickTick palette across all browsers */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--tt-border) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--tt-border);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--tt-muted);
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 }
