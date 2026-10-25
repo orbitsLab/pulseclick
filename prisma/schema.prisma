@@ -26,6 +26,7 @@ model User {
   tags              Tag[]
   pomodoroSessions  PomodoroSession[]
   habits            Habit[]
+  habitSections     HabitSection[]
   filters           Filter[]
   countdowns        Countdown[]
   memberships       ListMember[]
@@ -154,21 +155,44 @@ model PomodoroSession {
 }
 
 model Habit {
-  id         String     @id @default(cuid())
-  userId     String
-  title      String
-  icon       String     @default("Flame")
-  color      String     @default("#14b8a6")
-  frequency  String     @default("DAILY") // DAILY, WEEKLY
-  targetDays Int        @default(1)
-  order      Int        @default(0)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  id            String        @id @default(cuid())
+  userId        String
+  title         String
+  icon          String        @default("Flame")
+  color         String        @default("#14b8a6")
+  frequency     String        @default("DAILY") // DAILY, WEEKLY
+  targetDays    Int           @default(1)
+  order         Int           @default(0)
 
-  user User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  logs HabitLog[]
+  // Custom Goals (boolean vs numeric with units)
+  goalType      String        @default("BOOLEAN") // BOOLEAN, NUMERIC
+  goalValue     Float?
+  goalUnit      String?
+
+  // Section membership (grouping)
+  sectionId     String?
+
+  // Archival state
+  status        String        @default("ACTIVE") // ACTIVE, ARCHIVED
+  archivedAt    DateTime?
+
+  // Encouragement quote/message
+  encouragement String?
+
+  // Habit Reminders
+  reminderTime    String?       // HH:mm format, e.g. "07:30"
+  reminderEnabled Boolean       @default(false)
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  section       HabitSection? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  logs          HabitLog[]
 
   @@index([userId])
+  @@index([userId, status])
+  @@index([sectionId])
 }
 
 model HabitLog {
@@ -176,6 +200,9 @@ model HabitLog {
   habitId   String
   date      String   // YYYY-MM-DD
   completed Boolean  @default(true)
+  status    String   @default("COMPLETED") // COMPLETED, SKIPPED, MISSED
+  value     Float?   // Logged numeric value
+  note      String?  // Optional memo/reflection
   createdAt DateTime @default(now())
 
   habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
@@ -183,6 +210,22 @@ model HabitLog {
   @@unique([habitId, date])
   @@index([habitId])
   @@index([date])
+}
+
+model HabitSection {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  order     Int      @default(0)
+  collapsed Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  habits Habit[]
+
+  @@unique([userId, name])
+  @@index([userId])
 }
 
 // ---------------------------------------------------------------------------

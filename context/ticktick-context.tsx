@@ -9,6 +9,8 @@ import {
   TaskList,
   Tag,
   Habit,
+  HabitSection,
+  HabitAnalyticsData,
   Countdown,
   StatisticsData,
   UserSettings,
@@ -89,6 +91,14 @@ export interface TickTickContextType {
   isLoadingHabits: boolean;
   isInitialLoadingHabits: boolean;
   hasLoadedHabitsOnce: boolean;
+  habitSections: HabitSection[];
+  isLoadingHabitSections: boolean;
+  habitStatus: "ACTIVE" | "ARCHIVED" | "ALL";
+  setHabitStatus: (status: "ACTIVE" | "ARCHIVED" | "ALL") => void;
+  habitAnalytics: HabitAnalyticsData | null;
+  isLoadingHabitAnalytics: boolean;
+  habitAnalyticsHabitId: string;
+  setHabitAnalyticsHabitId: (id: string) => void;
   filters: any[];
   isLoadingFilters: boolean;
   isInitialLoadingFilters: boolean;
@@ -124,9 +134,24 @@ export interface TickTickContextType {
     color?: string;
     frequency?: string;
     targetDays?: number;
+    goalType?: "BOOLEAN" | "NUMERIC";
+    goalValue?: number | null;
+    goalUnit?: string | null;
+    sectionId?: string | null;
+    encouragement?: string | null;
+    reminderTime?: string | null;
+    reminderEnabled?: boolean;
   }) => Promise<any>;
+  updateHabit: (params: { id: string } & Partial<Habit>) => Promise<any>;
+  archiveHabit: (habitId: string) => Promise<any>;
+  restoreHabit: (habitId: string) => Promise<any>;
+  skipHabitDay: (params: { habitId: string; date: string; note?: string }) => Promise<any>;
+  logHabitValue: (params: { habitId: string; date: string; value: number; note?: string }) => Promise<any>;
   toggleHabitCheck: (params: { habitId: string; date: string }) => void;
   deleteHabit: (habitId: string) => Promise<any>;
+  addHabitSection: (params: { name: string }) => Promise<any>;
+  updateHabitSection: (params: { id: string } & Partial<HabitSection>) => Promise<any>;
+  deleteHabitSection: (id: string) => Promise<any>;
   createFilter: (input: { name: string; icon?: string; color?: string; query?: any }) => Promise<any>;
   updateFilter: (params: {
     id: string;
@@ -251,6 +276,8 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [isThemePickerOpen, setIsThemePickerOpen] = useState(false);
+  const [habitStatus, setHabitStatus] = useState<"ACTIVE" | "ARCHIVED" | "ALL">("ACTIVE");
+  const [habitAnalyticsHabitId, setHabitAnalyticsHabitId] = useState<string>("all");
 
   // TanStack Query Hook integration
   const ticktick = useTickTick({
@@ -265,6 +292,8 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
     statsRange,
     remindersTaskId: selectedTaskId,
     assigneesTaskId: selectedTaskId,
+    habitStatus,
+    habitAnalyticsHabitId,
   });
 
   // Track if initial domain queries have resolved at least once
@@ -450,6 +479,14 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
     isLoadingHabits: ticktick.isLoadingHabits,
     isInitialLoadingHabits,
     hasLoadedHabitsOnce,
+    habitSections: ticktick.habitSections,
+    isLoadingHabitSections: ticktick.isLoadingHabitSections,
+    habitStatus,
+    setHabitStatus,
+    habitAnalytics: ticktick.habitAnalytics,
+    isLoadingHabitAnalytics: ticktick.isLoadingHabitAnalytics,
+    habitAnalyticsHabitId,
+    setHabitAnalyticsHabitId,
     filters: ticktick.filters,
     isLoadingFilters: ticktick.isLoadingFilters,
     isInitialLoadingFilters,
@@ -476,8 +513,16 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
     deleteTag: ticktick.deleteTag,
     logPomodoro: ticktick.logPomodoro,
     addHabit: ticktick.addHabit,
+    updateHabit: ticktick.updateHabit,
+    archiveHabit: ticktick.archiveHabit,
+    restoreHabit: ticktick.restoreHabit,
+    skipHabitDay: ticktick.skipHabitDay,
+    logHabitValue: ticktick.logHabitValue,
     toggleHabitCheck: ticktick.toggleHabitCheck,
     deleteHabit: ticktick.deleteHabit,
+    addHabitSection: ticktick.addHabitSection,
+    updateHabitSection: ticktick.updateHabitSection,
+    deleteHabitSection: ticktick.deleteHabitSection,
     createFilter: ticktick.createFilter,
     updateFilter: ticktick.updateFilter,
     deleteFilter: ticktick.deleteFilter,

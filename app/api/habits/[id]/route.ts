@@ -26,6 +26,22 @@ export async function PATCH(
         color: body.color !== undefined ? body.color : undefined,
         frequency: body.frequency !== undefined ? body.frequency : undefined,
         targetDays: body.targetDays !== undefined ? Number(body.targetDays) : undefined,
+        goalType: body.goalType !== undefined ? body.goalType : undefined,
+        goalValue: body.goalValue !== undefined ? (body.goalValue === null ? null : Number(body.goalValue)) : undefined,
+        goalUnit: body.goalUnit !== undefined ? (body.goalUnit === null ? null : String(body.goalUnit).trim()) : undefined,
+        sectionId: body.sectionId !== undefined ? (body.sectionId === "" ? null : body.sectionId) : undefined,
+        status: body.status !== undefined ? body.status : undefined,
+        encouragement: body.encouragement !== undefined ? (body.encouragement === null ? null : String(body.encouragement).trim()) : undefined,
+        reminderTime: body.reminderTime !== undefined ? (body.reminderTime === null ? null : String(body.reminderTime).trim()) : undefined,
+        reminderEnabled: body.reminderEnabled !== undefined ? Boolean(body.reminderEnabled) : undefined,
+        order: body.order !== undefined ? Number(body.order) : undefined,
+      },
+      include: {
+        section: true,
+        logs: {
+          orderBy: { date: "desc" },
+          take: 30,
+        },
       },
     });
 

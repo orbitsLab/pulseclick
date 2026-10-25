@@ -153,11 +153,22 @@ export interface StatisticsData {
   busiest: { date: string; count: number }[];
 }
 
+export interface HabitSection {
+  id: string;
+  name: string;
+  order: number;
+  collapsed: boolean;
+  _count?: { habits: number };
+}
+
 export interface HabitLog {
   id: string;
   habitId: string;
   date: string;
   completed: boolean;
+  status: "COMPLETED" | "SKIPPED" | "MISSED" | "IN_PROGRESS";
+  value?: number | null;
+  note?: string | null;
 }
 
 export interface Habit {
@@ -170,7 +181,100 @@ export interface Habit {
   targetDays: number;
   streak: number;
   isCompletedToday: boolean;
+  isSkippedToday?: boolean;
+  todayValue?: number | null;
+  todayNote?: string | null;
+  goalType: "BOOLEAN" | "NUMERIC";
+  goalValue?: number | null;
+  goalUnit?: string | null;
+  sectionId?: string | null;
+  section?: HabitSection | null;
+  status: "ACTIVE" | "ARCHIVED";
+  archivedAt?: string | null;
+  encouragement?: string | null;
+  reminderTime?: string | null;
+  reminderEnabled?: boolean;
+  completedCycles?: number;
   logs: HabitLog[];
+}
+
+export interface HeatmapDay {
+  date: string;
+  count: number;
+  intensity: number;
+  habits: {
+    id: string;
+    title: string;
+    icon: string;
+    color: string;
+    status: string;
+    completed: boolean;
+    value?: number | null;
+    unit?: string | null;
+    note?: string | null;
+  }[];
+}
+
+export interface HabitAnalyticsData {
+  heatmap: HeatmapDay[];
+  stats: {
+    totalCheckIns: number;
+    totalCycles: number;
+    bestStreak: number;
+    currentStreak: number;
+    dayOfWeekDistribution: { name: string; count: number; dayNum: number }[];
+    monthlyTrends: { month: string; label: string; count: number }[];
+    perHabitStats: {
+      id: string;
+      title: string;
+      icon: string;
+      color: string;
+      frequency: string;
+      targetDays: number;
+      goalType: string;
+      goalValue?: number | null;
+      goalUnit?: string | null;
+      streak: number;
+      bestStreak: number;
+      totalLogs: number;
+      completedCycles: number;
+      completionRate: number;
+    }[];
+  };
+  achievements: {
+    score: number;
+    level: {
+      level: number;
+      title: string;
+      minScore: number;
+      nextScore: number;
+      progressPct: number;
+    };
+    badges: {
+      id: string;
+      title: string;
+      description: string;
+      category: string;
+      icon: string;
+      unlocked: boolean;
+      progress: number;
+      maxProgress: number;
+    }[];
+  };
+  recentLogs: {
+    id: string;
+    habitId: string;
+    title: string;
+    icon: string;
+    color: string;
+    date: string;
+    completed: boolean;
+    status: string;
+    value?: number | null;
+    unit?: string | null;
+    note?: string | null;
+    createdAt: string;
+  }[];
 }
 
 export function useTickTick(filters: {
@@ -183,6 +287,8 @@ export function useTickTick(filters: {
   remindersTaskId?: string | null;
   membersListId?: string | null;
   assigneesTaskId?: string | null;
+  habitStatus?: "ACTIVE" | "ARCHIVED" | "ALL";
+  habitAnalyticsHabitId?: string;
 }) {
   const queryClient = useQueryClient();
 
@@ -255,13 +361,38 @@ export function useTickTick(filters: {
   });
 
   // 5. Habits Query
+  const habitStatus = filters.habitStatus || "ACTIVE";
   const habitsQuery = useQuery({
-    queryKey: ["ticktick-habits"],
+    queryKey: ["ticktick-habits", habitStatus],
     queryFn: async () => {
-      const res = await fetch("/api/habits");
+      const res = await fetch(`/api/habits?status=${habitStatus}`);
       if (!res.ok) return [];
       const data = await res.json();
       return (data.habits || []) as Habit[];
+    },
+    placeholderData: keepPreviousData,
+  });
+
+  // 5b. Habit Sections Query
+  const habitSectionsQuery = useQuery({
+    queryKey: ["ticktick-habit-sections"],
+    queryFn: async () => {
+      const res = await fetch("/api/habits/sections");
+      if (!res.ok) return [];
+      const data = await res.json();
+      return (data.sections || []) as HabitSection[];
+    },
+    placeholderData: keepPreviousData,
+  });
+
+  // 5c. Habit Analytics Query (Heatmap, Insights, Achievements)
+  const habitAnalyticsHabitId = filters.habitAnalyticsHabitId || "all";
+  const habitAnalyticsQuery = useQuery({
+    queryKey: ["ticktick-habit-analytics", habitAnalyticsHabitId],
+    queryFn: async () => {
+      const res = await fetch(`/api/habits/analytics?habitId=${habitAnalyticsHabitId}`);
+      if (!res.ok) return null;
+      return (await res.json()) as HabitAnalyticsData;
     },
     placeholderData: keepPreviousData,
   });
@@ -880,6 +1011,13 @@ export function useTickTick(filters: {
       color?: string;
       frequency?: string;
       targetDays?: number;
+      goalType?: "BOOLEAN" | "NUMERIC";
+      goalValue?: number | null;
+      goalUnit?: string | null;
+      sectionId?: string | null;
+      encouragement?: string | null;
+      reminderTime?: string | null;
+      reminderEnabled?: boolean;
     }) => {
       const res = await fetch("/api/habits", {
         method: "POST",
@@ -891,7 +1029,7 @@ export function useTickTick(filters: {
     },
     onMutate: async (newHabit) => {
       await queryClient.cancelQueries({ queryKey: ["ticktick-habits"] });
-      const prevHabits = queryClient.getQueryData<Habit[]>(["ticktick-habits"]) || [];
+      const prevHabits = queryClient.getQueryData<Habit[]>(["ticktick-habits", habitStatus]) || [];
       const tempHabit: Habit = {
         id: `temp-habit-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
         userId: "current-user",
@@ -902,9 +1040,17 @@ export function useTickTick(filters: {
         targetDays: newHabit.targetDays || 7,
         streak: 0,
         isCompletedToday: false,
+        goalType: newHabit.goalType || "BOOLEAN",
+        goalValue: newHabit.goalValue ?? null,
+        goalUnit: newHabit.goalUnit ?? null,
+        sectionId: newHabit.sectionId ?? null,
+        status: "ACTIVE",
+        encouragement: newHabit.encouragement ?? null,
+        reminderTime: newHabit.reminderTime ?? null,
+        reminderEnabled: newHabit.reminderEnabled ?? false,
         logs: [],
       };
-      queryClient.setQueryData(["ticktick-habits"], [...prevHabits, tempHabit]);
+      queryClient.setQueryData(["ticktick-habits", habitStatus], [...prevHabits, tempHabit]);
       return { prevHabits, tempId: tempHabit.id };
     },
     onError: (err: any, _vars, context) => {
@@ -937,7 +1083,7 @@ export function useTickTick(filters: {
     onMutate: async ({ habitId, date }) => {
       playTaskCompleteSound();
       await queryClient.cancelQueries({ queryKey: ["ticktick-habits"] });
-      const prevHabits = queryClient.getQueryData<Habit[]>(["ticktick-habits"]) || [];
+      const prevHabits = queryClient.getQueryData<Habit[]>(["ticktick-habits", habitStatus]) || [];
 
       const todayStr = new Date().toISOString().split("T")[0];
       const updated = prevHabits.map((h) => {
@@ -947,7 +1093,17 @@ export function useTickTick(filters: {
         if (exists) {
           nextLogs = nextLogs.filter((l) => l.date !== date);
         } else {
-          nextLogs = [...nextLogs, { id: `temp-${Date.now()}`, habitId, date, completed: true }];
+          nextLogs = [
+            ...nextLogs,
+            {
+              id: `temp-${Date.now()}`,
+              habitId,
+              date,
+              completed: true,
+              status: "COMPLETED" as const,
+              value: h.goalType === "NUMERIC" ? h.goalValue ?? 1 : null,
+            },
+          ];
         }
         const isCompletedToday = date === todayStr ? !exists : h.isCompletedToday;
         const nextStreak = exists ? Math.max(0, h.streak - 1) : h.streak + 1;
@@ -959,16 +1115,17 @@ export function useTickTick(filters: {
         };
       });
 
-      queryClient.setQueryData(["ticktick-habits"], updated);
+      queryClient.setQueryData(["ticktick-habits", habitStatus], updated);
       return { prevHabits };
     },
     onError: (err: any, _vars, context) => {
-      if (context?.prevHabits) queryClient.setQueryData(["ticktick-habits"], context.prevHabits);
+      if (context?.prevHabits) queryClient.setQueryData(["ticktick-habits", habitStatus], context.prevHabits);
       notify.error("Failed to update habit check-in", err?.message || "Changes reverted.");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
       queryClient.invalidateQueries({ queryKey: ["ticktick-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-analytics"] });
     },
   });
 
@@ -981,20 +1138,136 @@ export function useTickTick(filters: {
     },
     onMutate: async (habitId: string) => {
       await queryClient.cancelQueries({ queryKey: ["ticktick-habits"] });
-      const prevHabits = queryClient.getQueryData<Habit[]>(["ticktick-habits"]) || [];
+      const prevHabits = queryClient.getQueryData<Habit[]>(["ticktick-habits", habitStatus]) || [];
       queryClient.setQueryData(
-        ["ticktick-habits"],
+        ["ticktick-habits", habitStatus],
         prevHabits.filter((h) => h.id !== habitId)
       );
       return { prevHabits };
     },
     onError: (err: any, _vars, context) => {
-      if (context?.prevHabits) queryClient.setQueryData(["ticktick-habits"], context.prevHabits);
+      if (context?.prevHabits) queryClient.setQueryData(["ticktick-habits", habitStatus], context.prevHabits);
       notify.error("Failed to delete habit", err?.message || "Habit could not be deleted.");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
       queryClient.invalidateQueries({ queryKey: ["ticktick-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-analytics"] });
+    },
+  });
+
+  // Update Habit
+  const updateHabitMutation = useMutation({
+    mutationFn: async ({ id, ...updates }: { id: string } & Partial<Habit>) => {
+      const res = await fetch(`/api/habits/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+      if (!res.ok) throw new Error("Failed to update habit");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
+      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-analytics"] });
+    },
+  });
+
+  // Archive / Restore Habit
+  const archiveHabitMutation = useMutation({
+    mutationFn: async (habitId: string) => {
+      const res = await fetch(`/api/habits/${habitId}/archive`, {
+        method: "POST",
+      });
+      if (!res.ok) throw new Error("Failed to toggle habit archive");
+      return res.json();
+    },
+    onSuccess: (data) => {
+      notify.success(data?.archived ? "Habit archived" : "Habit restored", "Habit status updated.");
+      queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
+      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-sections"] });
+      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-analytics"] });
+    },
+  });
+
+  // Skip Habit Day
+  const skipHabitDayMutation = useMutation({
+    mutationFn: async ({ habitId, date, note }: { habitId: string; date: string; note?: string }) => {
+      const res = await fetch(`/api/habits/${habitId}/check`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "skip", date, note }),
+      });
+      if (!res.ok) throw new Error("Failed to skip habit");
+      return res.json();
+    },
+    onSuccess: () => {
+      notify.info("Habit skipped for today", "Your streak remains protected.");
+      queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
+      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-analytics"] });
+    },
+  });
+
+  // Log Habit Numeric Value
+  const logHabitValueMutation = useMutation({
+    mutationFn: async ({ habitId, date, value, note }: { habitId: string; date: string; value: number; note?: string }) => {
+      const res = await fetch(`/api/habits/${habitId}/check`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "set_value", date, value, note }),
+      });
+      if (!res.ok) throw new Error("Failed to log habit value");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
+      queryClient.invalidateQueries({ queryKey: ["ticktick-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-analytics"] });
+    },
+  });
+
+  // Add Habit Section
+  const addHabitSectionMutation = useMutation({
+    mutationFn: async ({ name }: { name: string }) => {
+      const res = await fetch("/api/habits/sections", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      if (!res.ok) throw new Error("Failed to create section");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-sections"] });
+    },
+  });
+
+  // Update Habit Section
+  const updateHabitSectionMutation = useMutation({
+    mutationFn: async ({ id, ...updates }: { id: string } & Partial<HabitSection>) => {
+      const res = await fetch(`/api/habits/sections/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+      if (!res.ok) throw new Error("Failed to update section");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-sections"] });
+    },
+  });
+
+  // Delete Habit Section
+  const deleteHabitSectionMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/habits/sections/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete section");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-sections"] });
+      queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
     },
   });
 
@@ -1272,6 +1545,10 @@ export function useTickTick(filters: {
     pomodoroStats: pomodoroQuery.data || { sessions: [], todayTotalMinutes: 0, todayPomoCount: 0 },
     habits: habitsQuery.data || [],
     isLoadingHabits: habitsQuery.isLoading,
+    habitSections: habitSectionsQuery.data || [],
+    isLoadingHabitSections: habitSectionsQuery.isLoading,
+    habitAnalytics: habitAnalyticsQuery.data ?? null,
+    isLoadingHabitAnalytics: habitAnalyticsQuery.isLoading,
     filters: filtersQuery.data || [],
     isLoadingFilters: filtersQuery.isLoading,
     countdowns: countdownsQuery.data || [],
@@ -1295,8 +1572,16 @@ export function useTickTick(filters: {
     deleteTag: deleteTagMutation.mutateAsync,
     logPomodoro: logPomodoroMutation.mutateAsync,
     addHabit: addHabitMutation.mutateAsync,
+    updateHabit: updateHabitMutation.mutateAsync,
+    archiveHabit: archiveHabitMutation.mutateAsync,
+    restoreHabit: archiveHabitMutation.mutateAsync,
+    skipHabitDay: skipHabitDayMutation.mutateAsync,
+    logHabitValue: logHabitValueMutation.mutateAsync,
     toggleHabitCheck: toggleHabitCheckMutation.mutate,
     deleteHabit: deleteHabitMutation.mutateAsync,
+    addHabitSection: addHabitSectionMutation.mutateAsync,
+    updateHabitSection: updateHabitSectionMutation.mutateAsync,
+    deleteHabitSection: deleteHabitSectionMutation.mutateAsync,
     createFilter: createFilterMutation.mutateAsync,
     updateFilter: updateFilterMutation.mutateAsync,
     deleteFilter: deleteFilterMutation.mutateAsync,

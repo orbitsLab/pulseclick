@@ -152,15 +152,36 @@ export async function seedStarterTickTickDataForUser(userId: string) {
     },
   });
 
-  // 5. Seed default TickTick Habits
+  // 5. Seed default TickTick Habit Sections & Habits
+  const morningSection = await prisma.habitSection.create({
+    data: {
+      userId,
+      name: "Morning Routine",
+      order: 1,
+    },
+  });
+
+  const eveningSection = await prisma.habitSection.create({
+    data: {
+      userId,
+      name: "Evening Wind-down",
+      order: 2,
+    },
+  });
+
   const habit1 = await prisma.habit.create({
     data: {
       userId,
+      sectionId: morningSection.id,
       title: "Morning Workout & Stretching",
       icon: "Dumbbell",
       color: "#ef4444",
       frequency: "DAILY",
       targetDays: 7,
+      goalType: "BOOLEAN",
+      encouragement: "A 20-minute morning session powers your entire day.",
+      reminderTime: "07:00",
+      reminderEnabled: true,
       order: 1,
     },
   });
@@ -168,11 +189,18 @@ export async function seedStarterTickTickDataForUser(userId: string) {
   const habit2 = await prisma.habit.create({
     data: {
       userId,
-      title: "Read 20 pages of non-fiction",
+      sectionId: eveningSection.id,
+      title: "Read Non-Fiction",
       icon: "BookOpen",
       color: "#3b82f6",
       frequency: "DAILY",
       targetDays: 7,
+      goalType: "NUMERIC",
+      goalValue: 20,
+      goalUnit: "pages",
+      encouragement: "Consistency in reading compounds into deep wisdom.",
+      reminderTime: "21:30",
+      reminderEnabled: true,
       order: 2,
     },
   });
@@ -180,21 +208,162 @@ export async function seedStarterTickTickDataForUser(userId: string) {
   const habit3 = await prisma.habit.create({
     data: {
       userId,
-      title: "Drink 2L Water",
+      sectionId: morningSection.id,
+      title: "Drink Water",
       icon: "Droplets",
       color: "#06b6d4",
       frequency: "DAILY",
       targetDays: 7,
+      goalType: "NUMERIC",
+      goalValue: 8,
+      goalUnit: "glasses",
+      encouragement: "Hydration fuels clear thinking and sustained energy.",
+      reminderTime: "09:00",
+      reminderEnabled: true,
       order: 3,
     },
   });
 
-  await prisma.habitLog.create({
+  const habit4 = await prisma.habit.create({
     data: {
-      habitId: habit3.id,
-      date: todayIso,
-      completed: true,
+      userId,
+      sectionId: eveningSection.id,
+      title: "Mindfulness & Gratitude",
+      icon: "Smile",
+      color: "#10b981",
+      frequency: "DAILY",
+      targetDays: 7,
+      goalType: "BOOLEAN",
+      encouragement: "Gratitude turns what we have into enough.",
+      reminderTime: "22:00",
+      reminderEnabled: true,
+      order: 4,
     },
+  });
+
+  // Seed an archived habit
+  await prisma.habit.create({
+    data: {
+      userId,
+      title: "Cold Shower Challenge",
+      icon: "Sparkles",
+      color: "#6366f1",
+      frequency: "DAILY",
+      targetDays: 7,
+      goalType: "BOOLEAN",
+      status: "ARCHIVED",
+      archivedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+      order: 5,
+    },
+  });
+
+  // Seed multi-month historical check-in logs for active habits
+  const workoutNotes = [
+    "Felt high energy throughout the intervals!",
+    "Great session, focused on core stability.",
+    "Quick 20-minute morning mobility drill.",
+    "Kept up the pace, feeling refreshed.",
+    "Stretched hamstrings and shoulders thoroughly.",
+  ];
+
+  const readingNotes = [
+    "Deep dive into behavioral psychology chapters.",
+    "Fascinating insights on compound interest of habits.",
+    "Finished chapter 4 before bed.",
+    "Read 25 pages on architecture principles.",
+    "Reflective evening session with peppermint tea.",
+  ];
+
+  const logEntries: {
+    habitId: string;
+    date: string;
+    completed: boolean;
+    status: "COMPLETED" | "SKIPPED" | "IN_PROGRESS";
+    value?: number | null;
+    note?: string | null;
+  }[] = [];
+
+  for (let i = 0; i <= 90; i++) {
+    const dObj = new Date(today.getTime() - i * 86400000);
+    const dateStr = formatIso(dObj);
+
+    // Habit 1: Workout (completed ~82% of days, high on Mon-Fri, occasional skip on weekend)
+    const workoutSeed = (i * 7 + 3) % 100;
+    if (i === 0) {
+      logEntries.push({
+        habitId: habit1.id,
+        date: dateStr,
+        completed: true,
+        status: "COMPLETED",
+        note: "3-mile run and morning stretch",
+      });
+    } else if (workoutSeed < 78) {
+      logEntries.push({
+        habitId: habit1.id,
+        date: dateStr,
+        completed: true,
+        status: "COMPLETED",
+        note: workoutSeed % 4 === 0 ? workoutNotes[workoutSeed % workoutNotes.length] : null,
+      });
+    } else if (workoutSeed >= 90) {
+      logEntries.push({
+        habitId: habit1.id,
+        date: dateStr,
+        completed: false,
+        status: "SKIPPED",
+        note: "Rest & recovery day",
+      });
+    }
+
+    // Habit 2: Read (Numeric: 20 pages target)
+    const readSeed = (i * 13 + 7) % 100;
+    if (readSeed < 80) {
+      const pages = 18 + (readSeed % 15);
+      logEntries.push({
+        habitId: habit2.id,
+        date: dateStr,
+        completed: pages >= 20,
+        status: pages >= 20 ? "COMPLETED" : "IN_PROGRESS",
+        value: pages,
+        note: readSeed % 5 === 0 ? readingNotes[readSeed % readingNotes.length] : null,
+      });
+    }
+
+    // Habit 3: Drink Water (Numeric: 8 glasses)
+    const waterSeed = (i * 11 + 2) % 100;
+    if (i === 0) {
+      logEntries.push({
+        habitId: habit3.id,
+        date: dateStr,
+        completed: false,
+        status: "IN_PROGRESS",
+        value: 6,
+      });
+    } else if (waterSeed < 85) {
+      const glasses = 7 + (waterSeed % 3);
+      logEntries.push({
+        habitId: habit3.id,
+        date: dateStr,
+        completed: glasses >= 8,
+        status: glasses >= 8 ? "COMPLETED" : "IN_PROGRESS",
+        value: glasses,
+      });
+    }
+
+    // Habit 4: Mindfulness (Boolean)
+    const mindSeed = (i * 17 + 5) % 100;
+    if (mindSeed < 72) {
+      logEntries.push({
+        habitId: habit4.id,
+        date: dateStr,
+        completed: true,
+        status: "COMPLETED",
+      });
+    }
+  }
+
+  await prisma.habitLog.createMany({
+    data: logEntries,
   });
 
   // 6. Seed scheduled tasks for the Timeline view
