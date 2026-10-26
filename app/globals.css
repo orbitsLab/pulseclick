@@ -66,49 +66,49 @@
    size alone never carries the hierarchy. Weights are set on the element so a
    single role can play different jobs (a task title is heavier than a helper
    line that shares its size). */
-@utility tt-display {
+@utility app-display {
   font-family: var(--font-instrument-serif);
   font-size: 1.625rem;
   line-height: 1.15;
   letter-spacing: -0.018em;
 }
 
-@utility tt-title {
+@utility app-title {
   font-size: 1.0625rem;
   line-height: 1.3;
   letter-spacing: -0.012em;
 }
 
-@utility tt-heading {
+@utility app-heading {
   font-size: 0.9375rem;
   line-height: 1.4;
   letter-spacing: -0.006em;
 }
 
-@utility tt-body {
+@utility app-body {
   font-size: 0.8125rem;
   line-height: 1.55;
 }
 
-@utility tt-label {
+@utility app-label {
   font-size: 0.75rem;
   line-height: 1.45;
 }
 
-@utility tt-meta {
+@utility app-meta {
   font-size: 0.6875rem;
   line-height: 1.45;
   letter-spacing: 0.004em;
 }
 
-@utility tt-overline {
+@utility app-overline {
   font-size: 0.6875rem;
   line-height: 1.3;
   letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
-@utility tt-figure {
+@utility app-figure {
   font-size: 1.75rem;
   line-height: 1.05;
   letter-spacing: -0.022em;
@@ -125,19 +125,19 @@
   /* Workspace theme palette — overridden at runtime by applyTheme() (lib/themes.ts).
      These defaults are the "Midnight" theme so the first paint matches the
      persisted theme instead of flashing a different palette. */
-  --tt-accent: #4772fa;
-  --tt-accent-contrast: #ffffff;
+  --app-accent: #4772fa;
+  --app-accent-contrast: #ffffff;
   /* Derived from the accent: a darker fill so white text on it clears 4.5:1,
      and a lighter tone for accent-coloured text on dark surfaces. */
-  --tt-accent-strong: #3e64dc;
-  --tt-accent-text: #7b9dfb;
-  --tt-bg: #0f1115;
-  --tt-panel: #171a21;
-  --tt-panel-alt: #1f232c;
-  --tt-text: #eef1f6;
-  --tt-muted: #8b94a7;
-  --tt-border: #262b36;
-  --tt-rail: #12151b;
+  --app-accent-strong: #3e64dc;
+  --app-accent-text: #7b9dfb;
+  --app-bg: #0f1115;
+  --app-panel: #171a21;
+  --app-panel-alt: #1f232c;
+  --app-text: #eef1f6;
+  --app-muted: #8b94a7;
+  --app-border: #262b36;
+  --app-rail: #12151b;
 
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -252,10 +252,10 @@
     text-wrap: pretty;
   }
 
-  /* Sleek custom scrollbars matching TickTick palette across all browsers */
+  /* Sleek custom scrollbars matching theme palette across all browsers */
   * {
     scrollbar-width: thin;
-    scrollbar-color: var(--tt-border) transparent;
+    scrollbar-color: var(--app-border) transparent;
   }
   ::-webkit-scrollbar {
     width: 6px;
@@ -265,11 +265,11 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: var(--tt-border);
+    background: var(--app-border);
     border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--tt-muted);
+    background: var(--app-muted);
   }
   ::-webkit-scrollbar-corner {
     background: transparent;

@@ -68,7 +68,7 @@ export function AgendaView({
               key={day.toString()}
             >
               <span
-                className="-top-3 absolute left-0 flex h-6 items-center bg-background pe-4 tt-meta uppercase data-today:font-medium sm:pe-4 sm:tt-label"
+                className="-top-3 absolute left-0 flex h-6 items-center bg-background pe-4 app-meta uppercase data-today:font-medium sm:pe-4 sm:app-label"
                 data-today={isToday(day) || undefined}
               >
                 {format(day, "d MMM, EEEE")}

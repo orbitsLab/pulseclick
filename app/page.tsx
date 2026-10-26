@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect, useRef, Suspense } from "react";
 import { AuthModal } from "@/components/auth/auth-modal";
-import { TickTickApp } from "@/components/ticktick/ticktick-app";
+import { WorkspaceApp } from "@/components/workspace/workspace-app";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { applyTheme, getTheme, DEFAULT_THEME_ID } from "@/lib/themes";
 
-function TickTickMain() {
+function WorkspaceMain() {
   const queryClient = useQueryClient();
   const [themeId, setThemeId] = useState<string>(DEFAULT_THEME_ID);
   const [isDark, setIsDark] = useState<boolean>(false);
@@ -66,7 +66,7 @@ function TickTickMain() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ themeId: nextThemeId }),
       });
-      await queryClient.invalidateQueries({ queryKey: ["ticktick-settings"] });
+      await queryClient.invalidateQueries({ queryKey: ["workspace-settings"] });
     } catch {
       // The theme is already applied locally; persistence can retry later.
     }
@@ -79,7 +79,7 @@ function TickTickMain() {
   return (
     <>
       <AuthModal isOpen={!authQuery.isLoading && !authQuery.data} />
-      <TickTickApp
+      <WorkspaceApp
         user={authQuery.data}
         isDark={isDark}
         onToggleTheme={handleToggleTheme}
@@ -94,12 +94,12 @@ export default function Page() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-[var(--tt-bg)] text-[var(--tt-accent)] font-semibold text-sm">
-          Loading PulseTick...
+        <div className="flex min-h-screen items-center justify-center bg-[var(--app-bg)] text-[var(--app-accent)] font-semibold text-sm">
+          Loading PulseFlow...
         </div>
       }
     >
-      <TickTickMain />
+      <WorkspaceMain />
     </Suspense>
   );
 }

@@ -15,7 +15,7 @@ import {
   Radio,
   Clock,
 } from "lucide-react";
-import { Task, PomodoroStats } from "@/hooks/use-ticktick";
+import { Task, PomodoroStats } from "@/hooks/use-workspace";
 import {
   playPomodoroBellSound,
   playClickSound,
@@ -129,27 +129,27 @@ export function PomodoroView({ tasks, stats, onLogPomodoro }: PomodoroViewProps)
   const strokeDashoffset = 565 - (565 * progressPercent) / 100;
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-between rounded-2xl border border-[var(--tt-border)] bg-[var(--tt-panel)] p-6 shadow-sm transition-colors max-w-2xl mx-auto w-full">
+    <div className="flex-1 flex flex-col items-center justify-between rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-6 shadow-sm transition-colors max-w-2xl mx-auto w-full">
       {/* Mode Switcher Tabs */}
-      <div className="flex items-center gap-2 rounded-xl bg-[var(--tt-panel-alt)] p-1">
+      <div className="flex items-center gap-2 rounded-xl bg-[var(--app-panel-alt)] p-1">
         <button
           type="button"
           onClick={() => switchMode("focus")}
-          className={`rounded-lg px-4 py-1.5 tt-label font-semibold transition-all ${ mode === "focus" ? "bg-[var(--tt-accent-strong)] text-white shadow-md shadow-[var(--tt-accent)]/25" : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] dark:text-[var(--tt-muted)] dark:hover:text-white" }`}
+          className={`rounded-lg px-4 py-1.5 app-label font-semibold transition-all ${ mode === "focus" ? "bg-[var(--app-accent-strong)] text-white shadow-md shadow-[var(--app-accent)]/25" : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)] dark:hover:text-white" }`}
         >
           Pomodoro (25m)
         </button>
         <button
           type="button"
           onClick={() => switchMode("shortBreak")}
-          className={`rounded-lg px-4 py-1.5 tt-label font-semibold transition-all ${ mode === "shortBreak" ? "bg-[var(--tt-accent-strong)] text-white shadow-md shadow-[var(--tt-accent)]/25" : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] dark:text-[var(--tt-muted)] dark:hover:text-white" }`}
+          className={`rounded-lg px-4 py-1.5 app-label font-semibold transition-all ${ mode === "shortBreak" ? "bg-[var(--app-accent-strong)] text-white shadow-md shadow-[var(--app-accent)]/25" : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)] dark:hover:text-white" }`}
         >
           Short Break (5m)
         </button>
         <button
           type="button"
           onClick={() => switchMode("longBreak")}
-          className={`rounded-lg px-4 py-1.5 tt-label font-semibold transition-all ${ mode === "longBreak" ? "bg-[var(--tt-accent-strong)] text-white shadow-md shadow-[var(--tt-accent)]/25" : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] dark:text-[var(--tt-muted)] dark:hover:text-white" }`}
+          className={`rounded-lg px-4 py-1.5 app-label font-semibold transition-all ${ mode === "longBreak" ? "bg-[var(--app-accent-strong)] text-white shadow-md shadow-[var(--app-accent)]/25" : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)] dark:hover:text-white" }`}
         >
           Long Break (15m)
         </button>
@@ -160,7 +160,7 @@ export function PomodoroView({ tasks, stats, onLogPomodoro }: PomodoroViewProps)
         <select
           value={selectedTaskId}
           onChange={(e) => setSelectedTaskId(e.target.value)}
-          className="w-full rounded-xl border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-3 py-2 tt-label text-[var(--tt-text)] focus:outline-none focus:border-[var(--tt-accent)] text-center"
+          className="w-full rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)] text-center"
         >
           <option value="">🎯 Link timer to a task (Optional)...</option>
           {activeTasks.map((t) => (
@@ -178,7 +178,7 @@ export function PomodoroView({ tasks, stats, onLogPomodoro }: PomodoroViewProps)
             cx="100"
             cy="100"
             r="90"
-            className="stroke-[var(--tt-border)]"
+            className="stroke-[var(--app-border)]"
             strokeWidth="8"
             fill="transparent"
           />
@@ -186,7 +186,7 @@ export function PomodoroView({ tasks, stats, onLogPomodoro }: PomodoroViewProps)
             cx="100"
             cy="100"
             r="90"
-            className="stroke-[var(--tt-accent)] transition-all duration-500 ease-linear"
+            className="stroke-[var(--app-accent)] transition-all duration-500 ease-linear"
             strokeWidth="8"
             strokeDasharray="565"
             strokeDashoffset={strokeDashoffset}
@@ -196,10 +196,10 @@ export function PomodoroView({ tasks, stats, onLogPomodoro }: PomodoroViewProps)
         </svg>
 
         <div className="absolute flex flex-col items-center justify-center text-center">
-          <span className="text-5xl leading-none font-semibold tracking-tight text-[var(--tt-text)] font-mono tabular-nums">
+          <span className="text-5xl leading-none font-semibold tracking-tight text-[var(--app-text)] font-mono tabular-nums">
             {timeFormatted}
           </span>
-          <span className="tt-overline font-semibold text-[var(--tt-accent-text)] mt-2">
+          <span className="app-overline font-semibold text-[var(--app-accent-text)] mt-2">
             {mode === "focus" ? "Stay Focused" : "Rest & Recharge"}
           </span>
         </div>
@@ -207,14 +207,14 @@ export function PomodoroView({ tasks, stats, onLogPomodoro }: PomodoroViewProps)
 
       {/* Ambient Sound Switcher */}
       <div className="mb-4 flex flex-col items-center gap-1.5">
-        <span className="tt-overline font-semibold text-[var(--tt-muted)]">
+        <span className="app-overline font-semibold text-[var(--app-muted)]">
           Ambient Sound (Web Audio)
         </span>
-        <div className="flex items-center gap-1.5 rounded-xl border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] p-1">
+        <div className="flex items-center gap-1.5 rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] p-1">
           <button
             type="button"
             onClick={() => setAmbientSound("off")}
-            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 tt-label font-medium transition-all ${ ambientSound === "off" ? "bg-[var(--tt-panel)] text-[var(--tt-text)] shadow-xs dark:bg-[var(--tt-panel-alt)] dark:text-[var(--tt-text)]" : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] dark:text-[var(--tt-muted)]" }`}
+            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 app-label font-medium transition-all ${ ambientSound === "off" ? "bg-[var(--app-panel)] text-[var(--app-text)] shadow-xs dark:bg-[var(--app-panel-alt)] dark:text-[var(--app-text)]" : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)]" }`}
           >
             <VolumeX className="h-3.5 w-3.5" />
             <span>Off</span>
@@ -222,7 +222,7 @@ export function PomodoroView({ tasks, stats, onLogPomodoro }: PomodoroViewProps)
           <button
             type="button"
             onClick={() => setAmbientSound("rain")}
-            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 tt-label font-medium transition-all ${ ambientSound === "rain" ? "bg-[var(--tt-accent-strong)] text-white shadow-xs" : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] dark:text-[var(--tt-muted)]" }`}
+            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 app-label font-medium transition-all ${ ambientSound === "rain" ? "bg-[var(--app-accent-strong)] text-white shadow-xs" : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)]" }`}
           >
             <CloudRain className="h-3.5 w-3.5" />
             <span>Rain</span>
@@ -230,7 +230,7 @@ export function PomodoroView({ tasks, stats, onLogPomodoro }: PomodoroViewProps)
           <button
             type="button"
             onClick={() => setAmbientSound("whitenoise")}
-            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 tt-label font-medium transition-all ${ ambientSound === "whitenoise" ? "bg-[var(--tt-accent-strong)] text-white shadow-xs" : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] dark:text-[var(--tt-muted)]" }`}
+            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 app-label font-medium transition-all ${ ambientSound === "whitenoise" ? "bg-[var(--app-accent-strong)] text-white shadow-xs" : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)]" }`}
           >
             <Radio className="h-3.5 w-3.5" />
             <span>White Noise</span>
@@ -238,7 +238,7 @@ export function PomodoroView({ tasks, stats, onLogPomodoro }: PomodoroViewProps)
           <button
             type="button"
             onClick={() => setAmbientSound("clock")}
-            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 tt-label font-medium transition-all ${ ambientSound === "clock" ? "bg-[var(--tt-accent-strong)] text-white shadow-xs" : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] dark:text-[var(--tt-muted)]" }`}
+            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 app-label font-medium transition-all ${ ambientSound === "clock" ? "bg-[var(--app-accent-strong)] text-white shadow-xs" : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)]" }`}
           >
             <Clock className="h-3.5 w-3.5" />
             <span>Clock</span>
@@ -252,7 +252,7 @@ export function PomodoroView({ tasks, stats, onLogPomodoro }: PomodoroViewProps)
           type="button"
           onClick={handleReset}
           title="Reset timer"
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--tt-border)] text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)] transition-colors"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--app-border)] text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)] transition-colors"
         >
           <RotateCcw className="h-4 w-4" />
         </button>
@@ -260,7 +260,7 @@ export function PomodoroView({ tasks, stats, onLogPomodoro }: PomodoroViewProps)
         <button
           type="button"
           onClick={toggleRunning}
-          className="flex h-14 w-28 items-center justify-center gap-2 rounded-2xl bg-[var(--tt-accent-strong)] tt-heading font-semibold text-white shadow-xl shadow-[var(--tt-accent)]/25 hover:bg-[var(--tt-accent-strong)] active:scale-95 transition-all"
+          className="flex h-14 w-28 items-center justify-center gap-2 rounded-2xl bg-[var(--app-accent-strong)] app-heading font-semibold text-white shadow-xl shadow-[var(--app-accent)]/25 hover:bg-[var(--app-accent-strong)] active:scale-95 transition-all"
         >
           {isRunning ? (
             <>
@@ -279,23 +279,23 @@ export function PomodoroView({ tasks, stats, onLogPomodoro }: PomodoroViewProps)
             setTimeLeft(0);
           }}
           title="Skip to end"
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--tt-border)] text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)] transition-colors"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--app-border)] text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)] transition-colors"
         >
           <SkipForward className="h-4 w-4" />
         </button>
       </div>
 
       {/* Focus Stats Strip */}
-      <div className="mt-8 grid grid-cols-2 gap-4 w-full border-t border-[var(--tt-border)] pt-4">
-        <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-[var(--tt-panel-alt)]">
-          <span className="tt-overline font-semibold text-[var(--tt-muted)]">Today's Focus</span>
-          <span className="tt-title font-semibold text-[var(--tt-accent-text)] mt-1">
+      <div className="mt-8 grid grid-cols-2 gap-4 w-full border-t border-[var(--app-border)] pt-4">
+        <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-[var(--app-panel-alt)]">
+          <span className="app-overline font-semibold text-[var(--app-muted)]">Today's Focus</span>
+          <span className="app-title font-semibold text-[var(--app-accent-text)] mt-1">
             {stats.todayTotalMinutes} mins
           </span>
         </div>
-        <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-[var(--tt-panel-alt)]">
-          <span className="tt-overline font-semibold text-[var(--tt-muted)]">Pomodoros Completed</span>
-          <span className="tt-title font-semibold text-rose-500 mt-1">
+        <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-[var(--app-panel-alt)]">
+          <span className="app-overline font-semibold text-[var(--app-muted)]">Pomodoros Completed</span>
+          <span className="app-title font-semibold text-rose-500 mt-1">
             🍅 {stats.todayPomoCount}
           </span>
         </div>

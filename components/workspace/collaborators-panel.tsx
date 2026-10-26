@@ -76,17 +76,17 @@ export function CollaboratorsPanel({
   return (
     <section className="space-y-2.5">
       <div className="flex items-center justify-between">
-        <h3 className="flex items-center gap-1.5 tt-overline font-semibold text-[var(--tt-muted)]">
+        <h3 className="flex items-center gap-1.5 app-overline font-semibold text-[var(--app-muted)]">
           <Users className="h-3.5 w-3.5" />
           Collaboration
         </h3>
-        <span className="rounded-full bg-[var(--tt-panel-alt)] px-1.5 py-0.5 tt-meta font-bold text-[var(--tt-muted)]">
+        <span className="rounded-full bg-[var(--app-panel-alt)] px-1.5 py-0.5 app-meta font-bold text-[var(--app-muted)]">
           {members.length}
         </span>
       </div>
 
       {members.length === 0 ? (
-        <p className="rounded-lg bg-[var(--tt-panel-alt)] px-3 py-2 tt-meta text-[var(--tt-muted)]">
+        <p className="rounded-lg bg-[var(--app-panel-alt)] px-3 py-2 app-meta text-[var(--app-muted)]">
           Share this list with someone to work on it together.
         </p>
       ) : (
@@ -94,16 +94,16 @@ export function CollaboratorsPanel({
           {members.map((member) => (
             <li
               key={member.id}
-              className="flex items-center gap-2 rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel)] px-2.5 py-1.5"
+              className="flex items-center gap-2 rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1.5"
             >
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--tt-accent)]/10 tt-meta font-bold text-[var(--tt-accent-text)]">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--app-accent)]/10 app-meta font-bold text-[var(--app-accent-text)]">
                 {member.displayName.slice(0, 1).toUpperCase()}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate tt-label font-medium text-[var(--tt-text)]">
+                <span className="block truncate app-label font-medium text-[var(--app-text)]">
                   {member.displayName}
                 </span>
-                <span className="block truncate tt-meta text-[var(--tt-muted)]">
+                <span className="block truncate app-meta text-[var(--app-muted)]">
                   {member.email}
                   {member.status === "INVITED" ? " · pending" : ""}
                 </span>
@@ -123,7 +123,7 @@ export function CollaboratorsPanel({
                     else next.add(member.id);
                     onAssign(taskId, [...next]);
                   }}
-                  className={`shrink-0 rounded-md p-1 transition-colors ${ assignedIds.has(member.id) ? "bg-[var(--tt-accent-strong)] text-white" : "text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)] hover:text-[var(--tt-muted)] dark:text-[var(--tt-text)] dark:hover:bg-[var(--tt-panel-alt)]" }`}
+                  className={`shrink-0 rounded-md p-1 transition-colors ${ assignedIds.has(member.id) ? "bg-[var(--app-accent-strong)] text-white" : "text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-muted)] dark:text-[var(--app-text)] dark:hover:bg-[var(--app-panel-alt)]" }`}
                 >
                   <Check className="h-3.5 w-3.5" />
                 </button>
@@ -133,7 +133,7 @@ export function CollaboratorsPanel({
                 value={member.role}
                 aria-label={`Role for ${member.displayName}`}
                 onChange={(e) => onUpdateMember(member.id, { role: e.target.value })}
-                className="shrink-0 rounded-md border border-[var(--tt-border)] bg-[var(--tt-panel)] px-1 py-0.5 tt-meta text-[var(--tt-muted)] outline-none focus:border-[var(--tt-accent)]"
+                className="shrink-0 rounded-md border border-[var(--app-border)] bg-[var(--app-panel)] px-1 py-0.5 app-meta text-[var(--app-muted)] outline-none focus:border-[var(--app-accent)]"
               >
                 {ROLES.map((r) => (
                   <option key={r.value} value={r.value}>
@@ -154,7 +154,7 @@ export function CollaboratorsPanel({
                     setConfirmRemove(member.id);
                   }
                 }}
-                className={`shrink-0 rounded-md p-1 transition-colors ${ confirmRemove === member.id ? "bg-rose-50 text-rose-500 dark:bg-rose-500/10" : "text-[var(--tt-muted)] hover:bg-rose-50 hover:text-rose-500 dark:text-[var(--tt-text)] dark:hover:bg-rose-500/10" }`}
+                className={`shrink-0 rounded-md p-1 transition-colors ${ confirmRemove === member.id ? "bg-rose-50 text-rose-500 dark:bg-rose-500/10" : "text-[var(--app-muted)] hover:bg-rose-50 hover:text-rose-500 dark:text-[var(--app-text)] dark:hover:bg-rose-500/10" }`}
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -166,7 +166,7 @@ export function CollaboratorsPanel({
       <div className="space-y-1.5">
         <div className="flex items-center gap-1.5">
           <div className="relative flex-1">
-            <Mail className="pointer-events-none absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-[var(--tt-muted)]" />
+            <Mail className="pointer-events-none absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-[var(--app-muted)]" />
             <input
               type="email"
               value={email}
@@ -176,14 +176,14 @@ export function CollaboratorsPanel({
               }}
               placeholder="teammate@company.com"
               aria-label="Invite by email"
-              className="w-full rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel)] py-1.5 pl-7 pr-2 tt-meta text-[var(--tt-text)] outline-none placeholder:text-[var(--tt-muted)] focus:border-[var(--tt-accent)] dark:placeholder:text-[var(--tt-text)]"
+              className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] py-1.5 pl-7 pr-2 app-meta text-[var(--app-text)] outline-none placeholder:text-[var(--app-muted)] focus:border-[var(--app-accent)] dark:placeholder:text-[var(--app-text)]"
             />
           </div>
           <select
             value={role}
             onChange={(e) => setRole(e.target.value)}
             aria-label="Invite role"
-            className="rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel)] px-1.5 py-1.5 tt-meta text-[var(--tt-text)] outline-none focus:border-[var(--tt-accent)]"
+            className="rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] px-1.5 py-1.5 app-meta text-[var(--app-text)] outline-none focus:border-[var(--app-accent)]"
           >
             {ROLES.map((r) => (
               <option key={r.value} value={r.value}>
@@ -195,15 +195,15 @@ export function CollaboratorsPanel({
             type="button"
             onClick={handleInvite}
             disabled={isInviting || !listId}
-            className="flex items-center gap-1 rounded-lg bg-[var(--tt-accent-strong)] px-2 py-1.5 tt-meta font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="flex items-center gap-1 rounded-lg bg-[var(--app-accent-strong)] px-2 py-1.5 app-meta font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             <UserPlus className="h-3 w-3" />
             Invite
           </button>
         </div>
-        {error && <p className="tt-meta font-semibold text-rose-500">{error}</p>}
+        {error && <p className="app-meta font-semibold text-rose-500">{error}</p>}
         {!listId && (
-          <p className="tt-meta text-[var(--tt-muted)]">
+          <p className="app-meta text-[var(--app-muted)]">
             Pick a list to share it with other people.
           </p>
         )}

@@ -359,6 +359,6 @@ export const CalendarWithRangePresetsDemo = () => {
   return <DatePickerWithRangePresets />
 }
 
-export { MotionDateRangeTimePicker } from "@/components/ticktick/motion-date-range-time-picker"
+export { MotionDateRangeTimePicker } from "@/components/workspace/motion-date-range-time-picker"
 
 export default DatePickerWithRangePresets

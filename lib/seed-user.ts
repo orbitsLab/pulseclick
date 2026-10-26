@@ -1,6 +1,6 @@
 import { prisma } from "./prisma";
 
-export async function seedStarterTickTickDataForUser(userId: string) {
+export async function seedStarterWorkspaceDataForUser(userId: string) {
   const today = new Date();
   const formatIso = (d: Date) => d.toISOString().split("T")[0];
   const todayIso = formatIso(today);
@@ -13,7 +13,7 @@ export async function seedStarterTickTickDataForUser(userId: string) {
   nextWeekDt.setDate(nextWeekDt.getDate() + 5);
   const nextWeekIso = formatIso(nextWeekDt);
 
-  // 1. Seed default TickTick Lists
+  // 1. Seed default Workspace Lists
   const workList = await prisma.taskList.create({
     data: {
       userId,
@@ -152,7 +152,7 @@ export async function seedStarterTickTickDataForUser(userId: string) {
     },
   });
 
-  // 5. Seed default TickTick Habit Sections & Habits
+  // 5. Seed default Workspace Habit Sections & Habits
   const morningSection = await prisma.habitSection.create({
     data: {
       userId,

@@ -1,10 +1,10 @@
 /**
  * Recurrence engine.
  *
- * TickTick supports "flexible recurring rules (weekly, monthly, yearly, or
- * custom)". A recurring task stays a single row: when it is completed the
- * server advances the due date to the next occurrence instead of creating
- * duplicates, and a completed occurrence is archived in `completedAt`.
+ * Supports flexible recurring rules (daily, weekly, monthly, yearly, or custom).
+ * A recurring task stays a single row: when it is completed the server advances
+ * the due date to the next occurrence instead of creating duplicates, and a
+ * completed occurrence is archived in `completedAt`.
  */
 
 export type RecurrenceType =

@@ -1,7 +1,7 @@
 import { Geist_Mono, Instrument_Serif, Onest } from "next/font/google";
 
 /**
- * PulseTick type system — three voices, one job each.
+ * PulseFlow type system — three voices, one job each.
  *
  * - `onest` is the product voice: every label, control, task title and
  *   paragraph. It is a UI grotesque with a slightly squared, humanist

@@ -14,7 +14,7 @@ import {
   CheckCircle2,
   Lock,
 } from "lucide-react";
-import { HabitAnalyticsData } from "@/hooks/use-ticktick";
+import { HabitAnalyticsData } from "@/hooks/use-workspace";
 
 interface HabitAchievementsViewProps {
   analytics: HabitAnalyticsData | null;
@@ -51,53 +51,53 @@ export function HabitAchievementsView({
   return (
     <div className="space-y-6">
       {/* 1. Level & Score Banner */}
-      <div className="relative overflow-hidden rounded-2xl border border-[var(--tt-border)] bg-gradient-to-br from-[var(--tt-panel)] via-[var(--tt-panel)] to-[var(--tt-panel-alt)] p-6 shadow-sm">
+      <div className="relative overflow-hidden rounded-2xl border border-[var(--app-border)] bg-gradient-to-br from-[var(--app-panel)] via-[var(--app-panel)] to-[var(--app-panel-alt)] p-6 shadow-sm">
         {/* Glow orb */}
-        <div className="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-[var(--tt-accent)] opacity-15 blur-3xl pointer-events-none" />
+        <div className="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-[var(--app-accent)] opacity-15 blur-3xl pointer-events-none" />
 
         <div className="flex flex-wrap items-center justify-between gap-6 relative z-10">
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--tt-accent)] to-sky-500 text-white shadow-lg shadow-[var(--tt-accent)]/25">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--app-accent)] to-sky-500 text-white shadow-lg shadow-[var(--app-accent)]/25">
               <Award className="h-8 w-8 stroke-[2.2]" />
             </div>
 
             <div>
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-[var(--tt-accent)]/20 text-[var(--tt-accent-text)] px-2.5 py-0.5 tt-meta font-bold">
+                <span className="rounded-full bg-[var(--app-accent)]/20 text-[var(--app-accent-text)] px-2.5 py-0.5 app-meta font-bold">
                   LEVEL {level.level}
                 </span>
-                <span className="tt-meta text-[var(--tt-muted)]">
+                <span className="app-meta text-[var(--app-muted)]">
                   {unlockedBadges.length} of {badges.length} Medals Unlocked
                 </span>
               </div>
 
-              <h3 className="tt-display text-2xl font-serif text-[var(--tt-text)] mt-1">
+              <h3 className="app-display text-2xl font-serif text-[var(--app-text)] mt-1">
                 {level.title}
               </h3>
             </div>
           </div>
 
           <div className="text-right">
-            <span className="tt-overline font-semibold text-[var(--tt-muted)] text-[10px]">
+            <span className="app-overline font-semibold text-[var(--app-muted)] text-[10px]">
               ACHIEVEMENT SCORE
             </span>
-            <div className="tt-figure text-3xl font-bold text-[var(--tt-accent-text)]">
+            <div className="app-figure text-3xl font-bold text-[var(--app-accent-text)]">
               {score}
-              <span className="tt-meta font-normal text-[var(--tt-muted)] ml-1">pts</span>
+              <span className="app-meta font-normal text-[var(--app-muted)] ml-1">pts</span>
             </div>
           </div>
         </div>
 
         {/* Level Progress Bar */}
-        <div className="mt-6 pt-4 border-t border-[var(--tt-border)]/60 space-y-2 relative z-10">
-          <div className="flex justify-between tt-meta font-semibold text-[var(--tt-muted)]">
+        <div className="mt-6 pt-4 border-t border-[var(--app-border)]/60 space-y-2 relative z-10">
+          <div className="flex justify-between app-meta font-semibold text-[var(--app-muted)]">
             <span>Next Level: {level.nextScore} pts</span>
             <span>{level.progressPct}% to Level {level.level + 1}</span>
           </div>
 
-          <div className="h-2.5 w-full overflow-hidden rounded-full bg-[var(--tt-panel-alt)] border border-[var(--tt-border)]/50">
+          <div className="h-2.5 w-full overflow-hidden rounded-full bg-[var(--app-panel-alt)] border border-[var(--app-border)]/50">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[var(--tt-accent)] via-sky-400 to-indigo-500 transition-all duration-700"
+              className="h-full rounded-full bg-gradient-to-r from-[var(--app-accent)] via-sky-400 to-indigo-500 transition-all duration-700"
               style={{ width: `${level.progressPct}%` }}
             />
           </div>
@@ -105,26 +105,26 @@ export function HabitAchievementsView({
       </div>
 
       {/* 2. Scoring System Card */}
-      <div className="rounded-2xl border border-[var(--tt-border)]/80 bg-[var(--tt-panel)] p-4 flex flex-wrap items-center justify-between gap-4">
+      <div className="rounded-2xl border border-[var(--app-border)]/80 bg-[var(--app-panel)] p-4 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-[var(--tt-accent-text)]" />
-          <span className="tt-label font-bold text-[var(--tt-text)]">
+          <Sparkles className="h-4 w-4 text-[var(--app-accent-text)]" />
+          <span className="app-label font-bold text-[var(--app-text)]">
             How Points Are Earned:
           </span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 tt-meta font-medium text-[var(--tt-muted)]">
+        <div className="flex flex-wrap items-center gap-4 app-meta font-medium text-[var(--app-muted)]">
           <span className="flex items-center gap-1.5">
             <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-            Check-in: <strong className="text-[var(--tt-text)]">+10 pts</strong>
+            Check-in: <strong className="text-[var(--app-text)]">+10 pts</strong>
           </span>
           <span className="flex items-center gap-1.5">
-            <Trophy className="h-3.5 w-3.5 text-[var(--tt-accent-text)]" />
-            Target Cycle: <strong className="text-[var(--tt-text)]">+50 pts</strong>
+            <Trophy className="h-3.5 w-3.5 text-[var(--app-accent-text)]" />
+            Target Cycle: <strong className="text-[var(--app-text)]">+50 pts</strong>
           </span>
           <span className="flex items-center gap-1.5">
             <Flame className="h-3.5 w-3.5 text-amber-500" />
-            Longest Streak: <strong className="text-[var(--tt-text)]">+25 pts/day</strong>
+            Longest Streak: <strong className="text-[var(--app-text)]">+25 pts/day</strong>
           </span>
         </div>
       </div>
@@ -132,10 +132,10 @@ export function HabitAchievementsView({
       {/* 3. Medal Showcase Grid */}
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
-          <h4 className="tt-title font-semibold text-[var(--tt-text)]">
+          <h4 className="app-title font-semibold text-[var(--app-text)]">
             Milestone Medals & Badges
           </h4>
-          <span className="tt-meta text-[var(--tt-muted)]">
+          <span className="app-meta text-[var(--app-muted)]">
             {unlockedBadges.length} unlocked
           </span>
         </div>
@@ -150,8 +150,8 @@ export function HabitAchievementsView({
                 key={badge.id}
                 className={`relative flex flex-col justify-between rounded-2xl border p-4 transition-all ${
                   isUnlocked
-                    ? "border-[var(--tt-border)] bg-[var(--tt-panel)] shadow-sm hover:border-[var(--tt-accent)]"
-                    : "border-[var(--tt-border)]/40 bg-[var(--tt-panel)]/40 opacity-75"
+                    ? "border-[var(--app-border)] bg-[var(--app-panel)] shadow-sm hover:border-[var(--app-accent)]"
+                    : "border-[var(--app-border)]/40 bg-[var(--app-panel)]/40 opacity-75"
                 }`}
               >
                 <div>
@@ -159,44 +159,44 @@ export function HabitAchievementsView({
                     <div
                       className={`flex h-10 w-10 items-center justify-center rounded-xl font-bold shadow-xs ${
                         isUnlocked
-                          ? "bg-gradient-to-br from-[var(--tt-accent)] to-sky-500 text-white"
-                          : "bg-[var(--tt-panel-alt)] text-[var(--tt-muted)] border border-[var(--tt-border)]"
+                          ? "bg-gradient-to-br from-[var(--app-accent)] to-sky-500 text-white"
+                          : "bg-[var(--app-panel-alt)] text-[var(--app-muted)] border border-[var(--app-border)]"
                       }`}
                     >
                       {BADGE_ICONS[badge.icon] || <Trophy className="h-5 w-5" />}
                     </div>
 
                     {isUnlocked ? (
-                      <span className="rounded-full bg-emerald-500/15 text-emerald-500 px-2 py-0.5 tt-meta font-bold">
+                      <span className="rounded-full bg-emerald-500/15 text-emerald-500 px-2 py-0.5 app-meta font-bold">
                         Unlocked
                       </span>
                     ) : (
-                      <span className="rounded-full bg-[var(--tt-panel-alt)] text-[var(--tt-muted)] px-2 py-0.5 tt-meta font-bold flex items-center gap-1 border border-[var(--tt-border)]/50">
+                      <span className="rounded-full bg-[var(--app-panel-alt)] text-[var(--app-muted)] px-2 py-0.5 app-meta font-bold flex items-center gap-1 border border-[var(--app-border)]/50">
                         <Lock className="h-3 w-3" />
                         Locked
                       </span>
                     )}
                   </div>
 
-                  <h5 className="tt-heading font-semibold text-[var(--tt-text)]">
+                  <h5 className="app-heading font-semibold text-[var(--app-text)]">
                     {badge.title}
                   </h5>
 
-                  <p className="tt-body text-[var(--tt-muted)] text-xs mt-1 leading-relaxed">
+                  <p className="app-body text-[var(--app-muted)] text-xs mt-1 leading-relaxed">
                     {badge.description}
                   </p>
                 </div>
 
                 {/* Progress bar for locked badges */}
                 {!isUnlocked && (
-                  <div className="mt-4 pt-3 border-t border-[var(--tt-border)]/40 space-y-1">
-                    <div className="flex justify-between tt-meta font-medium text-[var(--tt-muted)] text-[11px]">
+                  <div className="mt-4 pt-3 border-t border-[var(--app-border)]/40 space-y-1">
+                    <div className="flex justify-between app-meta font-medium text-[var(--app-muted)] text-[11px]">
                       <span>Progress</span>
                       <span>{badge.progress} / {badge.maxProgress}</span>
                     </div>
-                    <div className="h-1.5 w-full rounded-full bg-[var(--tt-panel-alt)] overflow-hidden">
+                    <div className="h-1.5 w-full rounded-full bg-[var(--app-panel-alt)] overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-[var(--tt-accent)]/80"
+                        className="h-full rounded-full bg-[var(--app-accent)]/80"
                         style={{ width: `${pct}%` }}
                       />
                     </div>

@@ -309,7 +309,7 @@ export function FilterPanel({
         if (!open) onClose();
       }}
     >
-      <DialogContent className="max-h-[88vh] gap-0 overflow-hidden border border-[var(--tt-border)] bg-[var(--tt-panel)] p-0 text-[var(--tt-text)] ring-0 sm:max-w-3xl">
+      <DialogContent className="max-h-[88vh] gap-0 overflow-hidden border border-[var(--app-border)] bg-[var(--app-panel)] p-0 text-[var(--app-text)] ring-0 sm:max-w-3xl">
         <FilterPanelBody
           isOpen={isOpen}
           filters={filters}
@@ -467,13 +467,13 @@ function FilterPanelBody({
     <div className="flex max-h-[88vh] flex-col">
       {mode === "list" ? (
         <>
-          <DialogHeader className="border-b border-[var(--tt-border)] py-4 pr-12 pl-5">
+          <DialogHeader className="border-b border-[var(--app-border)] py-4 pr-12 pl-5">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <DialogTitle className="font-extrabold tracking-tight text-[var(--tt-text)]">
+                <DialogTitle className="font-extrabold tracking-tight text-[var(--app-text)]">
                   Smart filters
                 </DialogTitle>
-                <DialogDescription className="tt-label text-[var(--tt-muted)]">
+                <DialogDescription className="app-label text-[var(--app-muted)]">
                   Use smart filters to focus on what matters most.
                 </DialogDescription>
               </div>
@@ -492,14 +492,14 @@ function FilterPanelBody({
             {error && (
               <p
                 role="alert"
-                className="mb-3 rounded-lg bg-rose-50 px-3 py-2 tt-label font-medium text-rose-600 dark:bg-rose-500/10 dark:text-rose-400"
+                className="mb-3 rounded-lg bg-rose-50 px-3 py-2 app-label font-medium text-rose-600 dark:bg-rose-500/10 dark:text-rose-400"
               >
                 {error}
               </p>
             )}
 
             {filters.length === 0 ? (
-              <p className="rounded-xl bg-[var(--tt-panel-alt)] px-3 py-6 text-center tt-label text-[var(--tt-muted)]">
+              <p className="rounded-xl bg-[var(--app-panel-alt)] px-3 py-6 text-center app-label text-[var(--app-muted)]">
                 No smart filters yet. Create one to save a set of criteria.
               </p>
             ) : (
@@ -507,7 +507,7 @@ function FilterPanelBody({
                 {filters.map((filter) => (
                   <li
                     key={filter.id}
-                    className="flex items-center gap-3 rounded-xl border border-[var(--tt-border)] bg-[var(--tt-panel)] px-3 py-2.5"
+                    className="flex items-center gap-3 rounded-xl border border-[var(--app-border)] bg-[var(--app-panel)] px-3 py-2.5"
                   >
                     <span
                       aria-hidden="true"
@@ -516,20 +516,20 @@ function FilterPanelBody({
                     />
                     <FilterIcon
                       name={filter.icon}
-                      className="h-4 w-4 shrink-0 text-[var(--tt-muted)]"
+                      className="h-4 w-4 shrink-0 text-[var(--app-muted)]"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate tt-label font-semibold text-[var(--tt-text)]">
+                      <p className="truncate app-label font-semibold text-[var(--app-text)]">
                         {filter.name}
                       </p>
-                      <p className="truncate tt-meta text-[var(--tt-muted)]">
+                      <p className="truncate app-meta text-[var(--app-muted)]">
                         {summarizeFilterQuery(filter.query ?? {}, listNameById)}
                       </p>
                     </div>
 
                     {confirmDeleteId === filter.id ? (
                       <div className="flex shrink-0 items-center gap-1.5">
-                        <span className="tt-meta font-semibold text-rose-500">
+                        <span className="app-meta font-semibold text-rose-500">
                           Delete?
                         </span>
                         <Button
@@ -576,7 +576,7 @@ function FilterPanelBody({
                           size="xs"
                           variant="ghost"
                           aria-label={`Delete filter ${filter.name}`}
-                          className="rounded-lg text-[var(--tt-muted)] hover:text-rose-500"
+                          className="rounded-lg text-[var(--app-muted)] hover:text-rose-500"
                           onClick={() => setConfirmDeleteId(filter.id)}
                         >
                           <Trash2 className="size-3.5" />
@@ -591,13 +591,13 @@ function FilterPanelBody({
         </>
       ) : (
         <>
-          <DialogHeader className="border-b border-[var(--tt-border)] py-4 pr-12 pl-5">
+          <DialogHeader className="border-b border-[var(--app-border)] py-4 pr-12 pl-5">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <DialogTitle className="font-extrabold tracking-tight text-[var(--tt-text)]">
+                <DialogTitle className="font-extrabold tracking-tight text-[var(--app-text)]">
                   {editingId ? "Edit filter" : "New filter"}
                 </DialogTitle>
-                <DialogDescription className="tt-label text-[var(--tt-muted)]">
+                <DialogDescription className="app-label text-[var(--app-muted)]">
                   Pick the criteria that should match. They update as you type.
                 </DialogDescription>
               </div>
@@ -624,7 +624,7 @@ function FilterPanelBody({
               {error && (
                 <p
                   role="alert"
-                  className="rounded-lg bg-rose-50 px-3 py-2 tt-label font-medium text-rose-600 dark:bg-rose-500/10 dark:text-rose-400"
+                  className="rounded-lg bg-rose-50 px-3 py-2 app-label font-medium text-rose-600 dark:bg-rose-500/10 dark:text-rose-400"
                 >
                   {error}
                 </p>
@@ -634,7 +634,7 @@ function FilterPanelBody({
               <div className="flex flex-col gap-1.5">
                 <Label
                   htmlFor="filter-name"
-                  className="tt-label font-semibold text-[var(--tt-text)]"
+                  className="app-label font-semibold text-[var(--app-text)]"
                 >
                   Name
                 </Label>
@@ -646,13 +646,13 @@ function FilterPanelBody({
                   aria-label="Filter name"
                   autoComplete="off"
                   required
-                  className="rounded-lg border-[var(--tt-border)] bg-[var(--tt-panel)] text-[var(--tt-text)] focus-visible:border-[var(--tt-accent)] focus-visible:ring-[var(--tt-accent)]/40"
+                  className="rounded-lg border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-text)] focus-visible:border-[var(--app-accent)] focus-visible:ring-[var(--app-accent)]/40"
                 />
               </div>
 
               {/* Icon */}
               <div className="flex flex-col gap-1.5">
-                <Label className="tt-label font-semibold text-[var(--tt-text)]">
+                <Label className="app-label font-semibold text-[var(--app-text)]">
                   Icon
                 </Label>
                 <div
@@ -671,10 +671,10 @@ function FilterPanelBody({
                         title={iconName}
                         onClick={() => updateDraft({ icon: iconName })}
                         className={cn(
-                          "flex h-8 w-8 items-center justify-center rounded-lg border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tt-accent)]/50",
+                          "flex h-8 w-8 items-center justify-center rounded-lg border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/50",
                           selected
-                            ? "border-[var(--tt-accent)] bg-[var(--tt-accent)]/10 text-[var(--tt-accent-text)]"
-                            : "border-[var(--tt-border)] text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)] dark:border-[var(--tt-border)] dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]"
+                            ? "border-[var(--app-accent)] bg-[var(--app-accent)]/10 text-[var(--app-accent-text)]"
+                            : "border-[var(--app-border)] text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)] dark:border-[var(--app-border)] dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]"
                         )}
                       >
                         <FilterIcon name={iconName} className="h-4 w-4" />
@@ -686,7 +686,7 @@ function FilterPanelBody({
 
               {/* Colour */}
               <div className="flex flex-col gap-1.5">
-                <Label className="tt-label font-semibold text-[var(--tt-text)]">
+                <Label className="app-label font-semibold text-[var(--app-text)]">
                   Colour
                 </Label>
                 <div
@@ -707,9 +707,9 @@ function FilterPanelBody({
                         onClick={() => updateDraft({ color })}
                         style={{ backgroundColor: color }}
                         className={cn(
-                          "h-7 w-7 rounded-full transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tt-accent)]/60",
+                          "h-7 w-7 rounded-full transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/60",
                           selected
-                            ? "ring-2 ring-[var(--tt-panel)] ring-offset-2 dark:ring-white dark:ring-offset-slate-900"
+                            ? "ring-2 ring-[var(--app-panel)] ring-offset-2 dark:ring-white dark:ring-offset-slate-900"
                             : ""
                         )}
                       >
@@ -724,7 +724,7 @@ function FilterPanelBody({
 
               {/* Priority */}
               <div className="flex flex-col gap-1.5">
-                <Label className="tt-label font-semibold text-[var(--tt-text)]">
+                <Label className="app-label font-semibold text-[var(--app-text)]">
                   Priority
                 </Label>
                 <div
@@ -749,10 +749,10 @@ function FilterPanelBody({
                           })
                         }
                         className={cn(
-                          "rounded-lg border px-2.5 py-1 tt-label font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tt-accent)]/50",
+                          "rounded-lg border px-2.5 py-1 app-label font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/50",
                           selected
-                            ? "border-[var(--tt-accent)] bg-[var(--tt-accent)]/10 text-[var(--tt-accent-text)]"
-                            : "border-[var(--tt-border)] text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)] dark:border-[var(--tt-border)] dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]"
+                            ? "border-[var(--app-accent)] bg-[var(--app-accent)]/10 text-[var(--app-accent-text)]"
+                            : "border-[var(--app-border)] text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] dark:border-[var(--app-border)] dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]"
                         )}
                       >
                         {priority.label}
@@ -764,11 +764,11 @@ function FilterPanelBody({
 
               {/* Tags */}
               <div className="flex flex-col gap-1.5">
-                <Label className="tt-label font-semibold text-[var(--tt-text)]">
+                <Label className="app-label font-semibold text-[var(--app-text)]">
                   Tags
                 </Label>
                 {tags.length === 0 ? (
-                  <p className="tt-meta text-[var(--tt-muted)]">
+                  <p className="app-meta text-[var(--app-muted)]">
                     No tags created yet.
                   </p>
                 ) : (
@@ -791,10 +791,10 @@ function FilterPanelBody({
                             })
                           }
                           className={cn(
-                            "rounded-full border px-2.5 py-0.5 tt-label font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tt-accent)]/50",
+                            "rounded-full border px-2.5 py-0.5 app-label font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/50",
                             selected
-                              ? "border-[var(--tt-accent)] bg-[var(--tt-accent)]/10 text-[var(--tt-accent-text)]"
-                              : "border-[var(--tt-border)] text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)] dark:border-[var(--tt-border)] dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]"
+                              ? "border-[var(--app-accent)] bg-[var(--app-accent)]/10 text-[var(--app-accent-text)]"
+                              : "border-[var(--app-border)] text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] dark:border-[var(--app-border)] dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]"
                           )}
                         >
                           #{tag.name}
@@ -807,7 +807,7 @@ function FilterPanelBody({
 
               {/* Lists */}
               <div className="flex flex-col gap-1.5">
-                <Label className="tt-label font-semibold text-[var(--tt-text)]">
+                <Label className="app-label font-semibold text-[var(--app-text)]">
                   Lists
                 </Label>
                 <div
@@ -829,10 +829,10 @@ function FilterPanelBody({
                           })
                         }
                         className={cn(
-                          "rounded-lg border px-2.5 py-1 tt-label font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tt-accent)]/50",
+                          "rounded-lg border px-2.5 py-1 app-label font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/50",
                           selected
-                            ? "border-[var(--tt-accent)] bg-[var(--tt-accent)]/10 text-[var(--tt-accent-text)]"
-                            : "border-[var(--tt-border)] text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)] dark:border-[var(--tt-border)] dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]"
+                            ? "border-[var(--app-accent)] bg-[var(--app-accent)]/10 text-[var(--app-accent-text)]"
+                            : "border-[var(--app-border)] text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] dark:border-[var(--app-border)] dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]"
                         )}
                       >
                         {list.id === INBOX_ID ? "Inbox" : list.name}
@@ -847,7 +847,7 @@ function FilterPanelBody({
                 <div className="flex flex-col gap-1.5">
                   <Label
                     htmlFor="filter-status"
-                    className="tt-label font-semibold text-[var(--tt-text)]"
+                    className="app-label font-semibold text-[var(--app-text)]"
                   >
                     Status
                   </Label>
@@ -860,7 +860,7 @@ function FilterPanelBody({
                         status: event.target.value as FilterDraft["status"],
                       })
                     }
-                    className="h-8 w-full rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel)] px-2 tt-label text-[var(--tt-text)] outline-none focus-visible:border-[var(--tt-accent)] focus-visible:ring-2 focus-visible:ring-[var(--tt-accent)]/40"
+                    className="h-8 w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] px-2 app-label text-[var(--app-text)] outline-none focus-visible:border-[var(--app-accent)] focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/40"
                   >
                     <option value="any">Any</option>
                     <option value="open">Open</option>
@@ -871,7 +871,7 @@ function FilterPanelBody({
                 <div className="flex flex-col gap-1.5">
                   <Label
                     htmlFor="filter-due-from"
-                    className="tt-label font-semibold text-[var(--tt-text)]"
+                    className="app-label font-semibold text-[var(--app-text)]"
                   >
                     Due from
                   </Label>
@@ -883,14 +883,14 @@ function FilterPanelBody({
                     onChange={(event) =>
                       updateDraft({ dueFrom: event.target.value })
                     }
-                    className="h-8 w-full rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel)] px-2 tt-label text-[var(--tt-text)] outline-none focus-visible:border-[var(--tt-accent)] focus-visible:ring-2 focus-visible:ring-[var(--tt-accent)]/40"
+                    className="h-8 w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] px-2 app-label text-[var(--app-text)] outline-none focus-visible:border-[var(--app-accent)] focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/40"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
                   <Label
                     htmlFor="filter-due-to"
-                    className="tt-label font-semibold text-[var(--tt-text)]"
+                    className="app-label font-semibold text-[var(--app-text)]"
                   >
                     Due to
                   </Label>
@@ -900,7 +900,7 @@ function FilterPanelBody({
                     aria-label="Due date to"
                     value={draft.dueTo}
                     onChange={(event) => updateDraft({ dueTo: event.target.value })}
-                    className="h-8 w-full rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel)] px-2 tt-label text-[var(--tt-text)] outline-none focus-visible:border-[var(--tt-accent)] focus-visible:ring-2 focus-visible:ring-[var(--tt-accent)]/40"
+                    className="h-8 w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] px-2 app-label text-[var(--app-text)] outline-none focus-visible:border-[var(--app-accent)] focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/40"
                   />
                 </div>
               </div>
@@ -909,7 +909,7 @@ function FilterPanelBody({
               <div className="grid gap-2 sm:grid-cols-3">
                 <label
                   htmlFor="filter-hasDescription"
-                  className="flex cursor-pointer items-start gap-2 rounded-xl border border-[var(--tt-border)] px-3 py-2.5 transition-colors hover:bg-[var(--tt-panel-alt)] dark:hover:bg-[var(--tt-panel-alt)]/60"
+                  className="flex cursor-pointer items-start gap-2 rounded-xl border border-[var(--app-border)] px-3 py-2.5 transition-colors hover:bg-[var(--app-panel-alt)] dark:hover:bg-[var(--app-panel-alt)]/60"
                 >
                   <Checkbox
                     id="filter-hasDescription"
@@ -917,13 +917,13 @@ function FilterPanelBody({
                     onCheckedChange={(checked: boolean) =>
                       updateDraft({ hasDescription: checked })
                     }
-                    className="mt-0.5 border-[var(--tt-border)] data-checked:border-[var(--tt-accent)] data-checked:bg-[var(--tt-accent-strong)] data-checked:text-white"
+                    className="mt-0.5 border-[var(--app-border)] data-checked:border-[var(--app-accent)] data-checked:bg-[var(--app-accent-strong)] data-checked:text-white"
                   />
                   <span className="flex flex-col">
-                    <span className="tt-label font-semibold text-[var(--tt-text)]">
+                    <span className="app-label font-semibold text-[var(--app-text)]">
                       Has description
                     </span>
-                    <span className="tt-meta text-[var(--tt-muted)]">
+                    <span className="app-meta text-[var(--app-muted)]">
                       Only tasks with a description
                     </span>
                   </span>
@@ -931,7 +931,7 @@ function FilterPanelBody({
 
                 <label
                   htmlFor="filter-hasSubtasks"
-                  className="flex cursor-pointer items-start gap-2 rounded-xl border border-[var(--tt-border)] px-3 py-2.5 transition-colors hover:bg-[var(--tt-panel-alt)] dark:hover:bg-[var(--tt-panel-alt)]/60"
+                  className="flex cursor-pointer items-start gap-2 rounded-xl border border-[var(--app-border)] px-3 py-2.5 transition-colors hover:bg-[var(--app-panel-alt)] dark:hover:bg-[var(--app-panel-alt)]/60"
                 >
                   <Checkbox
                     id="filter-hasSubtasks"
@@ -939,13 +939,13 @@ function FilterPanelBody({
                     onCheckedChange={(checked: boolean) =>
                       updateDraft({ hasSubtasks: checked })
                     }
-                    className="mt-0.5 border-[var(--tt-border)] data-checked:border-[var(--tt-accent)] data-checked:bg-[var(--tt-accent-strong)] data-checked:text-white"
+                    className="mt-0.5 border-[var(--app-border)] data-checked:border-[var(--app-accent)] data-checked:bg-[var(--app-accent-strong)] data-checked:text-white"
                   />
                   <span className="flex flex-col">
-                    <span className="tt-label font-semibold text-[var(--tt-text)]">
+                    <span className="app-label font-semibold text-[var(--app-text)]">
                       Has subtasks
                     </span>
-                    <span className="tt-meta text-[var(--tt-muted)]">
+                    <span className="app-meta text-[var(--app-muted)]">
                       Only tasks with sub tasks
                     </span>
                   </span>
@@ -953,7 +953,7 @@ function FilterPanelBody({
 
                 <label
                   htmlFor="filter-pinned"
-                  className="flex cursor-pointer items-start gap-2 rounded-xl border border-[var(--tt-border)] px-3 py-2.5 transition-colors hover:bg-[var(--tt-panel-alt)] dark:hover:bg-[var(--tt-panel-alt)]/60"
+                  className="flex cursor-pointer items-start gap-2 rounded-xl border border-[var(--app-border)] px-3 py-2.5 transition-colors hover:bg-[var(--app-panel-alt)] dark:hover:bg-[var(--app-panel-alt)]/60"
                 >
                   <Checkbox
                     id="filter-pinned"
@@ -961,13 +961,13 @@ function FilterPanelBody({
                     onCheckedChange={(checked: boolean) =>
                       updateDraft({ pinned: checked })
                     }
-                    className="mt-0.5 border-[var(--tt-border)] data-checked:border-[var(--tt-accent)] data-checked:bg-[var(--tt-accent-strong)] data-checked:text-white"
+                    className="mt-0.5 border-[var(--app-border)] data-checked:border-[var(--app-accent)] data-checked:bg-[var(--app-accent-strong)] data-checked:text-white"
                   />
                   <span className="flex flex-col">
-                    <span className="tt-label font-semibold text-[var(--tt-text)]">
+                    <span className="app-label font-semibold text-[var(--app-text)]">
                       Pinned only
                     </span>
-                    <span className="tt-meta text-[var(--tt-muted)]">
+                    <span className="app-meta text-[var(--app-muted)]">
                       Only pinned tasks
                     </span>
                   </span>
@@ -978,7 +978,7 @@ function FilterPanelBody({
               <div className="flex flex-col gap-1.5">
                 <Label
                   htmlFor="filter-keyword"
-                  className="tt-label font-semibold text-[var(--tt-text)]"
+                  className="app-label font-semibold text-[var(--app-text)]"
                 >
                   Keyword
                 </Label>
@@ -989,25 +989,25 @@ function FilterPanelBody({
                   placeholder="Search title or description"
                   aria-label="Filter keyword"
                   autoComplete="off"
-                  className="rounded-lg border-[var(--tt-border)] bg-[var(--tt-panel)] text-[var(--tt-text)] focus-visible:border-[var(--tt-accent)] focus-visible:ring-[var(--tt-accent)]/40"
+                  className="rounded-lg border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-text)] focus-visible:border-[var(--app-accent)] focus-visible:ring-[var(--app-accent)]/40"
                 />
               </div>
 
               {/* Live summary */}
-              <div className="rounded-xl border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-3 py-2.5">
-                <p className="tt-meta font-bold tracking-wider text-[var(--tt-muted)] uppercase">
+              <div className="rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2.5">
+                <p className="app-meta font-bold tracking-wider text-[var(--app-muted)] uppercase">
                   Summary
                 </p>
                 <p
                   aria-live="polite"
-                  className="mt-0.5 tt-label font-medium text-[var(--tt-text)]"
+                  className="mt-0.5 app-label font-medium text-[var(--app-text)]"
                 >
                   {summary}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 border-t border-[var(--tt-border)] px-5 py-3">
+            <div className="flex items-center justify-end gap-2 border-t border-[var(--app-border)] px-5 py-3">
               <Button
                 type="button"
                 variant="outline"

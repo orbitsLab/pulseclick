@@ -19,10 +19,10 @@ import {
   ChevronRight,
   Check,
 } from "lucide-react";
-import { TaskList, Tag } from "@/hooks/use-ticktick";
+import { TaskList, Tag } from "@/hooks/use-workspace";
 import { getTodayISO, addDays, formatShortDate, parseISODate } from "@/lib/date-utils";
 import { parseTaskInput } from "@/lib/nlp";
-import { TickTickContext } from "@/context/ticktick-context";
+import { WorkspaceContext } from "@/context/workspace-context";
 import { TaskDatePickerPopover } from "./task-date-picker-popover";
 import {
   DropdownMenu,
@@ -60,7 +60,7 @@ interface TaskInputBarProps {
 }
 
 export function TaskInputBar(props: TaskInputBarProps = {}) {
-  const context = useContext(TickTickContext);
+  const context = useContext(WorkspaceContext);
   const currentListName = props.currentListName ?? context?.currentListName ?? "Tasks";
   const currentListId = props.currentListId !== undefined ? props.currentListId : (context?.activeListId ?? null);
   const lists = props.lists ?? context?.lists ?? [];
@@ -233,17 +233,17 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
       {/* Main Single-line Input Bar (Image 4 & 5 Style) */}
       <form
         onSubmit={handleSubmit}
-        className="group relative flex items-center justify-between rounded-xl border border-[var(--tt-border)] bg-[var(--tt-panel-alt)]/60 px-3.5 py-2.5 shadow-xs transition-all focus-within:border-[var(--tt-accent)] focus-within:ring-1 focus-within:ring-[var(--tt-accent)]"
+        className="group relative flex items-center justify-between rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)]/60 px-3.5 py-2.5 shadow-xs transition-all focus-within:border-[var(--app-accent)] focus-within:ring-1 focus-within:ring-[var(--app-accent)]"
       >
         <div className="flex flex-1 items-center gap-2.5 min-w-0">
-          <Plus className="h-4 w-4 text-[var(--tt-muted)] shrink-0" />
+          <Plus className="h-4 w-4 text-[var(--app-muted)] shrink-0" />
           <input
             type="text"
             required
             value={title}
             onChange={(e) => handleTitleChange(e.target.value)}
             placeholder={`Add task to "${targetList?.name || currentListName}", press Enter to save`}
-            className="flex-1 bg-transparent tt-body text-sm text-[var(--tt-text)] placeholder-[var(--tt-muted)]/70 focus:outline-none"
+            className="flex-1 bg-transparent app-body text-sm text-[var(--app-text)] placeholder-[var(--app-muted)]/70 focus:outline-none"
           />
         </div>
 
@@ -251,7 +251,7 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
         <div className="flex items-center gap-1.5 shrink-0 ml-2">
           {/* Active Date Label Pill if set */}
           {dueDate && (
-            <span className="flex items-center gap-1 rounded-md bg-[var(--tt-accent)]/15 px-2 py-0.5 tt-meta font-medium text-[var(--tt-accent-text)]">
+            <span className="flex items-center gap-1 rounded-md bg-[var(--app-accent)]/15 px-2 py-0.5 app-meta font-medium text-[var(--app-accent-text)]">
               <span>
                 {dueDate === today ? "Today" : dueDate === tomorrow ? "Tomorrow" : formatShortDate(dueDate)}
               </span>
@@ -282,7 +282,7 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
               "flex h-7 w-7 items-center justify-center rounded-lg transition-colors cursor-pointer",
               isListening
                 ? "bg-rose-500/15 text-rose-500"
-                : "text-[var(--tt-muted)] hover:bg-[var(--tt-panel)] hover:text-[var(--tt-text)]"
+                : "text-[var(--app-muted)] hover:bg-[var(--app-panel)] hover:text-[var(--app-text)]"
             )}
           >
             {isListening ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
@@ -296,8 +296,8 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
               className={cn(
                 "flex h-7 w-7 items-center justify-center rounded-lg transition-colors cursor-pointer",
                 dueDate
-                  ? "text-[var(--tt-accent-text)] bg-[var(--tt-accent)]/15"
-                  : "text-[var(--tt-muted)] hover:bg-[var(--tt-panel)] hover:text-[var(--tt-text)]"
+                  ? "text-[var(--app-accent-text)] bg-[var(--app-accent)]/15"
+                  : "text-[var(--app-muted)] hover:bg-[var(--app-panel)] hover:text-[var(--app-text)]"
               )}
               title="Set date"
             >
@@ -331,7 +331,7 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--tt-muted)] hover:bg-[var(--tt-panel)] hover:text-[var(--tt-text)] transition-colors cursor-pointer"
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--app-muted)] hover:bg-[var(--app-panel)] hover:text-[var(--app-text)] transition-colors cursor-pointer"
                 title="Task options"
               >
                 <ChevronDown className="h-4 w-4" />
@@ -339,11 +339,11 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="w-56 bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)] p-2 shadow-xl"
+              className="w-56 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] p-2 shadow-xl"
             >
               {/* Priority Flags Header */}
               <div className="px-2 py-1.5">
-                <span className="block tt-overline font-semibold text-[var(--tt-muted)] mb-1.5">
+                <span className="block app-overline font-semibold text-[var(--app-muted)] mb-1.5">
                   Priority
                 </span>
                 <div className="flex items-center justify-between gap-1">
@@ -351,7 +351,7 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
                     { level: 3, label: "High", color: "text-rose-500", bg: "hover:bg-rose-500/15" },
                     { level: 2, label: "Medium", color: "text-amber-500", bg: "hover:bg-amber-500/15" },
                     { level: 1, label: "Low", color: "text-sky-500", bg: "hover:bg-sky-500/15" },
-                    { level: 0, label: "None", color: "text-[var(--tt-muted)]", bg: "hover:bg-[var(--tt-panel-alt)]" },
+                    { level: 0, label: "None", color: "text-[var(--app-muted)]", bg: "hover:bg-[var(--app-panel-alt)]" },
                   ].map((p) => (
                     <button
                       key={p.level}
@@ -366,7 +366,7 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
                         p.color,
                         p.bg,
                         priority === p.level
-                          ? "border-[var(--tt-accent)] bg-[var(--tt-accent)]/10 font-bold"
+                          ? "border-[var(--app-accent)] bg-[var(--app-accent)]/10 font-bold"
                           : "border-transparent"
                       )}
                     >
@@ -376,7 +376,7 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
                 </div>
               </div>
 
-              <DropdownMenuSeparator className="bg-[var(--tt-border)] my-1" />
+              <DropdownMenuSeparator className="bg-[var(--app-border)] my-1" />
 
               {/* List Selector Submenu */}
               <DropdownMenuSub>
@@ -384,7 +384,7 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
                   <Folder className="h-4 w-4 mr-2" style={{ color: targetList?.color || undefined }} />
                   <span className="truncate flex-1">{targetList?.name || "Inbox"}</span>
                 </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)] min-w-36">
+                <DropdownMenuSubContent className="bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] min-w-36">
                   <DropdownMenuItem
                     onClick={() => {
                       setListId(null);
@@ -421,9 +421,9 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
                   <TagIcon className="h-4 w-4 mr-2" />
                   <span>Tags</span>
                 </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)] min-w-36">
+                <DropdownMenuSubContent className="bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] min-w-36">
                   {tags.length === 0 ? (
-                    <div className="p-2 tt-meta text-[var(--tt-muted)]">No tags yet</div>
+                    <div className="p-2 app-meta text-[var(--app-muted)]">No tags yet</div>
                   ) : (
                     tags.map((t) => {
                       const isSelected = selectedTagIds.includes(t.id);
@@ -453,17 +453,17 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
               </DropdownMenuSub>
 
               {/* Action items matching Image 5 */}
-              <DropdownMenuItem className="cursor-pointer text-[var(--tt-muted)]">
+              <DropdownMenuItem className="cursor-pointer text-[var(--app-muted)]">
                 <Paperclip className="h-4 w-4 mr-2" />
                 <span>Attachment</span>
               </DropdownMenuItem>
 
-              <DropdownMenuItem className="cursor-pointer text-[var(--tt-muted)]">
+              <DropdownMenuItem className="cursor-pointer text-[var(--app-muted)]">
                 <Bookmark className="h-4 w-4 mr-2" />
                 <span>Add from Template</span>
               </DropdownMenuItem>
 
-              <DropdownMenuItem className="cursor-pointer text-[var(--tt-muted)]">
+              <DropdownMenuItem className="cursor-pointer text-[var(--app-muted)]">
                 <FileText className="h-4 w-4 mr-2" />
                 <span>Convert to Note</span>
               </DropdownMenuItem>
@@ -479,18 +479,18 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
         (parsed.priority !== null && parsed.priority !== undefined) ||
         parsed.tags?.length ||
         parsed.durationMinutes) && (
-        <div className="flex flex-wrap items-center gap-1.5 px-1 tt-meta animate-in fade-in duration-150">
-          <span className="flex items-center gap-1 font-bold uppercase tracking-wider text-[var(--tt-muted)]">
+        <div className="flex flex-wrap items-center gap-1.5 px-1 app-meta animate-in fade-in duration-150">
+          <span className="flex items-center gap-1 font-bold uppercase tracking-wider text-[var(--app-muted)]">
             <Wand2 className="h-3 w-3" />
             Understood
           </span>
           {parsed.dueDate && (
-            <span className="rounded-md bg-[var(--tt-accent)]/10 px-1.5 py-0.5 font-semibold text-[var(--tt-accent-text)]">
+            <span className="rounded-md bg-[var(--app-accent)]/10 px-1.5 py-0.5 font-semibold text-[var(--app-accent-text)]">
               {parsed.dueDate}
             </span>
           )}
           {parsed.dueTime && (
-            <span className="rounded-md bg-[var(--tt-accent)]/10 px-1.5 py-0.5 font-semibold text-[var(--tt-accent-text)]">
+            <span className="rounded-md bg-[var(--app-accent)]/10 px-1.5 py-0.5 font-semibold text-[var(--app-accent-text)]">
               {parsed.dueTime}
             </span>
           )}

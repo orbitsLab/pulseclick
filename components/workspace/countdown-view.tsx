@@ -209,14 +209,14 @@ function withAlpha(hex: string, alpha: string): string {
 
 function UnitBox({ value, label, color }: { value: number; label: string; color: string }) {
   return (
-    <div className="flex min-w-0 flex-1 flex-col items-center gap-1 rounded-xl border border-[var(--tt-border)] bg-[var(--tt-panel-alt)]/80 px-1 py-2">
+    <div className="flex min-w-0 flex-1 flex-col items-center gap-1 rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)]/80 px-1 py-2">
       <span
         className="font-mono text-2xl leading-none font-semibold tabular-nums tracking-tight"
         style={{ color }}
       >
         {String(value).padStart(2, "0")}
       </span>
-      <span className="tt-meta font-bold tracking-wider text-[var(--tt-muted)] uppercase">
+      <span className="app-meta font-bold tracking-wider text-[var(--app-muted)] uppercase">
         {label}
       </span>
     </div>
@@ -237,7 +237,7 @@ export function CountdownView({
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Live ticking clock shared by every card.
+  // Live countdown timer shared by every card.
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(timer);
@@ -349,7 +349,7 @@ export function CountdownView({
       {/* Header strip */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
-          <p className="tt-body text-[var(--tt-muted)]">
+          <p className="app-body text-[var(--app-muted)]">
             Keep track of the dates that matter — birthdays, anniversaries, deadlines
             and launches.
           </p>
@@ -366,14 +366,14 @@ export function CountdownView({
 
       {/* Cards */}
       {sorted.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-[var(--tt-border)] bg-[var(--tt-panel)] px-6 py-14 text-center">
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--tt-panel-alt)] text-[var(--tt-muted)]">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-[var(--app-border)] bg-[var(--app-panel)] px-6 py-14 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--app-panel-alt)] text-[var(--app-muted)]">
             <PartyPopper className="size-6" />
           </span>
-          <h3 className="tt-heading font-semibold text-[var(--tt-text)]">
+          <h3 className="app-heading font-semibold text-[var(--app-text)]">
             No countdowns yet
           </h3>
-          <p className="max-w-sm tt-body text-[var(--tt-muted)]">
+          <p className="max-w-sm app-body text-[var(--app-muted)]">
             Add a date you are looking forward to and we will count every second
             until it arrives.
           </p>
@@ -400,7 +400,7 @@ export function CountdownView({
             return (
               <div
                 key={countdown.id}
-                className="flex flex-col gap-4 rounded-2xl border border-[var(--tt-border)] bg-[var(--tt-panel)] p-4 shadow-sm transition-colors"
+                className="flex flex-col gap-4 rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4 shadow-sm transition-colors"
               >
                 {/* Title row */}
                 <div className="flex items-start justify-between gap-2">
@@ -419,10 +419,10 @@ export function CountdownView({
                       )}
                     </span>
                     <div className="min-w-0">
-                      <h3 className="truncate tt-heading font-semibold text-[var(--tt-text)]">
+                      <h3 className="truncate app-heading font-semibold text-[var(--app-text)]">
                         {countdown.title}
                       </h3>
-                      <span className="mt-0.5 flex items-center gap-1.5 tt-label text-[var(--tt-muted)]">
+                      <span className="mt-0.5 flex items-center gap-1.5 app-label text-[var(--app-muted)]">
                         <CalendarDays className="size-3.5 shrink-0" />
                         <span className="truncate">
                           {formatAbsoluteDate(countdown.targetDate)}
@@ -436,7 +436,7 @@ export function CountdownView({
                       type="button"
                       onClick={() => openEdit(countdown)}
                       aria-label={`Edit ${countdown.title}`}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--tt-muted)] transition-colors hover:bg-[var(--tt-panel-alt)] hover:text-[var(--tt-text)] dark:hover:text-[var(--tt-text)]"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--app-muted)] transition-colors hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-text)] dark:hover:text-[var(--app-text)]"
                     >
                       <Pencil className="size-4" />
                     </button>
@@ -444,7 +444,7 @@ export function CountdownView({
                       type="button"
                       onClick={() => handleDelete(countdown.id)}
                       aria-label={`Delete ${countdown.title}`}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--tt-muted)] transition-colors hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--app-muted)] transition-colors hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
                     >
                       <Trash2 className="size-4" />
                     </button>
@@ -452,7 +452,7 @@ export function CountdownView({
                 </div>
 
                 {confirming && (
-                  <p className="flex items-center gap-1.5 rounded-lg bg-rose-50 px-2.5 py-1.5 tt-label font-medium text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">
+                  <p className="flex items-center gap-1.5 rounded-lg bg-rose-50 px-2.5 py-1.5 app-label font-medium text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">
                     <Trash2 className="size-3.5" />
                     Click delete again to confirm
                   </p>
@@ -460,17 +460,17 @@ export function CountdownView({
 
                 {/* Countdown / passed state */}
                 {isPassed ? (
-                  <div className="flex flex-col gap-2 rounded-xl border border-[var(--tt-border)] bg-[var(--tt-panel-alt)]/80 p-3">
+                  <div className="flex flex-col gap-2 rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)]/80 p-3">
                     <div className="flex items-center gap-2">
-                      <span className="rounded-lg bg-[var(--tt-panel-alt)] px-2 py-0.5 tt-meta font-bold tracking-wider text-[var(--tt-text)] uppercase">
+                      <span className="rounded-lg bg-[var(--app-panel-alt)] px-2 py-0.5 app-meta font-bold tracking-wider text-[var(--app-text)] uppercase">
                         Ended
                       </span>
-                      <span className="tt-label font-medium text-[var(--tt-muted)]">
+                      <span className="app-label font-medium text-[var(--app-muted)]">
                         Passed {splitDuration(elapsedSinceTarget).days} day
                         {splitDuration(elapsedSinceTarget).days === 1 ? "" : "s"} ago
                       </span>
                     </div>
-                    <p className="tt-label text-[var(--tt-muted)]">
+                    <p className="app-label text-[var(--app-muted)]">
                       This countdown has passed
                       {(countdown.repeat || "NONE").toUpperCase() === "YEARLY"
                         ? " and does not repeat."
@@ -488,14 +488,14 @@ export function CountdownView({
 
                 {/* Progress bar */}
                 <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center justify-between tt-meta font-bold tracking-wide text-[var(--tt-muted)] uppercase">
+                  <div className="flex items-center justify-between app-meta font-bold tracking-wide text-[var(--app-muted)] uppercase">
                     <span>
                       {isPassed ? "Completed" : "Elapsed"}
                       {isRollover ? " · next occurrence" : ""}
                     </span>
                     <span className="tabular-nums">{progressPercent}%</span>
                   </div>
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--tt-panel-alt)]">
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--app-panel-alt)]">
                     <div
                       className="h-full rounded-full transition-[width] duration-500 ease-linear"
                       style={{
@@ -509,12 +509,12 @@ export function CountdownView({
                 {/* Badges */}
                 <div className="flex flex-wrap items-center gap-1.5">
                   {(countdown.repeat || "NONE").toUpperCase() === "YEARLY" && (
-                    <span className="rounded-lg border border-[var(--tt-border)] px-2 py-0.5 tt-meta font-bold tracking-wider text-[var(--tt-muted)] uppercase">
+                    <span className="rounded-lg border border-[var(--app-border)] px-2 py-0.5 app-meta font-bold tracking-wider text-[var(--app-muted)] uppercase">
                       Repeats yearly
                     </span>
                   )}
                   {isRollover && (
-                    <span className="rounded-lg border border-[var(--tt-border)] px-2 py-0.5 tt-meta font-bold tracking-wider text-[var(--tt-muted)] uppercase">
+                    <span className="rounded-lg border border-[var(--app-border)] px-2 py-0.5 app-meta font-bold tracking-wider text-[var(--app-muted)] uppercase">
                       Next: {target ? formatAbsoluteDate(toDateInput(target)) : ""}
                     </span>
                   )}
@@ -571,7 +571,7 @@ export function CountdownView({
                 onChange={(event) =>
                   setForm((prev) => ({ ...prev, targetDate: event.target.value }))
                 }
-                className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 tt-body transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
+                className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 app-body transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
               />
             </div>
 
@@ -603,7 +603,7 @@ export function CountdownView({
                       aria-pressed={selected}
                       className={cn(
                         "flex h-7 w-7 items-center justify-center rounded-full transition-transform hover:scale-110",
-                        selected ? "ring-2 ring-[var(--tt-panel)] ring-offset-2 dark:ring-white dark:ring-offset-slate-900" : ""
+                        selected ? "ring-2 ring-[var(--app-panel)] ring-offset-2 dark:ring-white dark:ring-offset-slate-900" : ""
                       )}
                       style={{ backgroundColor: preset }}
                     >
@@ -616,12 +616,12 @@ export function CountdownView({
               </div>
             </div>
 
-            <div className="flex items-center justify-between rounded-xl border border-[var(--tt-border)] px-3 py-2.5">
+            <div className="flex items-center justify-between rounded-xl border border-[var(--app-border)] px-3 py-2.5">
               <div className="flex flex-col">
-                <Label htmlFor="countdown-repeat" className="tt-body font-semibold">
+                <Label htmlFor="countdown-repeat" className="app-body font-semibold">
                   Repeat yearly
                 </Label>
-                <span className="tt-label text-[var(--tt-muted)]">
+                <span className="app-label text-[var(--app-muted)]">
                   Count down to this date every year.
                 </span>
               </div>
@@ -637,7 +637,7 @@ export function CountdownView({
             {error && (
               <p
                 role="alert"
-                className="rounded-lg bg-rose-50 px-3 py-2 tt-label font-medium text-rose-600 dark:bg-rose-500/10 dark:text-rose-400"
+                className="rounded-lg bg-rose-50 px-3 py-2 app-label font-medium text-rose-600 dark:bg-rose-500/10 dark:text-rose-400"
               >
                 {error}
               </p>

@@ -19,9 +19,9 @@ import {
   Layers,
   Sunrise,
 } from "lucide-react";
-import { Task } from "@/hooks/use-ticktick";
+import { Task } from "@/hooks/use-workspace";
 import { getTodayISO, addDays, formatShortDate } from "@/lib/date-utils";
-import { TickTickContext } from "@/context/ticktick-context";
+import { WorkspaceContext } from "@/context/workspace-context";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -31,20 +31,20 @@ export function TaskListSkeleton({ count = 5 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="flex items-center justify-between gap-3 rounded-xl border border-[var(--tt-border)]/60 bg-[var(--tt-panel)]/30 p-2.5 transition-opacity"
+          className="flex items-center justify-between gap-3 rounded-xl border border-[var(--app-border)]/60 bg-[var(--app-panel)]/30 p-2.5 transition-opacity"
           style={{ opacity: Math.max(0.35, 1 - i * 0.15) }}
         >
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
-            <Skeleton className="h-4.5 w-4.5 rounded-md shrink-0 bg-[var(--tt-panel-alt)]" />
+            <Skeleton className="h-4.5 w-4.5 rounded-md shrink-0 bg-[var(--app-panel-alt)]" />
             <Skeleton
-              className="h-4 rounded-md bg-[var(--tt-panel-alt)]"
+              className="h-4 rounded-md bg-[var(--app-panel-alt)]"
               style={{ width: `${Math.max(35, 75 - (i % 3) * 15)}%` }}
             />
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <Skeleton className="h-4.5 w-16 rounded-md bg-[var(--tt-panel-alt)]/70 hidden sm:block" />
-            <Skeleton className="h-4.5 w-20 rounded-md bg-[var(--tt-panel-alt)]/70" />
-            <Skeleton className="h-4 w-4 rounded-full bg-[var(--tt-panel-alt)]/60" />
+            <Skeleton className="h-4.5 w-16 rounded-md bg-[var(--app-panel-alt)]/70 hidden sm:block" />
+            <Skeleton className="h-4.5 w-20 rounded-md bg-[var(--app-panel-alt)]/70" />
+            <Skeleton className="h-4 w-4 rounded-full bg-[var(--app-panel-alt)]/60" />
           </div>
         </div>
       ))}
@@ -69,7 +69,7 @@ interface TaskListViewProps {
 }
 
 export function TaskListView(props: TaskListViewProps = {}) {
-  const context = useContext(TickTickContext);
+  const context = useContext(WorkspaceContext);
 
   const tasks = props.tasks ?? context?.tasks ?? [];
   const selectedTaskId = props.selectedTaskId !== undefined ? props.selectedTaskId : (context?.selectedTaskId ?? null);
@@ -148,7 +148,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
       case 1:
         return "text-blue-400";
       default:
-        return "text-[var(--tt-muted)]";
+        return "text-[var(--app-muted)]";
     }
   }
 
@@ -165,7 +165,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
       <div
         key={task.id}
         onClick={() => onSelectTask(task.id)}
-        className={`group relative flex items-center justify-between gap-3 rounded-xl border-y border-r p-2.5 sm:px-3.5 transition-all cursor-pointer ${getPriorityColor( task.priority )} ${ isSelected ? "border-y-[var(--tt-accent)]/40 border-r-[var(--tt-accent)]/40 bg-[var(--tt-accent)]/10 shadow-xs" : isCheckedInBatch ? "border-y-indigo-500/40 border-r-indigo-500/40 bg-indigo-500/10" : "border-y-[var(--tt-border)] border-r-[var(--tt-border)] bg-[var(--tt-panel)] hover:bg-[var(--tt-panel-alt)]" } ${task.completed ? "opacity-60" : ""}`}
+        className={`group relative flex items-center justify-between gap-3 rounded-xl border-y border-r p-2.5 sm:px-3.5 transition-all cursor-pointer ${getPriorityColor( task.priority )} ${ isSelected ? "border-y-[var(--app-accent)]/40 border-r-[var(--app-accent)]/40 bg-[var(--app-accent)]/10 shadow-xs" : isCheckedInBatch ? "border-y-indigo-500/40 border-r-indigo-500/40 bg-indigo-500/10" : "border-y-[var(--app-border)] border-r-[var(--app-border)] bg-[var(--app-panel)] hover:bg-[var(--app-panel-alt)]" } ${task.completed ? "opacity-60" : ""}`}
       >
         {/* Left: Multi-select checkbox + Completion Checkbox + Title + Badges */}
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -174,7 +174,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
             type="button"
             onClick={(e) => toggleSelectTask(e, task.id)}
             title="Select for batch action"
-            className={`opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded text-[var(--tt-muted)] hover:text-[var(--tt-text)] ${ isCheckedInBatch ? "!opacity-100 text-[var(--tt-accent-text)] font-bold" : "" }`}
+            className={`opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded text-[var(--app-muted)] hover:text-[var(--app-text)] ${ isCheckedInBatch ? "!opacity-100 text-[var(--app-accent-text)] font-bold" : "" }`}
           >
             {isCheckedInBatch ? (
               <CheckSquare className="h-3.5 w-3.5" />
@@ -190,7 +190,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
               e.stopPropagation();
               onToggleComplete(task.id, !task.completed);
             }}
-            className={`flex h-4.5 w-4.5 flex-shrink-0 items-center justify-center rounded-md border transition-all active:scale-90 ${ task.completed ? "border-[var(--tt-accent)] bg-[var(--tt-accent-strong)] text-white shadow-xs shadow-[var(--tt-accent)]/30" : task.priority === 3 ? "border-rose-500 hover:bg-rose-500/20" : task.priority === 2 ? "border-amber-500 hover:bg-amber-500/20" : task.priority === 1 ? "border-blue-400 hover:bg-blue-500/20" : "border-[var(--tt-border)] hover:border-[var(--tt-accent)] dark:hover:border-[var(--tt-accent)]" }`}
+            className={`flex h-4.5 w-4.5 flex-shrink-0 items-center justify-center rounded-md border transition-all active:scale-90 ${ task.completed ? "border-[var(--app-accent)] bg-[var(--app-accent-strong)] text-white shadow-xs shadow-[var(--app-accent)]/30" : task.priority === 3 ? "border-rose-500 hover:bg-rose-500/20" : task.priority === 2 ? "border-amber-500 hover:bg-amber-500/20" : task.priority === 1 ? "border-blue-400 hover:bg-blue-500/20" : "border-[var(--app-border)] hover:border-[var(--app-accent)] dark:hover:border-[var(--app-accent)]" }`}
           >
             {task.completed && <Check className="h-3 w-3 stroke-[3]" />}
           </button>
@@ -200,7 +200,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
             type="button"
             onClick={(e) => cyclePriority(e, task)}
             title={`Priority: ${task.priority === 3 ? "High" : task.priority === 2 ? "Medium" : task.priority === 1 ? "Low" : "None"}. Click to cycle.`}
-            className={`p-0.5 rounded transition-all ${ task.priority === 3 ? "text-rose-500" : task.priority === 2 ? "text-amber-500" : task.priority === 1 ? "text-blue-400" : "text-[var(--tt-muted)] dark:text-[var(--tt-text)] hover:text-[var(--tt-muted)]" }`}
+            className={`p-0.5 rounded transition-all ${ task.priority === 3 ? "text-rose-500" : task.priority === 2 ? "text-amber-500" : task.priority === 1 ? "text-blue-400" : "text-[var(--app-muted)] dark:text-[var(--app-text)] hover:text-[var(--app-muted)]" }`}
           >
             <Flag className="h-3 w-3 fill-current" />
           </button>
@@ -208,7 +208,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span
-                className={`tt-heading font-semibold truncate ${ task.completed ? "line-through text-[var(--tt-muted)]" : "text-[var(--tt-text)] dark:text-[var(--tt-text)]" }`}
+                className={`app-heading font-semibold truncate ${ task.completed ? "line-through text-[var(--app-muted)]" : "text-[var(--app-text)] dark:text-[var(--app-text)]" }`}
               >
                 {task.title}
               </span>
@@ -223,10 +223,10 @@ export function TaskListView(props: TaskListViewProps = {}) {
                     onUpdateTask?.({ taskId: task.id, kanbanStatus: nextStatus });
                   }}
                   title={`Status: ${task.kanbanStatus === "IN_PROGRESS" ? "In Progress" : "To Do"}. Click to toggle.`}
-                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 tt-meta font-medium transition-colors cursor-pointer ${
+                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 app-meta font-medium transition-colors cursor-pointer ${
                     task.kanbanStatus === "IN_PROGRESS"
                       ? "bg-amber-500/15 text-amber-500 hover:bg-amber-500/25 border border-amber-500/30"
-                      : "bg-[var(--tt-panel-alt)] text-[var(--tt-muted)] hover:text-[var(--tt-text)] hover:border-[var(--tt-border)] border border-[var(--tt-border)]/60"
+                      : "bg-[var(--app-panel-alt)] text-[var(--app-muted)] hover:text-[var(--app-text)] hover:border-[var(--app-border)] border border-[var(--app-border)]/60"
                   }`}
                 >
                   <span
@@ -244,7 +244,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
             </div>
 
             {/* Badges row: List, Subtasks, Pomodoro, Due Date, Tags */}
-            <div className="mt-1 flex flex-wrap items-center gap-2 tt-meta text-[var(--tt-muted)]">
+            <div className="mt-1 flex flex-wrap items-center gap-2 app-meta text-[var(--app-muted)]">
               {task.list && (
                 <span className="flex items-center gap-1 font-semibold" style={{ color: task.list.color }}>
                   <Folder className="h-3 w-3" />
@@ -254,7 +254,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
 
               {task.dueDate && (
                 <span
-                  className={`inline-flex items-center gap-0.5 rounded px-1.5 py-0.2 font-medium ${ isOverdue ? "bg-rose-500/15 text-rose-500 font-bold" : isDueToday ? "bg-[var(--tt-accent)]/15 text-[var(--tt-accent-text)] font-bold" : "bg-[var(--tt-panel-alt)] text-[var(--tt-text)] dark:bg-[var(--tt-panel-alt)] dark:text-[var(--tt-muted)]" }`}
+                  className={`inline-flex items-center gap-0.5 rounded px-1.5 py-0.2 font-medium ${ isOverdue ? "bg-rose-500/15 text-rose-500 font-bold" : isDueToday ? "bg-[var(--app-accent)]/15 text-[var(--app-accent-text)] font-bold" : "bg-[var(--app-panel-alt)] text-[var(--app-text)] dark:bg-[var(--app-panel-alt)] dark:text-[var(--app-muted)]" }`}
                 >
                   <Calendar className="h-2.5 w-2.5" />
                   {task.dueDate === today
@@ -274,8 +274,8 @@ export function TaskListView(props: TaskListViewProps = {}) {
               )}
 
               {totalSubtasks > 0 && (
-                <span className="inline-flex items-center gap-1 font-semibold text-[var(--tt-muted)]">
-                  <CheckCircle2 className="h-3 w-3 text-[var(--tt-accent-text)]" />
+                <span className="inline-flex items-center gap-1 font-semibold text-[var(--app-muted)]">
+                  <CheckCircle2 className="h-3 w-3 text-[var(--app-accent-text)]" />
                   {completedSubtasks}/{totalSubtasks}
                 </span>
               )}
@@ -310,7 +310,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
                 onUpdateTask?.({ taskId: task.id, dueDate: today });
               }}
               title="Set to Today"
-              className="rounded p-1 text-[var(--tt-muted)] hover:text-[var(--tt-accent-text)] transition-colors"
+              className="rounded p-1 text-[var(--app-muted)] hover:text-[var(--app-accent-text)] transition-colors"
             >
               <Calendar className="h-3.5 w-3.5" />
             </button>
@@ -323,7 +323,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
               onTogglePin(task.id, !task.isPinned);
             }}
             title={task.isPinned ? "Unpin task" : "Pin task to top"}
-            className={`rounded p-1 transition-colors ${ task.isPinned ? "text-amber-400" : "text-[var(--tt-muted)] hover:text-amber-400" }`}
+            className={`rounded p-1 transition-colors ${ task.isPinned ? "text-amber-400" : "text-[var(--app-muted)] hover:text-amber-400" }`}
           >
             <Pin className="h-3.5 w-3.5" />
           </button>
@@ -335,7 +335,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
               setTaskToDelete(task);
             }}
             title="Move to trash"
-            className="rounded p-1 text-[var(--tt-muted)] hover:text-rose-500 transition-colors cursor-pointer"
+            className="rounded p-1 text-[var(--app-muted)] hover:text-rose-500 transition-colors cursor-pointer"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
@@ -344,13 +344,13 @@ export function TaskListView(props: TaskListViewProps = {}) {
     );
   }
 
-  function renderSection(title: string, sectionTasks: Task[], badgeColor: string = "text-[var(--tt-muted)]") {
+  function renderSection(title: string, sectionTasks: Task[], badgeColor: string = "text-[var(--app-muted)]") {
     if (sectionTasks.length === 0) return null;
     return (
       <div key={title} className="space-y-1.5">
-        <div className="flex items-center gap-2 px-1 tt-overline font-semibold text-[var(--tt-muted)]">
+        <div className="flex items-center gap-2 px-1 app-overline font-semibold text-[var(--app-muted)]">
           <span className={badgeColor}>{title}</span>
-          <span className="tt-meta text-[var(--tt-muted)]">({sectionTasks.length})</span>
+          <span className="app-meta text-[var(--app-muted)]">({sectionTasks.length})</span>
         </div>
         <div className="space-y-1.5">{sectionTasks.map(renderTaskItem)}</div>
       </div>
@@ -374,7 +374,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
           {renderSection("High Priority", high, "text-rose-500")}
           {renderSection("Medium Priority", med, "text-amber-400")}
           {renderSection("Low Priority", low, "text-blue-400")}
-          {renderSection("No Priority", none, "text-[var(--tt-muted)]")}
+          {renderSection("No Priority", none, "text-[var(--app-muted)]")}
         </div>
       );
     }
@@ -390,7 +390,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
       return (
         <div className="space-y-4">
           {Array.from(listMap.entries()).map(([listTitle, tasksInList]) =>
-            renderSection(listTitle, tasksInList, "text-[var(--tt-accent-text)]")
+            renderSection(listTitle, tasksInList, "text-[var(--app-accent-text)]")
           )}
         </div>
       );
@@ -410,10 +410,10 @@ export function TaskListView(props: TaskListViewProps = {}) {
       <div className="space-y-4">
         {renderSection("Pinned", pinned, "text-amber-400")}
         {renderSection("Overdue", overdue, "text-rose-500")}
-        {renderSection("Today", todayList, "text-[var(--tt-accent-text)]")}
+        {renderSection("Today", todayList, "text-[var(--app-accent-text)]")}
         {renderSection("Tomorrow", tomorrowList, "text-amber-400")}
         {renderSection("Upcoming", upcoming, "text-indigo-400")}
-        {renderSection("No Due Date", noDate, "text-[var(--tt-muted)]")}
+        {renderSection("No Due Date", noDate, "text-[var(--app-muted)]")}
       </div>
     );
   }
@@ -421,27 +421,27 @@ export function TaskListView(props: TaskListViewProps = {}) {
   return (
     <div className="flex-1 flex flex-col overflow-hidden relative">
       {/* Control bar: Sort & Group By & Select All */}
-      <div className="flex flex-wrap items-center justify-between gap-2 px-1 pb-2 tt-label text-[var(--tt-muted)] border-b border-[var(--tt-border)]/80 mb-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-1 pb-2 app-label text-[var(--app-muted)] border-b border-[var(--app-border)]/80 mb-2">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={selectAllIncomplete}
-            className="hover:text-[var(--tt-text)] transition-colors font-medium"
+            className="hover:text-[var(--app-text)] transition-colors font-medium"
           >
             {selectedTaskIds.length > 0 ? `Deselect All` : `Select All`}
           </button>
-          <span className="text-[var(--tt-text)]">•</span>
+          <span className="text-[var(--app-text)]">•</span>
           <span>{incompleteTasks.length} active</span>
         </div>
 
         <div className="flex items-center gap-3">
           {/* Group By selector */}
           <div className="flex items-center gap-1.5">
-            <Layers className="h-3.5 w-3.5 text-[var(--tt-muted)]" />
+            <Layers className="h-3.5 w-3.5 text-[var(--app-muted)]" />
             <select
               value={groupBy}
               onChange={(e: any) => setGroupBy(e.target.value)}
-              className="bg-transparent tt-label text-[var(--tt-muted)] focus:outline-none cursor-pointer"
+              className="bg-transparent app-label text-[var(--app-muted)] focus:outline-none cursor-pointer"
             >
               <option value="date">Group: Date</option>
               <option value="priority">Group: Priority</option>
@@ -452,11 +452,11 @@ export function TaskListView(props: TaskListViewProps = {}) {
 
           {/* Sort selector */}
           <div className="flex items-center gap-1.5">
-            <ArrowUpDown className="h-3.5 w-3.5 text-[var(--tt-muted)]" />
+            <ArrowUpDown className="h-3.5 w-3.5 text-[var(--app-muted)]" />
             <select
               value={sortBy}
               onChange={(e: any) => setSortBy(e.target.value)}
-              className="bg-transparent tt-label text-[var(--tt-muted)] focus:outline-none cursor-pointer"
+              className="bg-transparent app-label text-[var(--app-muted)] focus:outline-none cursor-pointer"
             >
               <option value="default">Default Sort</option>
               <option value="date">Due Date</option>
@@ -472,12 +472,12 @@ export function TaskListView(props: TaskListViewProps = {}) {
         {isInitialLoading ? (
           <TaskListSkeleton count={5} />
         ) : tasks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center text-[var(--tt-muted)]">
-            <h2 className="flex items-center gap-2 tt-heading font-semibold text-[var(--tt-text)]">
-              <CheckCircle2 className="h-4 w-4 text-[var(--tt-accent-text)]" />
+          <div className="flex flex-col items-center justify-center py-16 text-center text-[var(--app-muted)]">
+            <h2 className="flex items-center gap-2 app-heading font-semibold text-[var(--app-text)]">
+              <CheckCircle2 className="h-4 w-4 text-[var(--app-accent-text)]" />
               No tasks in {viewName}
             </h2>
-            <p className="tt-label text-[var(--tt-muted)] mt-1 max-w-xs">
+            <p className="app-label text-[var(--app-muted)] mt-1 max-w-xs">
               Add a task with the input bar above, or take a break.
             </p>
           </div>
@@ -487,11 +487,11 @@ export function TaskListView(props: TaskListViewProps = {}) {
 
             {/* Completed Tasks section with toggle */}
             {completedTasks.length > 0 && (
-              <div className="space-y-1.5 pt-4 border-t border-[var(--tt-border)]/60">
+              <div className="space-y-1.5 pt-4 border-t border-[var(--app-border)]/60">
                 <button
                   type="button"
                   onClick={() => setShowCompleted(!showCompleted)}
-                  className="flex items-center gap-1.5 tt-overline font-semibold text-[var(--tt-muted)] hover:text-[var(--tt-text)] transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 app-overline font-semibold text-[var(--app-muted)] hover:text-[var(--app-text)] transition-colors cursor-pointer"
                 >
                   {showCompleted ? (
                     <ChevronDown className="h-3.5 w-3.5" />
@@ -499,7 +499,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
                     <ChevronRight className="h-3.5 w-3.5" />
                   )}
                   <span>Completed & Won&apos;t Do</span>
-                  <span className="rounded-full bg-[var(--tt-panel-alt)] px-1.5 py-0.2 tt-meta text-[var(--tt-muted)]">
+                  <span className="rounded-full bg-[var(--app-panel-alt)] px-1.5 py-0.2 app-meta text-[var(--app-muted)]">
                     {completedTasks.length}
                   </span>
                 </button>
@@ -512,14 +512,14 @@ export function TaskListView(props: TaskListViewProps = {}) {
         )}
       </div>
 
-      {/* Floating Batch Actions Bar (TickTick Signature Feature) */}
+      {/* Floating Batch Actions Bar */}
       {selectedTaskIds.length > 0 && onBatchAction && (
-        <div className="absolute bottom-3 left-4 right-4 z-30 flex items-center justify-between rounded-2xl border border-[var(--tt-border)] bg-[var(--tt-rail)]/95 p-3 shadow-2xl backdrop-blur-md animate-in slide-in-from-bottom duration-200">
+        <div className="absolute bottom-3 left-4 right-4 z-30 flex items-center justify-between rounded-2xl border border-[var(--app-border)] bg-[var(--app-rail)]/95 p-3 shadow-2xl backdrop-blur-md animate-in slide-in-from-bottom duration-200">
           <div className="flex items-center gap-3">
-            <span className="rounded-lg bg-[var(--tt-accent-strong)] px-2 py-0.5 tt-label font-semibold text-white">
+            <span className="rounded-lg bg-[var(--app-accent-strong)] px-2 py-0.5 app-label font-semibold text-white">
               {selectedTaskIds.length}
             </span>
-            <span className="tt-label font-medium text-[var(--tt-text)]">Selected</span>
+            <span className="app-label font-medium text-[var(--app-text)]">Selected</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -529,7 +529,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
                 await onBatchAction({ taskIds: selectedTaskIds, action: "complete", value: true });
                 setSelectedTaskIds([]);
               }}
-              className="rounded-lg bg-[var(--tt-accent)]/20 px-2.5 py-1 tt-label font-medium text-[var(--tt-accent-text)] hover:bg-[var(--tt-accent-strong)]/30"
+              className="rounded-lg bg-[var(--app-accent)]/20 px-2.5 py-1 app-label font-medium text-[var(--app-accent-text)] hover:bg-[var(--app-accent-strong)]/30"
             >
               Complete ✓
             </button>
@@ -540,7 +540,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
                 await onBatchAction({ taskIds: selectedTaskIds, action: "dueDate", value: today });
                 setSelectedTaskIds([]);
               }}
-              className="rounded-lg bg-[var(--tt-panel-alt)] px-2.5 py-1 tt-label font-medium text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)]"
+              className="rounded-lg bg-[var(--app-panel-alt)] px-2.5 py-1 app-label font-medium text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
             >
               Set Today
             </button>
@@ -551,7 +551,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
                 await onBatchAction({ taskIds: selectedTaskIds, action: "priority", value: 3 });
                 setSelectedTaskIds([]);
               }}
-              className="rounded-lg bg-rose-500/20 px-2.5 py-1 tt-label font-medium text-rose-400 hover:bg-rose-500/30"
+              className="rounded-lg bg-rose-500/20 px-2.5 py-1 app-label font-medium text-rose-400 hover:bg-rose-500/30"
             >
               High Priority
             </button>
@@ -562,7 +562,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
                 await onBatchAction({ taskIds: selectedTaskIds, action: "delete" });
                 setSelectedTaskIds([]);
               }}
-              className="rounded-lg p-1 text-[var(--tt-muted)] hover:text-rose-400 hover:bg-[var(--tt-panel-alt)]"
+              className="rounded-lg p-1 text-[var(--app-muted)] hover:text-rose-400 hover:bg-[var(--app-panel-alt)]"
               title="Delete selected"
             >
               <Trash2 className="h-4 w-4" />
@@ -571,7 +571,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
             <button
               type="button"
               onClick={() => setSelectedTaskIds([])}
-              className="rounded-lg p-1 text-[var(--tt-muted)] hover:text-white hover:bg-[var(--tt-panel-alt)]"
+              className="rounded-lg p-1 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)]"
               title="Cancel selection"
             >
               <X className="h-4 w-4" />

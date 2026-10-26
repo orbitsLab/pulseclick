@@ -47,7 +47,7 @@ function EventCheckbox({ completed, priority, title, onToggle, size = "sm" }: Ev
       onMouseDown={(e) => e.stopPropagation()}
       onTouchStart={(e) => e.stopPropagation()}
       className={cn(
-        "flex shrink-0 items-center justify-center border transition-all active:scale-90 cursor-pointer focus-visible:outline-none focus-visible:ring-1.5 focus-visible:ring-[var(--tt-accent)]",
+        "flex shrink-0 items-center justify-center border transition-all active:scale-90 cursor-pointer focus-visible:outline-none focus-visible:ring-1.5 focus-visible:ring-[var(--app-accent)]",
         sizeClasses,
         isCompleted
           ? "border-emerald-500 bg-emerald-500 text-white shadow-xs"
@@ -57,7 +57,7 @@ function EventCheckbox({ completed, priority, title, onToggle, size = "sm" }: Ev
           ? "border-amber-500 bg-amber-500/15 hover:bg-amber-500/30 text-amber-500"
           : priority === 1
           ? "border-sky-500 bg-sky-500/15 hover:bg-sky-500/30 text-sky-500"
-          : "border-[var(--tt-border)] bg-[var(--tt-panel)]/80 hover:border-[var(--tt-accent)] text-[var(--tt-muted)]"
+          : "border-[var(--app-border)] bg-[var(--app-panel)]/80 hover:border-[var(--app-accent)] text-[var(--app-muted)]"
       )}
     >
       {isCompleted && <Check className={cn(iconSize, "stroke-[3]")} />}
@@ -199,7 +199,7 @@ export function EventItem({
     return (
       <EventWrapper
         className={cn(
-          "mt-[var(--event-gap)] h-[var(--event-height)] items-center tt-meta sm:tt-label",
+          "mt-[var(--event-gap)] h-[var(--event-height)] items-center app-meta sm:app-label",
           className,
         )}
         currentTime={currentTime}
@@ -223,11 +223,11 @@ export function EventItem({
               onToggle={() => onToggleComplete?.(event.id, !event.completed)}
             />
             {!event.allDay && (
-              <span className="font-mono tt-meta opacity-75 shrink-0">
+              <span className="font-mono app-meta opacity-75 shrink-0">
                 {formatTimeWithOptionalMinutes(displayStart)}
               </span>
             )}
-            <span className={cn("truncate min-w-0 font-medium", event.completed && "line-through text-[var(--tt-muted)]")}>
+            <span className={cn("truncate min-w-0 font-medium", event.completed && "line-through text-[var(--app-muted)]")}>
               {event.title}
             </span>
           </div>
@@ -242,7 +242,7 @@ export function EventItem({
         className={cn(
           "py-1",
           durationMinutes < 45 ? "items-center" : "flex-col",
-          view === "week" ? "tt-meta sm:tt-label" : "tt-label",
+          view === "week" ? "app-meta sm:app-label" : "app-label",
           className,
         )}
         currentTime={currentTime}
@@ -265,11 +265,11 @@ export function EventItem({
               size="sm"
               onToggle={() => onToggleComplete?.(event.id, !event.completed)}
             />
-            <span className={cn("truncate min-w-0 font-medium", event.completed && "line-through text-[var(--tt-muted)]")}>
+            <span className={cn("truncate min-w-0 font-medium", event.completed && "line-through text-[var(--app-muted)]")}>
               {event.title}
             </span>
             {showTime && (
-              <span className="opacity-75 font-mono tt-meta shrink-0 ml-auto">
+              <span className="opacity-75 font-mono app-meta shrink-0 ml-auto">
                 {formatTimeWithOptionalMinutes(displayStart)}
               </span>
             )}
@@ -284,12 +284,12 @@ export function EventItem({
                 size="sm"
                 onToggle={() => onToggleComplete?.(event.id, !event.completed)}
               />
-              <span className={cn("truncate min-w-0 font-medium", event.completed && "line-through text-[var(--tt-muted)]")}>
+              <span className={cn("truncate min-w-0 font-medium", event.completed && "line-through text-[var(--app-muted)]")}>
                 {event.title}
               </span>
             </div>
             {showTime && (
-              <div className="truncate font-mono opacity-75 tt-meta pl-5">
+              <div className="truncate font-mono opacity-75 app-meta pl-5">
                 {getEventTime()}
               </div>
             )}
@@ -325,7 +325,7 @@ export function EventItem({
       {...dndAttributes}
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2.5 font-medium tt-heading truncate min-w-0">
+        <div className="flex items-center gap-2.5 font-medium app-heading truncate min-w-0">
           <EventCheckbox
             completed={event.completed}
             priority={event.priority}
@@ -333,17 +333,17 @@ export function EventItem({
             size="md"
             onToggle={() => onToggleComplete?.(event.id, !event.completed)}
           />
-          <span className={cn("truncate", isCompleted && "line-through text-[var(--tt-muted)]")}>
+          <span className={cn("truncate", isCompleted && "line-through text-[var(--app-muted)]")}>
             {event.title}
           </span>
         </div>
         {event.listName && (
-          <span className="tt-meta rounded-md bg-[var(--tt-panel-alt)] border border-[var(--tt-border)] px-2 py-0.5 text-[var(--tt-muted)] shrink-0 font-medium">
+          <span className="app-meta rounded-md bg-[var(--app-panel-alt)] border border-[var(--app-border)] px-2 py-0.5 text-[var(--app-muted)] shrink-0 font-medium">
             {event.listName}
           </span>
         )}
       </div>
-      <div className="flex items-center gap-2 tt-meta text-[var(--tt-muted)] pl-6.5">
+      <div className="flex items-center gap-2 app-meta text-[var(--app-muted)] pl-6.5">
         {event.allDay ? (
           <span>All day</span>
         ) : (
@@ -360,14 +360,14 @@ export function EventItem({
         {event.subtaskCount ? (
           <>
             <span className="opacity-40">·</span>
-            <span className="text-[var(--tt-accent-text)] font-medium">
+            <span className="text-[var(--app-accent-text)] font-medium">
               {event.subtasksCompleted ?? 0}/{event.subtaskCount} subtasks
             </span>
           </>
         ) : null}
       </div>
       {event.description && (
-        <div className="tt-body text-[var(--tt-muted)] line-clamp-2 mt-0.5 pl-6.5">
+        <div className="app-body text-[var(--app-muted)] line-clamp-2 mt-0.5 pl-6.5">
           {event.description}
         </div>
       )}

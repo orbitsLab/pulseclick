@@ -21,11 +21,11 @@ import {
   ListPlus,
   XIcon,
 } from "lucide-react";
-import { Task, TaskList, Tag, TaskReminder, ListMember } from "@/hooks/use-ticktick";
+import { Task, TaskList, Tag, TaskReminder, ListMember } from "@/hooks/use-workspace";
 import { getTodayISO, formatShortDate, parseISODate, addDays } from "@/lib/date-utils";
 import { TaskDatePickerPopover } from "./task-date-picker-popover";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
-import { useTickTickContext } from "@/context/ticktick-context";
+import { useWorkspaceContext } from "@/context/workspace-context";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -87,7 +87,7 @@ export function TaskInspector({
   onUpdateTask,
   onDeleteTask,
 }: TaskInspectorProps) {
-  const context = useTickTickContext();
+  const context = useWorkspaceContext();
   const [title, setTitle] = useState(task?.title || "");
   const [description, setDescription] = useState(task?.description || "");
   const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
@@ -304,9 +304,9 @@ export function TaskInspector({
 
   return (
     <>
-      <aside className="flex flex-col h-full w-80 md:w-96 border-l border-[var(--tt-border)] bg-[var(--tt-panel)] shadow-xl z-20 flex-shrink-0 animate-in slide-in-from-right duration-200 relative">
+      <aside className="flex flex-col h-full w-80 md:w-96 border-l border-[var(--app-border)] bg-[var(--app-panel)] shadow-xl z-20 flex-shrink-0 animate-in slide-in-from-right duration-200 relative">
         {/* Top Header Bar */}
-        <div className="flex items-center justify-between border-b border-[var(--tt-border)]/80 px-3.5 py-2.5">
+        <div className="flex items-center justify-between border-b border-[var(--app-border)]/80 px-3.5 py-2.5">
           <div className="flex items-center gap-2">
             {/* Complete Task Toggle Checkbox with Context Menu */}
             <ContextMenu>
@@ -327,7 +327,7 @@ export function TaskInspector({
                       ? task.kanbanStatus === "WONT_DO"
                         ? "border-rose-500 bg-rose-500 text-white shadow-xs"
                         : "border-emerald-500 bg-emerald-500 text-white shadow-xs"
-                      : "border-[var(--tt-border)] hover:border-[var(--tt-accent)] text-[var(--tt-muted)]"
+                      : "border-[var(--app-border)] hover:border-[var(--app-accent)] text-[var(--app-muted)]"
                   )}
                   title={
                     task.completed
@@ -345,7 +345,7 @@ export function TaskInspector({
                 </button>
               </ContextMenuTrigger>
 
-              <ContextMenuContent className="w-52 bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)] shadow-xl p-1.5 z-50">
+              <ContextMenuContent className="w-52 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] shadow-xl p-1.5 z-50">
                 <ContextMenuItem
                   onClick={() => {
                     const nextCompleted = task.completed && task.kanbanStatus !== "WONT_DO" ? false : true;
@@ -355,7 +355,7 @@ export function TaskInspector({
                       kanbanStatus: nextCompleted ? "DONE" : "TODO",
                     });
                   }}
-                  className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-md text-xs hover:bg-[var(--tt-panel-alt)]"
+                  className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-md text-xs hover:bg-[var(--app-panel-alt)]"
                 >
                   <span>Completed</span>
                   {task.completed && task.kanbanStatus !== "WONT_DO" && (
@@ -372,7 +372,7 @@ export function TaskInspector({
                       kanbanStatus: nextWonDo ? "WONT_DO" : "TODO",
                     });
                   }}
-                  className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-md text-xs hover:bg-[var(--tt-panel-alt)]"
+                  className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-md text-xs hover:bg-[var(--app-panel-alt)]"
                 >
                   <span>Won&apos;t Do</span>
                   {task.completed && task.kanbanStatus === "WONT_DO" && (
@@ -380,16 +380,16 @@ export function TaskInspector({
                   )}
                 </ContextMenuItem>
 
-                <ContextMenuSeparator className="my-1.5 bg-[var(--tt-border)]" />
+                <ContextMenuSeparator className="my-1.5 bg-[var(--app-border)]" />
 
                 <div
                   className="px-2.5 py-1.5 space-y-2 select-none"
                   onPointerDown={(e) => e.stopPropagation()}
                   onMouseDown={(e) => e.stopPropagation()}
                 >
-                  <div className="flex items-center justify-between tt-meta text-[var(--tt-muted)]">
+                  <div className="flex items-center justify-between app-meta text-[var(--app-muted)]">
                     <span>Progress</span>
-                    <span className="font-semibold text-[var(--tt-text)]">{progress}%</span>
+                    <span className="font-semibold text-[var(--app-text)]">{progress}%</span>
                   </div>
                   <Slider
                     value={[progress]}
@@ -404,7 +404,7 @@ export function TaskInspector({
             </ContextMenu>
 
             {/* Vertical Divider */}
-            <span className="h-3.5 w-px bg-[var(--tt-border)]/80" />
+            <span className="h-3.5 w-px bg-[var(--app-border)]/80" />
 
             {/* Due Date Trigger Button with Popover */}
             <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
@@ -412,16 +412,16 @@ export function TaskInspector({
                 <button
                   type="button"
                   className={cn(
-                    "flex items-center gap-1.5 tt-meta font-medium rounded px-1.5 py-0.5 transition-colors cursor-pointer",
+                    "flex items-center gap-1.5 app-meta font-medium rounded px-1.5 py-0.5 transition-colors cursor-pointer",
                     isOverdue
                       ? "text-rose-500 font-semibold hover:bg-rose-500/10"
                       : isDueToday
-                      ? "text-[var(--tt-accent-text)] font-semibold hover:bg-[var(--tt-panel-alt)]"
+                      ? "text-[var(--app-accent-text)] font-semibold hover:bg-[var(--app-panel-alt)]"
                       : isDueTomorrow
                       ? "text-amber-400 font-semibold hover:bg-amber-500/10"
                       : task.dueDate
-                      ? "text-[var(--tt-accent-text)] hover:bg-[var(--tt-panel-alt)]"
-                      : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]"
+                      ? "text-[var(--app-accent-text)] hover:bg-[var(--app-panel-alt)]"
+                      : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]"
                   )}
                   title="Change due date"
                 >
@@ -431,7 +431,7 @@ export function TaskInspector({
                       isOverdue
                         ? "text-rose-500"
                         : isDueToday
-                        ? "text-[var(--tt-accent-text)]"
+                        ? "text-[var(--app-accent-text)]"
                         : isDueTomorrow
                         ? "text-amber-400"
                         : undefined
@@ -505,7 +505,7 @@ export function TaskInspector({
                       ? "text-amber-500 hover:bg-amber-500/10"
                       : task.priority === 1
                       ? "text-sky-500 hover:bg-sky-500/10"
-                      : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]"
+                      : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]"
                   )}
                 >
                   <Flag
@@ -518,11 +518,11 @@ export function TaskInspector({
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="min-w-36 bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)] p-1 z-50"
+                className="min-w-36 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] p-1 z-50"
               >
                 <DropdownMenuItem
                   onClick={() => onUpdateTask({ taskId: task.id, priority: 3 })}
-                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-md hover:bg-[var(--tt-panel-alt)]"
+                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-md hover:bg-[var(--app-panel-alt)]"
                 >
                   <span className="flex items-center gap-2">
                     <Flag className="h-3.5 w-3.5 text-rose-500 fill-current" />
@@ -532,7 +532,7 @@ export function TaskInspector({
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onUpdateTask({ taskId: task.id, priority: 2 })}
-                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-md hover:bg-[var(--tt-panel-alt)]"
+                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-md hover:bg-[var(--app-panel-alt)]"
                 >
                   <span className="flex items-center gap-2">
                     <Flag className="h-3.5 w-3.5 text-amber-500 fill-current" />
@@ -542,7 +542,7 @@ export function TaskInspector({
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onUpdateTask({ taskId: task.id, priority: 1 })}
-                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-md hover:bg-[var(--tt-panel-alt)]"
+                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-md hover:bg-[var(--app-panel-alt)]"
                 >
                   <span className="flex items-center gap-2">
                     <Flag className="h-3.5 w-3.5 text-sky-500 fill-current" />
@@ -552,7 +552,7 @@ export function TaskInspector({
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onUpdateTask({ taskId: task.id, priority: 0 })}
-                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-md hover:bg-[var(--tt-panel-alt)]"
+                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-md hover:bg-[var(--app-panel-alt)]"
                 >
                   <span className="flex items-center gap-2">
                     <Flag className="h-3.5 w-3.5 text-slate-400" />
@@ -568,7 +568,7 @@ export function TaskInspector({
               type="button"
               onClick={onClose}
               title="Close drawer"
-              className="rounded p-1.5 text-[var(--tt-muted)] hover:text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)] transition-colors cursor-pointer"
+              className="rounded p-1.5 text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] transition-colors cursor-pointer"
             >
               <X className="h-4 w-4" />
             </button>
@@ -586,8 +586,8 @@ export function TaskInspector({
               onBlur={handleTitleBlur}
               placeholder="Task title..."
               className={cn(
-                "w-full bg-transparent tt-title text-lg md:text-xl font-bold text-[var(--tt-text)] focus:outline-none placeholder-[var(--tt-muted)]/60",
-                task.completed && "line-through opacity-60 text-[var(--tt-muted)]"
+                "w-full bg-transparent app-title text-lg md:text-xl font-bold text-[var(--app-text)] focus:outline-none placeholder-[var(--app-muted)]/60",
+                task.completed && "line-through opacity-60 text-[var(--app-muted)]"
               )}
             />
           </div>
@@ -600,12 +600,12 @@ export function TaskInspector({
               onBlur={handleDescriptionBlur}
               placeholder="Write something or type / for commands"
               rows={3}
-              className="w-full bg-transparent tt-body text-[var(--tt-text)] placeholder-[var(--tt-muted)]/70 resize-none focus:outline-none min-h-[70px] leading-relaxed"
+              className="w-full bg-transparent app-body text-[var(--app-text)] placeholder-[var(--app-muted)]/70 resize-none focus:outline-none min-h-[70px] leading-relaxed"
             />
           </div>
 
           {/* Subtasks / Checklist Section */}
-          <div className="space-y-2 pt-1 border-t border-[var(--tt-border)]/60">
+          <div className="space-y-2 pt-1 border-t border-[var(--app-border)]/60">
             {/* Existing Subtasks */}
             {task.subtasks.map((subtask) => (
               <div
@@ -619,15 +619,15 @@ export function TaskInspector({
                     "flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors cursor-pointer",
                     subtask.completed
                       ? "border-emerald-500 bg-emerald-500 text-white"
-                      : "border-[var(--tt-border)] hover:border-[var(--tt-accent)]"
+                      : "border-[var(--app-border)] hover:border-[var(--app-accent)]"
                   )}
                 >
                   {subtask.completed && <Check className="h-2.5 w-2.5 stroke-[3]" />}
                 </button>
                 <span
                   className={cn(
-                    "flex-1 tt-body text-xs text-[var(--tt-text)] truncate",
-                    subtask.completed && "line-through text-[var(--tt-muted)] opacity-60"
+                    "flex-1 app-body text-xs text-[var(--app-text)] truncate",
+                    subtask.completed && "line-through text-[var(--app-muted)] opacity-60"
                   )}
                 >
                   {subtask.title}
@@ -635,7 +635,7 @@ export function TaskInspector({
                 <button
                   type="button"
                   onClick={() => handleDeleteSubtask(subtask.id)}
-                  className="opacity-0 group-hover:opacity-100 p-0.5 text-[var(--tt-muted)] hover:text-rose-500 transition-opacity"
+                  className="opacity-0 group-hover:opacity-100 p-0.5 text-[var(--app-muted)] hover:text-rose-500 transition-opacity"
                   title="Delete subtask"
                 >
                   <XIcon className="h-3 w-3" />
@@ -645,7 +645,7 @@ export function TaskInspector({
 
             {/* Empty Subtask Row: "Press 'Enter' to add list item" */}
             <div className="flex items-center gap-2 py-0.5">
-              <Circle className="h-4 w-4 shrink-0 text-[var(--tt-muted)]/60" />
+              <Circle className="h-4 w-4 shrink-0 text-[var(--app-muted)]/60" />
               <input
                 ref={newSubtaskInputRef}
                 type="text"
@@ -658,7 +658,7 @@ export function TaskInspector({
                   }
                 }}
                 placeholder="Press 'Enter' to add list item"
-                className="flex-1 bg-transparent tt-body text-xs text-[var(--tt-text)] placeholder-[var(--tt-muted)]/70 focus:outline-none"
+                className="flex-1 bg-transparent app-body text-xs text-[var(--app-text)] placeholder-[var(--app-muted)]/70 focus:outline-none"
               />
             </div>
           </div>
@@ -668,7 +668,7 @@ export function TaskInspector({
             {localTags.map((tag) => (
               <span
                 key={tag.id}
-                className="group inline-flex items-center gap-1 rounded-md px-2 py-0.5 tt-meta font-medium transition-colors"
+                className="group inline-flex items-center gap-1 rounded-md px-2 py-0.5 app-meta font-medium transition-colors"
                 style={{
                   backgroundColor: `${tag.color || "#4772fa"}20`,
                   color: tag.color || "#4772fa",
@@ -691,7 +691,7 @@ export function TaskInspector({
               <PopoverTrigger asChild>
                 <button
                   type="button"
-                  className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--tt-panel-alt)] border border-[var(--tt-border)] text-[var(--tt-muted)] hover:text-[var(--tt-text)] hover:border-[var(--tt-accent)] transition-colors cursor-pointer"
+                  className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--app-panel-alt)] border border-[var(--app-border)] text-[var(--app-muted)] hover:text-[var(--app-text)] hover:border-[var(--app-accent)] transition-colors cursor-pointer"
                   title="Add tag"
                 >
                   <Plus className="h-3 w-3" />
@@ -700,11 +700,11 @@ export function TaskInspector({
               <PopoverContent
                 align="start"
                 sideOffset={6}
-                className="w-52 p-2 bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)] rounded-xl shadow-xl z-50"
+                className="w-52 p-2 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] rounded-xl shadow-xl z-50"
               >
                 {/* Search / Create Tag Input */}
-                <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-[var(--tt-panel-alt)] border border-[var(--tt-border)] mb-2">
-                  <TagIcon className="h-3.5 w-3.5 text-[var(--tt-muted)] shrink-0" />
+                <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-[var(--app-panel-alt)] border border-[var(--app-border)] mb-2">
+                  <TagIcon className="h-3.5 w-3.5 text-[var(--app-muted)] shrink-0" />
                   <input
                     type="text"
                     autoFocus
@@ -717,7 +717,7 @@ export function TaskInspector({
                       }
                     }}
                     placeholder="Find or create tag..."
-                    className="w-full bg-transparent tt-meta text-xs text-[var(--tt-text)] placeholder-[var(--tt-muted)] focus:outline-none"
+                    className="w-full bg-transparent app-meta text-xs text-[var(--app-text)] placeholder-[var(--app-muted)] focus:outline-none"
                   />
                 </div>
 
@@ -727,7 +727,7 @@ export function TaskInspector({
                     type="button"
                     onClick={handleCreateTag}
                     disabled={isCreatingTag}
-                    className="w-full flex items-center gap-2 px-2 py-1.5 mb-1.5 rounded-lg text-xs font-medium text-[var(--tt-accent-text)] bg-[var(--tt-accent)]/10 hover:bg-[var(--tt-accent)]/20 transition-colors text-left cursor-pointer disabled:opacity-50"
+                    className="w-full flex items-center gap-2 px-2 py-1.5 mb-1.5 rounded-lg text-xs font-medium text-[var(--app-accent-text)] bg-[var(--app-accent)]/10 hover:bg-[var(--app-accent)]/20 transition-colors text-left cursor-pointer disabled:opacity-50"
                   >
                     <Plus className="h-3.5 w-3.5 shrink-0" />
                     <span className="truncate">Create &quot;{tagSearch.trim()}&quot;</span>
@@ -742,7 +742,7 @@ export function TaskInspector({
                       <div
                         key={t.id}
                         onClick={() => handleToggleTag(t.id)}
-                        className="group/item flex items-center justify-between px-2 py-1.5 rounded-lg text-xs hover:bg-[var(--tt-panel-alt)] transition-colors text-left cursor-pointer"
+                        className="group/item flex items-center justify-between px-2 py-1.5 rounded-lg text-xs hover:bg-[var(--app-panel-alt)] transition-colors text-left cursor-pointer"
                       >
                         <span className="flex items-center gap-2 truncate flex-1 min-w-0">
                           <span
@@ -760,7 +760,7 @@ export function TaskInspector({
                               setTagToDelete({ id: t.id, name: t.name });
                             }}
                             title="Delete tag"
-                            className="opacity-0 group-hover/item:opacity-100 p-0.5 rounded text-[var(--tt-muted)] hover:text-rose-400 hover:bg-rose-500/10 transition-opacity"
+                            className="opacity-0 group-hover/item:opacity-100 p-0.5 rounded text-[var(--app-muted)] hover:text-rose-400 hover:bg-rose-500/10 transition-opacity"
                           >
                             <Trash2 className="h-3 w-3" />
                           </button>
@@ -770,7 +770,7 @@ export function TaskInspector({
                   })}
 
                   {tags.length === 0 && !tagSearch.trim() && (
-                    <div className="py-3 text-center tt-meta text-xs text-[var(--tt-muted)]">
+                    <div className="py-3 text-center app-meta text-xs text-[var(--app-muted)]">
                       Type above to create a tag
                     </div>
                   )}
@@ -784,7 +784,7 @@ export function TaskInspector({
         <div className="absolute bottom-14 right-4 z-10">
           <button
             type="button"
-            className="flex size-9 items-center justify-center rounded-full bg-[var(--tt-panel-alt)] border border-[var(--tt-border)] text-sky-400 shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            className="flex size-9 items-center justify-center rounded-full bg-[var(--app-panel-alt)] border border-[var(--app-border)] text-sky-400 shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
             title="AI & Smart Actions"
             onClick={() => {
               if (task && description) {
@@ -798,13 +798,13 @@ export function TaskInspector({
         </div>
 
         {/* Bottom Action Footer Bar */}
-        <div className="flex items-center justify-between border-t border-[var(--tt-border)]/80 px-3 py-2 bg-[var(--tt-panel)]">
+        <div className="flex items-center justify-between border-t border-[var(--app-border)]/80 px-3 py-2 bg-[var(--app-panel)]">
           {/* Left: List Selector */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="flex items-center gap-1.5 tt-meta font-medium px-2 py-1 rounded-md text-[var(--tt-muted)] hover:text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)] transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 app-meta font-medium px-2 py-1 rounded-md text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] transition-colors cursor-pointer"
               >
                 <Folder
                   className="h-3.5 w-3.5 shrink-0"
@@ -817,7 +817,7 @@ export function TaskInspector({
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="start"
-              className="min-w-40 bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)]"
+              className="min-w-40 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)]"
             >
               <DropdownMenuItem
                 onClick={() => onUpdateTask({ taskId: task.id, listId: null })}
@@ -843,10 +843,10 @@ export function TaskInspector({
           </DropdownMenu>
 
           {/* Right: Formatting, Activity & Options Menu */}
-          <div className="flex items-center gap-1 text-[var(--tt-muted)]">
+          <div className="flex items-center gap-1 text-[var(--app-muted)]">
             <button
               type="button"
-              className="p-1.5 rounded hover:text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)] transition-colors cursor-pointer"
+              className="p-1.5 rounded hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] transition-colors cursor-pointer"
               title="Formatting"
             >
               <Type className="h-3.5 w-3.5" />
@@ -854,7 +854,7 @@ export function TaskInspector({
 
             <button
               type="button"
-              className="p-1.5 rounded hover:text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)] transition-colors cursor-pointer"
+              className="p-1.5 rounded hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] transition-colors cursor-pointer"
               title="Task activity"
             >
               <MessageSquare className="h-3.5 w-3.5" />
@@ -865,7 +865,7 @@ export function TaskInspector({
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className="p-1.5 rounded hover:text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)] transition-colors cursor-pointer"
+                  className="p-1.5 rounded hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] transition-colors cursor-pointer"
                   title="More actions"
                 >
                   <MoreHorizontal className="h-3.5 w-3.5" />
@@ -873,7 +873,7 @@ export function TaskInspector({
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="min-w-48 bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)]"
+                className="min-w-48 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)]"
               >
                 {/* Add Subtask */}
                 <DropdownMenuItem
@@ -915,7 +915,7 @@ export function TaskInspector({
                   <span>Start Focus</span>
                 </DropdownMenuItem>
 
-                <DropdownMenuSeparator className="bg-[var(--tt-border)]" />
+                <DropdownMenuSeparator className="bg-[var(--app-border)]" />
 
                 {/* Delete Task */}
                 <DropdownMenuItem

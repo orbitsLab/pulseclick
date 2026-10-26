@@ -57,7 +57,7 @@ const DAY_WIDTH = 44;
 const MIN_WINDOW_DAYS = 14;
 const MIN_BAR_WIDTH = 10;
 const DRAG_THRESHOLD_PX = 3;
-const ACCENT = "var(--tt-accent, #4dabf7)";
+const ACCENT = "var(--app-accent, #4dabf7)";
 
 const PRIORITY_COLORS: Record<number, string> = {
   3: "#ef4444",
@@ -394,21 +394,21 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
   const rangeLabel = `${format(windowStart, "d MMM")} – ${format(windowEnd, "d MMM yyyy")}`;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col rounded-2xl border border-[var(--tt-border)] bg-[var(--tt-panel)] shadow-sm transition-colors">
+    <div className="flex min-h-0 flex-1 flex-col rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] shadow-sm transition-colors">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--tt-border)] px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--app-border)] px-4 py-3">
         <div className="flex items-center gap-2.5">
           <CalendarDays className="h-5 w-5" style={{ color: ACCENT }} />
           <div className="flex flex-col">
-            <h2 className="tt-heading font-semibold text-[var(--tt-text)] flex items-center gap-2">
+            <h2 className="app-heading font-semibold text-[var(--app-text)] flex items-center gap-2">
               Timeline
               {isLoading && tasks.length === 0 && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--tt-panel-alt)] px-2 py-0.5 tt-meta font-normal text-[var(--tt-muted)] animate-pulse">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--tt-accent)]" /> Syncing tasks…
+                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--app-panel-alt)] px-2 py-0.5 app-meta font-normal text-[var(--app-muted)] animate-pulse">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--app-accent)]" /> Syncing tasks…
                 </span>
               )}
             </h2>
-            <span className="tt-label text-[var(--tt-muted)]">{rangeLabel}</span>
+            <span className="app-label text-[var(--app-muted)]">{rangeLabel}</span>
           </div>
         </div>
 
@@ -416,17 +416,17 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
           <button
             type="button"
             onClick={goToday}
-            className="rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-3 py-1 tt-label font-medium text-[var(--tt-text)] transition-colors hover:bg-[var(--tt-panel-alt)]"
-            style={{ borderColor: "var(--tt-border, currentColor)" }}
+            className="rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-1 app-label font-medium text-[var(--app-text)] transition-colors hover:bg-[var(--app-panel-alt)]"
+            style={{ borderColor: "var(--app-border, currentColor)" }}
           >
             Today
           </button>
-          <div className="flex items-center rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel-alt)]">
+          <div className="flex items-center rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)]">
             <button
               type="button"
               onClick={goPrev}
               aria-label="Previous week"
-              className="p-1 text-[var(--tt-text)] transition-colors hover:text-[var(--tt-text)] dark:hover:text-white"
+              className="p-1 text-[var(--app-text)] transition-colors hover:text-[var(--app-text)] dark:hover:text-white"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -434,7 +434,7 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
               type="button"
               onClick={goNext}
               aria-label="Next week"
-              className="p-1 text-[var(--tt-text)] transition-colors hover:text-[var(--tt-text)] dark:hover:text-white"
+              className="p-1 text-[var(--app-text)] transition-colors hover:text-[var(--app-text)] dark:hover:text-white"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -444,8 +444,8 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
 
       {/* Unscheduled tray */}
       {unscheduled.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 border-b border-[var(--tt-border)] bg-[var(--tt-panel-alt)]/70 px-4 py-2.5">
-          <span className="flex items-center gap-1 tt-meta font-semibold uppercase tracking-wide text-[var(--tt-muted)]">
+        <div className="flex flex-wrap items-center gap-2 border-b border-[var(--app-border)] bg-[var(--app-panel-alt)]/70 px-4 py-2.5">
+          <span className="flex items-center gap-1 app-meta font-semibold uppercase tracking-wide text-[var(--app-muted)]">
             <Plus className="h-3 w-3" />
             Unscheduled
           </span>
@@ -454,7 +454,7 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
               key={task.id}
               type="button"
               onClick={() => onSelectTask(task.id)}
-              className="group flex max-w-[220px] items-center gap-1.5 rounded-full border border-[var(--tt-border)] bg-[var(--tt-panel)] px-2.5 py-1 tt-label text-[var(--tt-text)] transition-colors hover:border-[var(--tt-border)] hover:bg-[var(--tt-panel-alt)]"
+              className="group flex max-w-[220px] items-center gap-1.5 rounded-full border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1 app-label text-[var(--app-text)] transition-colors hover:border-[var(--app-border)] hover:bg-[var(--app-panel-alt)]"
             >
               <span
                 className="h-1.5 w-1.5 shrink-0 rounded-full"
@@ -473,11 +473,11 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
       {/* Grid */}
       {scheduled.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-2 p-10 text-center">
-          <CalendarDays className="h-8 w-8 text-[var(--tt-muted)]" />
-          <p className="tt-body font-semibold text-[var(--tt-text)]">
+          <CalendarDays className="h-8 w-8 text-[var(--app-muted)]" />
+          <p className="app-body font-semibold text-[var(--app-text)]">
             Nothing scheduled yet
           </p>
-          <p className="max-w-xs tt-label text-[var(--tt-muted)]">
+          <p className="max-w-xs app-label text-[var(--app-muted)]">
             Give a task a start date to see it laid out on the timeline.
           </p>
         </div>
@@ -485,17 +485,17 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
         <div className="min-h-0 flex-1 overflow-auto">
           <div className="flex w-max min-w-full">
             {/* Left: task names (sticky) */}
-            <div className="sticky left-0 z-20 w-56 shrink-0 border-r border-[var(--tt-border)] bg-[var(--tt-panel)]">
-              <div className="sticky top-0 z-10 flex h-12 items-center gap-2 border-b border-[var(--tt-border)] bg-[var(--tt-panel)]/90 px-3 tt-overline font-semibold tracking-wide text-[var(--tt-muted)] backdrop-blur">
+            <div className="sticky left-0 z-20 w-56 shrink-0 border-r border-[var(--app-border)] bg-[var(--app-panel)]">
+              <div className="sticky top-0 z-10 flex h-12 items-center gap-2 border-b border-[var(--app-border)] bg-[var(--app-panel)]/90 px-3 app-overline font-semibold tracking-wide text-[var(--app-muted)] backdrop-blur">
                 <span>Task</span>
-                <span className="rounded-full bg-[var(--tt-panel-alt)] px-1.5 tt-meta font-bold text-[var(--tt-muted)]">
+                <span className="rounded-full bg-[var(--app-panel-alt)] px-1.5 app-meta font-bold text-[var(--app-muted)]">
                   {scheduled.length}
                 </span>
               </div>
               {scheduled.map((task) => (
                 <div
                   key={task.id}
-                  className="flex h-11 items-center gap-2 border-b border-[var(--tt-border)] px-3"
+                  className="flex h-11 items-center gap-2 border-b border-[var(--app-border)] px-3"
                 >
                   <span
                     className="h-1.5 w-1.5 shrink-0 rounded-full"
@@ -505,7 +505,7 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
                     type="button"
                     onClick={() => onSelectTask(task.id)}
                     title={task.title}
-                    className={`truncate text-left tt-heading font-semibold text-[var(--tt-text)] hover:text-[var(--tt-text)] hover:underline dark:text-[var(--tt-muted)] dark:hover:text-white ${ task.completed ? "line-through opacity-60" : "" }`}
+                    className={`truncate text-left app-heading font-semibold text-[var(--app-text)] hover:text-[var(--app-text)] hover:underline dark:text-[var(--app-muted)] dark:hover:text-white ${ task.completed ? "line-through opacity-60" : "" }`}
                   >
                     {task.title}
                   </button>
@@ -519,20 +519,20 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
               style={{ width: windowDays * DAY_WIDTH }}
             >
               {/* Day header */}
-              <div className="sticky top-0 z-10 flex h-12 divide-x divide-[var(--tt-border)] border-b border-[var(--tt-border)] bg-[var(--tt-panel)]/80 backdrop-blur">
+              <div className="sticky top-0 z-10 flex h-12 divide-x divide-[var(--app-border)] border-b border-[var(--app-border)] bg-[var(--app-panel)]/80 backdrop-blur">
                 {days.map((day) => {
                   const isToday = differenceInCalendarDays(day, today) === 0;
                   const isWeekend = [0, 6].includes(day.getDay());
                   return (
                     <div
                       key={toISO(day)}
-                      className={`flex w-11 shrink-0 flex-col items-center justify-center text-center ${ isWeekend ? "bg-[var(--tt-panel-alt)]/80 dark:bg-[var(--tt-bg)]/40" : "" }`}
+                      className={`flex w-11 shrink-0 flex-col items-center justify-center text-center ${ isWeekend ? "bg-[var(--app-panel-alt)]/80 dark:bg-[var(--app-bg)]/40" : "" }`}
                     >
-                      <span className="tt-meta font-semibold uppercase tracking-wide text-[var(--tt-muted)]">
+                      <span className="app-meta font-semibold uppercase tracking-wide text-[var(--app-muted)]">
                         {format(day, "EEE")}
                       </span>
                       <span
-                        className={`tt-label font-semibold ${ isToday ? "text-[var(--tt-text)]" : "text-[var(--tt-muted)]" }`}
+                        className={`app-label font-semibold ${ isToday ? "text-[var(--app-text)]" : "text-[var(--app-muted)]" }`}
                         style={isToday ? { color: ACCENT } : undefined}
                       >
                         {format(day, "d")}
@@ -570,10 +570,10 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
                   return (
                     <div
                       key={task.id}
-                      className="group relative h-11 border-b border-[var(--tt-border)]/70"
+                      className="group relative h-11 border-b border-[var(--app-border)]/70"
                     >
                       {/* day grid lines */}
-                      <div className="absolute inset-0 flex divide-x divide-[var(--tt-border)]">
+                      <div className="absolute inset-0 flex divide-x divide-[var(--app-border)]">
                         {days.map((day) => (
                           <div key={toISO(day)} className="w-11 shrink-0" />
                         ))}
@@ -594,7 +594,7 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
                             onSelectTask(task.id);
                           }
                         }}
-                        className={`group absolute top-1.5 flex h-8 select-none items-center overflow-hidden rounded-lg border border-[var(--tt-border)] shadow-xs transition-[filter,opacity] hover:brightness-110 ${ task.completed ? "opacity-50" : "" } ${isDragging ? "cursor-grabbing ring-2 ring-white/60" : "cursor-grab"}`}
+                        className={`group absolute top-1.5 flex h-8 select-none items-center overflow-hidden rounded-lg border border-[var(--app-border)] shadow-xs transition-[filter,opacity] hover:brightness-110 ${ task.completed ? "opacity-50" : "" } ${isDragging ? "cursor-grabbing ring-2 ring-white/60" : "cursor-grab"}`}
                         style={{
                           left,
                           width,
@@ -605,21 +605,21 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
                         {/* left edge handle */}
                         <span
                           data-drag-handle="start"
-                          className="absolute inset-y-0 left-0 z-10 flex w-2 cursor-ew-resize items-center justify-center bg-[var(--tt-panel)] opacity-0 transition-opacity group-hover:opacity-80 hover:bg-[var(--tt-panel)]/40"
+                          className="absolute inset-y-0 left-0 z-10 flex w-2 cursor-ew-resize items-center justify-center bg-[var(--app-panel)] opacity-0 transition-opacity group-hover:opacity-80 hover:bg-[var(--app-panel)]/40"
                           style={{ touchAction: "none" }}
                         >
                           <GripVertical className="h-3 w-3 text-white/90" />
                         </span>
 
                         {/* label */}
-                        <span className="pointer-events-none flex min-w-0 flex-1 items-center gap-1 px-2 tt-meta font-semibold text-white">
+                        <span className="pointer-events-none flex min-w-0 flex-1 items-center gap-1 px-2 app-meta font-semibold text-white">
                           <span
                             className={`truncate ${ task.completed ? "line-through" : "" }`}
                           >
                             {task.title}
                           </span>
                           {timeLabel && (
-                            <span className="hidden shrink-0 items-center gap-0.5 tt-meta font-medium text-white/85 sm:flex">
+                            <span className="hidden shrink-0 items-center gap-0.5 app-meta font-medium text-white/85 sm:flex">
                               <Clock className="h-2.5 w-2.5" />
                               {timeLabel}
                             </span>
@@ -629,7 +629,7 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
                         {/* right edge handle */}
                         <span
                           data-drag-handle="end"
-                          className="absolute inset-y-0 right-0 z-10 flex w-2 cursor-ew-resize items-center justify-center bg-[var(--tt-panel)] opacity-0 transition-opacity group-hover:opacity-80 hover:bg-[var(--tt-panel)]/40"
+                          className="absolute inset-y-0 right-0 z-10 flex w-2 cursor-ew-resize items-center justify-center bg-[var(--app-panel)] opacity-0 transition-opacity group-hover:opacity-80 hover:bg-[var(--app-panel)]/40"
                           style={{ touchAction: "none" }}
                         >
                           <GripVertical className="h-3 w-3 text-white/90" />
@@ -661,8 +661,8 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
       )}
 
       {/* Legend */}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[var(--tt-border)] px-4 py-2.5 tt-meta text-[var(--tt-muted)]">
-        <span className="font-semibold text-[var(--tt-text)]">Legend</span>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[var(--app-border)] px-4 py-2.5 app-meta text-[var(--app-muted)]">
+        <span className="font-semibold text-[var(--app-text)]">Legend</span>
         {PRIORITY_LABELS.map(({ priority, label }) => (
           <span key={priority} className="flex items-center gap-1.5">
             <span
@@ -675,7 +675,7 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
         <span className="flex items-center gap-1.5">
           <span
             className="h-2.5 w-2.5 rounded-sm"
-            style={{ backgroundColor: "var(--tt-accent, #4dabf7)" }}
+            style={{ backgroundColor: "var(--app-accent, #4dabf7)" }}
           />
           Today
         </span>
@@ -684,7 +684,7 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
           Drag a bar to move it
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-3 w-1 rounded-sm bg-[var(--tt-panel-alt)]" />
+          <span className="h-3 w-1 rounded-sm bg-[var(--app-panel-alt)]" />
           Drag the edges to resize
         </span>
       </div>
@@ -692,7 +692,7 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
       {/* Drag tooltip */}
       {drag && (
         <div
-          className="pointer-events-none fixed z-50 rounded-lg border border-[var(--tt-border)] bg-[var(--tt-rail)] px-2.5 py-1.5 tt-meta font-medium text-white shadow-lg"
+          className="pointer-events-none fixed z-50 rounded-lg border border-[var(--app-border)] bg-[var(--app-rail)] px-2.5 py-1.5 app-meta font-medium text-white shadow-lg"
           style={{ left: drag.clientX + 14, top: drag.clientY - 38 }}
         >
           {(() => {

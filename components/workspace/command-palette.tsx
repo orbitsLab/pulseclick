@@ -18,8 +18,8 @@ import {
   ArrowRight,
   Flame,
 } from "lucide-react";
-import { Task, TaskList, Tag } from "@/hooks/use-ticktick";
-import { TickTickModule } from "./module-rail";
+import { Task, TaskList, Tag } from "@/hooks/use-workspace";
+import { WorkspaceModule } from "./module-rail";
 
 interface CommandPaletteProps {
   isOpen: boolean;
@@ -27,7 +27,7 @@ interface CommandPaletteProps {
   tasks: Task[];
   lists: TaskList[];
   tags: Tag[];
-  onSelectModule: (module: TickTickModule) => void;
+  onSelectModule: (module: WorkspaceModule) => void;
   onSelectView: (view: string, listId?: string | null, tag?: string | null) => void;
   onSelectTask: (taskId: string) => void;
 }
@@ -71,7 +71,7 @@ export function CommandPalette({
 
   // Navigation Items
   const moduleItems = [
-    { id: "mod-tasks", label: "Tasks", icon: <CheckSquare className="h-4 w-4 text-[var(--tt-accent-text)]" />, action: () => onSelectModule("tasks") },
+    { id: "mod-tasks", label: "Tasks", icon: <CheckSquare className="h-4 w-4 text-[var(--app-accent-text)]" />, action: () => onSelectModule("tasks") },
     { id: "mod-cal", label: "Calendar Schedule", icon: <Calendar className="h-4 w-4 text-indigo-400" />, action: () => onSelectModule("calendar") },
     { id: "mod-habits", label: "Habit Tracker", icon: <Flame className="h-4 w-4 text-emerald-400" />, action: () => onSelectModule("habits") },
     { id: "mod-matrix", label: "Eisenhower Matrix", icon: <LayoutGrid className="h-4 w-4 text-amber-400" />, action: () => onSelectModule("matrix") },
@@ -79,7 +79,7 @@ export function CommandPalette({
   ].filter((item) => !q || item.label.toLowerCase().includes(q));
 
   const smartListItems = [
-    { id: "sl-today", label: "Today", icon: <Calendar className="h-4 w-4 text-[var(--tt-accent-text)]" />, action: () => { onSelectModule("tasks"); onSelectView("today"); } },
+    { id: "sl-today", label: "Today", icon: <Calendar className="h-4 w-4 text-[var(--app-accent-text)]" />, action: () => { onSelectModule("tasks"); onSelectView("today"); } },
     { id: "sl-tomorrow", label: "Tomorrow", icon: <Sunrise className="h-4 w-4 text-amber-400" />, action: () => { onSelectModule("tasks"); onSelectView("tomorrow"); } },
     { id: "sl-next7", label: "Next 7 Days", icon: <CalendarDays className="h-4 w-4 text-indigo-400" />, action: () => { onSelectModule("tasks"); onSelectView("next7"); } },
     { id: "sl-inbox", label: "Inbox", icon: <Inbox className="h-4 w-4 text-blue-400" />, action: () => { onSelectModule("tasks"); onSelectView("inbox"); } },
@@ -117,7 +117,7 @@ export function CommandPalette({
     .map((t) => ({
       id: `task-${t.id}`,
       label: t.title,
-      icon: <CheckCircle className="h-3.5 w-3.5 text-[var(--tt-muted)]" />,
+      icon: <CheckCircle className="h-3.5 w-3.5 text-[var(--app-muted)]" />,
       action: () => {
         onSelectModule("tasks");
         onSelectTask(t.id);
@@ -148,10 +148,10 @@ export function CommandPalette({
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 pt-20 p-4 backdrop-blur-xs">
-      <div className="w-full max-w-xl overflow-hidden rounded-2xl border border-[var(--tt-border)] bg-[var(--tt-rail)] text-[var(--tt-text)] shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+      <div className="w-full max-w-xl overflow-hidden rounded-2xl border border-[var(--app-border)] bg-[var(--app-rail)] text-[var(--app-text)] shadow-2xl animate-in fade-in zoom-in-95 duration-150">
         {/* Search header */}
-        <div className="flex items-center gap-3 border-b border-[var(--tt-border)] px-4 py-3">
-          <Search className="h-5 w-5 text-[var(--tt-muted)] flex-shrink-0" />
+        <div className="flex items-center gap-3 border-b border-[var(--app-border)] px-4 py-3">
+          <Search className="h-5 w-5 text-[var(--app-muted)] flex-shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -162,12 +162,12 @@ export function CommandPalette({
             }}
             onKeyDown={handleKeyDown}
             placeholder="Type a command, search tasks, lists, or tags..."
-            className="flex-1 bg-transparent tt-body text-white placeholder-[var(--tt-muted)] focus:outline-none"
+            className="flex-1 bg-transparent app-body text-white placeholder-[var(--app-muted)] focus:outline-none"
           />
           <button
             type="button"
             onClick={onClose}
-            className="rounded p-1 text-[var(--tt-muted)] hover:text-white hover:bg-[var(--tt-panel-alt)]"
+            className="rounded p-1 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)]"
           >
             <X className="h-4 w-4" />
           </button>
@@ -176,7 +176,7 @@ export function CommandPalette({
         {/* Results List */}
         <div className="max-h-80 overflow-y-auto p-2 space-y-1">
           {allItems.length === 0 ? (
-            <div className="py-8 text-center tt-label text-[var(--tt-muted)]">
+            <div className="py-8 text-center app-label text-[var(--app-muted)]">
               No results found for &quot;{query}&quot;
             </div>
           ) : (
@@ -188,13 +188,13 @@ export function CommandPalette({
                   type="button"
                   onClick={() => handleSelect(item.action)}
                   onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`flex w-full items-center justify-between rounded-xl px-3 py-2 tt-label font-medium transition-colors ${ isSelected ? "bg-[var(--tt-accent)]/20 text-[var(--tt-accent-text)] font-bold" : "text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)]/60" }`}
+                  className={`flex w-full items-center justify-between rounded-xl px-3 py-2 app-label font-medium transition-colors ${ isSelected ? "bg-[var(--app-accent)]/20 text-[var(--app-accent-text)] font-bold" : "text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]/60" }`}
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     {item.icon}
                     <span className="truncate">{item.label}</span>
                   </div>
-                  {isSelected && <ArrowRight className="h-3.5 w-3.5 text-[var(--tt-accent-text)]" />}
+                  {isSelected && <ArrowRight className="h-3.5 w-3.5 text-[var(--app-accent-text)]" />}
                 </button>
               );
             })
@@ -202,18 +202,18 @@ export function CommandPalette({
         </div>
 
         {/* Footer shortcuts tip */}
-        <div className="flex items-center justify-between border-t border-[var(--tt-border)] px-4 py-2 tt-meta text-[var(--tt-muted)] bg-[var(--tt-bg)]/40">
+        <div className="flex items-center justify-between border-t border-[var(--app-border)] px-4 py-2 app-meta text-[var(--app-muted)] bg-[var(--app-bg)]/40">
           <div className="flex items-center gap-3">
             <span>
-              <kbd className="rounded bg-[var(--tt-panel-alt)] px-1 py-0.5 font-mono">↑</kbd>{" "}
-              <kbd className="rounded bg-[var(--tt-panel-alt)] px-1 py-0.5 font-mono">↓</kbd> to navigate
+              <kbd className="rounded bg-[var(--app-panel-alt)] px-1 py-0.5 font-mono">↑</kbd>{" "}
+              <kbd className="rounded bg-[var(--app-panel-alt)] px-1 py-0.5 font-mono">↓</kbd> to navigate
             </span>
             <span>
-              <kbd className="rounded bg-[var(--tt-panel-alt)] px-1.5 py-0.5 font-mono">Enter</kbd> to select
+              <kbd className="rounded bg-[var(--app-panel-alt)] px-1.5 py-0.5 font-mono">Enter</kbd> to select
             </span>
           </div>
           <span>
-            <kbd className="rounded bg-[var(--tt-panel-alt)] px-1.5 py-0.5 font-mono">Esc</kbd> to close
+            <kbd className="rounded bg-[var(--app-panel-alt)] px-1.5 py-0.5 font-mono">Esc</kbd> to close
           </span>
         </div>
       </div>

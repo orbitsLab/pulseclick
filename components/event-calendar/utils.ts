@@ -10,7 +10,7 @@ import type {
  */
 export function getEventColorClasses(color?: EventColor | string, completed?: boolean): string {
   if (completed) {
-    return "bg-[var(--tt-panel-alt)]/50 text-[var(--tt-muted)] border border-[var(--tt-border)]/60 hover:bg-[var(--tt-panel-alt)]/70 line-through opacity-60";
+    return "bg-[var(--app-panel-alt)]/50 text-[var(--app-muted)] border border-[var(--app-border)]/60 hover:bg-[var(--app-panel-alt)]/70 line-through opacity-60";
   }
 
   const eventColor = color || "slate";
@@ -30,7 +30,7 @@ export function getEventColorClasses(color?: EventColor | string, completed?: bo
       return "bg-orange-500/15 hover:bg-orange-500/25 text-orange-700 dark:text-orange-300 border border-orange-500/35";
     case "slate":
     default:
-      return "bg-[var(--tt-panel-alt)] hover:bg-[var(--tt-panel-alt)]/80 text-[var(--tt-text)] border border-[var(--tt-border)]";
+      return "bg-[var(--app-panel-alt)] hover:bg-[var(--app-panel-alt)]/80 text-[var(--app-text)] border border-[var(--app-border)]";
   }
 }
 

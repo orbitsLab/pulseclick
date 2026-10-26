@@ -7,8 +7,8 @@ import {
   type EventColor,
   EventCalendar,
 } from "@/components/event-calendar";
-import { Task } from "@/hooks/use-ticktick";
-import { useTickTickContext } from "@/context/ticktick-context";
+import { Task } from "@/hooks/use-workspace";
+import { useWorkspaceContext } from "@/context/workspace-context";
 
 interface TaskCalendarViewProps {
   tasks?: Task[];
@@ -21,7 +21,7 @@ export function TaskCalendarView({
   onSelectTask,
   onAddTaskForDate,
 }: TaskCalendarViewProps) {
-  const context = useTickTickContext();
+  const context = useWorkspaceContext();
   const tasks = propTasks || context.tasks || [];
   const lists = context.lists || [];
   const activeListId = context.activeListId;
@@ -196,9 +196,9 @@ export function TaskCalendarView({
   return (
     <div className="relative flex-1 flex flex-col h-full overflow-hidden">
       {isInitialLoading && (
-        <div className="absolute top-2.5 right-3 z-30 flex items-center gap-2 rounded-lg border border-[var(--tt-border)]/80 bg-[var(--tt-panel)]/95 px-3 py-1.5 text-xs text-[var(--tt-muted)] shadow-md animate-pulse">
-          <div className="h-2 w-2 rounded-full bg-[var(--tt-accent)]" />
-          <span className="font-medium text-[var(--tt-text)]">Syncing calendar tasks…</span>
+        <div className="absolute top-2.5 right-3 z-30 flex items-center gap-2 rounded-lg border border-[var(--app-border)]/80 bg-[var(--app-panel)]/95 px-3 py-1.5 text-xs text-[var(--app-muted)] shadow-md animate-pulse">
+          <div className="h-2 w-2 rounded-full bg-[var(--app-accent)]" />
+          <span className="font-medium text-[var(--app-text)]">Syncing calendar tasks…</span>
         </div>
       )}
       <EventCalendar

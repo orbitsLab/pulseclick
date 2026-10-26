@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, signSession, AUTH_COOKIE_NAME } from "@/lib/auth";
-import { seedStarterTickTickDataForUser } from "@/lib/seed-user";
+import { seedStarterWorkspaceDataForUser } from "@/lib/seed-user";
 
 export async function POST(req: Request) {
   try {
@@ -52,9 +52,9 @@ export async function POST(req: Request) {
       },
     });
 
-    // Automatically populate new user accounts with TickTick starter data
+    // Automatically populate new user accounts with starter workspace data
     try {
-      await seedStarterTickTickDataForUser(user.id);
+      await seedStarterWorkspaceDataForUser(user.id);
     } catch (seedErr) {
       console.error("Failed to seed starter data:", seedErr);
     }

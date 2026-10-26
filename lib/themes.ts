@@ -1,11 +1,10 @@
 /**
  * Theme gallery.
  *
- * ticktick.com/features lists "Theme: Choose from 40+ themes to personalize
- * your workspace." and "List Background: Customize backgrounds for each list".
+ * Provides 40+ themes and custom list backgrounds to personalize the workspace.
  *
  * A theme is a small palette that is published as CSS custom properties on
- * `document.documentElement`, so every surface in the clone picks it up.
+ * `document.documentElement`, so every surface in the app picks it up.
  */
 
 export interface ThemePalette {
@@ -98,7 +97,7 @@ const dark = (p: Partial<ThemePalette>): ThemePalette => ({
 
 const RAW_THEMES: Theme[] = [
   // --- Light ------------------------------------------------------------
-  { id: "ticktick-blue", name: "TickTick Blue", mode: "light", palette: light({}) },
+  { id: "flow-blue", name: "Flow Blue", mode: "light", palette: light({}) },
   { id: "classic-grey", name: "Classic Grey", mode: "light", palette: light({ accent: "#6b7280", rail: "#f2f3f5" }) },
   { id: "sunset", name: "Sunset", mode: "light", palette: light({ accent: "#f2683c", accentContrast: "#ffffff", panelAlt: "#fff3ee", border: "#ffe0d3" }) },
   { id: "mint", name: "Mint", mode: "light", palette: light({ accent: "#12b886", panelAlt: "#e9faf3", border: "#d3f2e6" }) },
@@ -185,17 +184,17 @@ export function getTheme(id: string | null | undefined): Theme {
 }
 
 export const THEME_CSS_VARS: Array<[keyof ThemePalette, string]> = [
-  ["accent", "--tt-accent"],
-  ["accentContrast", "--tt-accent-contrast"],
-  ["accentText", "--tt-accent-text"],
-  ["accentStrong", "--tt-accent-strong"],
-  ["bg", "--tt-bg"],
-  ["panel", "--tt-panel"],
-  ["panelAlt", "--tt-panel-alt"],
-  ["text", "--tt-text"],
-  ["muted", "--tt-muted"],
-  ["border", "--tt-border"],
-  ["rail", "--tt-rail"],
+  ["accent", "--app-accent"],
+  ["accentContrast", "--app-accent-contrast"],
+  ["accentText", "--app-accent-text"],
+  ["accentStrong", "--app-accent-strong"],
+  ["bg", "--app-bg"],
+  ["panel", "--app-panel"],
+  ["panelAlt", "--app-panel-alt"],
+  ["text", "--app-text"],
+  ["muted", "--app-muted"],
+  ["border", "--app-border"],
+  ["rail", "--app-rail"],
 ];
 
 /** Publish a theme onto an element (defaults to `document.documentElement`). */
@@ -206,8 +205,8 @@ export function applyTheme(themeId: string | null | undefined, root?: HTMLElemen
   for (const [key, cssVar] of THEME_CSS_VARS) {
     target.style.setProperty(cssVar, theme.palette[key]);
   }
-  target.dataset.ttTheme = theme.id;
-  target.dataset.ttMode = theme.mode;
+  target.dataset.appTheme = theme.id;
+  target.dataset.appMode = theme.mode;
   target.classList.toggle("dark", theme.mode === "dark");
   return theme;
 }

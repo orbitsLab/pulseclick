@@ -8,7 +8,7 @@ interface AuthModalProps {
   isOpen: boolean;
 }
 
-const DEMO_EMAIL = "demo@pulsetick.app";
+const DEMO_EMAIL = "demo@pulseflow.app";
 const DEMO_PASSWORD = "password123";
 
 export function AuthModal({ isOpen }: AuthModalProps) {
@@ -94,17 +94,17 @@ export function AuthModal({ isOpen }: AuthModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md rounded-2xl border border-[var(--tt-border)] bg-[#0f172a] p-6 shadow-2xl text-[var(--tt-text)] sm:p-8 animate-in fade-in zoom-in-95 duration-200">
+      <div className="w-full max-w-md rounded-2xl border border-[var(--app-border)] bg-[#0f172a] p-6 shadow-2xl text-[var(--app-text)] sm:p-8 animate-in fade-in zoom-in-95 duration-200">
         {/* Brand header — the mark sits beside the heading, not above it */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="h-11 w-11 shrink-0 rounded-xl bg-gradient-to-br from-[var(--tt-accent)] to-indigo-600 flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-black/20">
+          <div className="h-11 w-11 shrink-0 rounded-xl bg-gradient-to-br from-[var(--app-accent)] to-indigo-600 flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-black/20">
             ✓
           </div>
           <div>
-            <h2 className="tt-display text-white">
-              {isLogin ? "Welcome back to PulseTick" : "Start with PulseTick"}
+            <h2 className="app-display text-white">
+              {isLogin ? "Welcome back to PulseFlow" : "Start with PulseFlow"}
             </h2>
-            <p className="tt-body text-[var(--tt-muted)] mt-1">
+            <p className="app-body text-[var(--app-muted)] mt-1">
               {isLogin
                 ? "Sign in to pick up your tasks, schedule, habits and focus sessions."
                 : "Capture tasks, keep habits on track, and review your week."}
@@ -113,7 +113,7 @@ export function AuthModal({ isOpen }: AuthModalProps) {
         </div>
 
         {error && (
-          <div className="mb-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 tt-label text-rose-400">
+          <div className="mb-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 app-label text-rose-400">
             {error}
           </div>
         )}
@@ -121,45 +121,45 @@ export function AuthModal({ isOpen }: AuthModalProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
             <div>
-              <label className="block tt-overline font-semibold text-[var(--tt-muted)] mb-1.5">
+              <label className="block app-overline font-semibold text-[var(--app-muted)] mb-1.5">
                 Your Name
               </label>
               <div className="relative">
-                <UserIcon className="absolute left-3.5 top-3 h-4 w-4 text-[var(--tt-muted)]" />
+                <UserIcon className="absolute left-3.5 top-3 h-4 w-4 text-[var(--app-muted)]" />
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Alex"
-                  className="w-full rounded-lg border border-[var(--tt-border)] bg-[var(--tt-rail)]/80 px-10 py-2.5 tt-body text-white placeholder-[var(--tt-muted)] focus:border-[var(--tt-accent)] focus:outline-none focus:ring-1 focus:ring-[var(--tt-accent)]"
+                  className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-rail)]/80 px-10 py-2.5 app-body text-white placeholder-[var(--app-muted)] focus:border-[var(--app-accent)] focus:outline-none focus:ring-1 focus:ring-[var(--app-accent)]"
                 />
               </div>
             </div>
           )}
 
           <div>
-            <label className="block tt-overline font-semibold text-[var(--tt-muted)] mb-1.5">
+            <label className="block app-overline font-semibold text-[var(--app-muted)] mb-1.5">
               Email Address
             </label>
             <div className="relative">
-              <Mail className="absolute left-3.5 top-3 h-4 w-4 text-[var(--tt-muted)]" />
+              <Mail className="absolute left-3.5 top-3 h-4 w-4 text-[var(--app-muted)]" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full rounded-lg border border-[var(--tt-border)] bg-[var(--tt-rail)]/80 px-10 py-2.5 tt-body text-white placeholder-[var(--tt-muted)] focus:border-[var(--tt-accent)] focus:outline-none focus:ring-1 focus:ring-[var(--tt-accent)]"
+                className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-rail)]/80 px-10 py-2.5 app-body text-white placeholder-[var(--app-muted)] focus:border-[var(--app-accent)] focus:outline-none focus:ring-1 focus:ring-[var(--app-accent)]"
               />
             </div>
           </div>
 
           <div>
-            <label className="block tt-overline font-semibold text-[var(--tt-muted)] mb-1.5">
+            <label className="block app-overline font-semibold text-[var(--app-muted)] mb-1.5">
               Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-3 h-4 w-4 text-[var(--tt-muted)]" />
+              <Lock className="absolute left-3.5 top-3 h-4 w-4 text-[var(--app-muted)]" />
               <input
                 type="password"
                 required
@@ -167,7 +167,7 @@ export function AuthModal({ isOpen }: AuthModalProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-lg border border-[var(--tt-border)] bg-[var(--tt-rail)]/80 px-10 py-2.5 tt-body text-white placeholder-[var(--tt-muted)] focus:border-[var(--tt-accent)] focus:outline-none focus:ring-1 focus:ring-[var(--tt-accent)]"
+                className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-rail)]/80 px-10 py-2.5 app-body text-white placeholder-[var(--app-muted)] focus:border-[var(--app-accent)] focus:outline-none focus:ring-1 focus:ring-[var(--app-accent)]"
               />
             </div>
           </div>
@@ -175,7 +175,7 @@ export function AuthModal({ isOpen }: AuthModalProps) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 rounded-lg bg-[var(--tt-accent-strong)] py-2.5 px-4 tt-body font-semibold text-white shadow-lg shadow-[var(--tt-accent)]/20 transition-all hover:bg-[var(--tt-accent-strong)] active:scale-[0.98] disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 rounded-lg bg-[var(--app-accent-strong)] py-2.5 px-4 app-body font-semibold text-white shadow-lg shadow-[var(--app-accent)]/20 transition-all hover:bg-[var(--app-accent-strong)] active:scale-[0.98] disabled:opacity-50"
           >
             {loading ? (
               <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -191,14 +191,14 @@ export function AuthModal({ isOpen }: AuthModalProps) {
           </button>
         </form>
 
-        <div className="mt-5 flex items-center justify-between border-t border-[var(--tt-border)] pt-4 tt-label text-[var(--tt-muted)]">
+        <div className="mt-5 flex items-center justify-between border-t border-[var(--app-border)] pt-4 app-label text-[var(--app-muted)]">
           <button
             type="button"
             onClick={() => {
               setIsLogin(!isLogin);
               setError("");
             }}
-            className="text-[var(--tt-accent-text)] hover:text-white underline font-medium"
+            className="text-[var(--app-accent-text)] hover:text-white underline font-medium"
           >
             {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
           </button>
@@ -207,7 +207,7 @@ export function AuthModal({ isOpen }: AuthModalProps) {
             type="button"
             onClick={handleQuickDemo}
             disabled={loading}
-            className="inline-flex items-center gap-1 text-[var(--tt-muted)] hover:text-[var(--tt-text)] transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-1 text-[var(--app-muted)] hover:text-[var(--app-text)] transition-colors disabled:opacity-50"
             title="Open the demo workspace"
           >
             <Sparkles className="h-3.5 w-3.5 text-amber-400" /> Open demo

@@ -60,22 +60,22 @@ export function YearView({
           return (
             <div
               key={monthIndex}
-              className="flex flex-col rounded-xl border border-[var(--tt-border)] bg-[var(--tt-panel-alt)]/40 p-3 hover:border-[var(--tt-border)]/80 transition-colors"
+              className="flex flex-col rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)]/40 p-3 hover:border-[var(--app-border)]/80 transition-colors"
             >
               {/* Month Header */}
               <div className="mb-2 flex items-center justify-between">
-                <span className="tt-label font-semibold text-[var(--tt-text)]">
+                <span className="app-label font-semibold text-[var(--app-text)]">
                   {format(mFirst, "MMMM")}
                 </span>
                 {monthCount > 0 && (
-                  <span className="rounded-full bg-[var(--tt-panel)] border border-[var(--tt-border)] px-1.5 py-0.5 tt-meta font-medium text-[var(--tt-muted)]">
+                  <span className="rounded-full bg-[var(--app-panel)] border border-[var(--app-border)] px-1.5 py-0.5 app-meta font-medium text-[var(--app-muted)]">
                     {monthCount} {monthCount === 1 ? "task" : "tasks"}
                   </span>
                 )}
               </div>
 
               {/* Weekday headers */}
-              <div className="grid grid-cols-7 gap-1 text-center tt-meta text-[var(--tt-muted)] pb-1 border-b border-[var(--tt-border)]/50">
+              <div className="grid grid-cols-7 gap-1 text-center app-meta text-[var(--app-muted)] pb-1 border-b border-[var(--app-border)]/50">
                 {weekDays.map((d, i) => (
                   <span key={i}>{d}</span>
                 ))}
@@ -102,12 +102,12 @@ export function YearView({
                       onClick={() => onSelectDate?.(dayDate)}
                       title={`${iso}: ${count} task${count === 1 ? "" : "s"}`}
                       className={cn(
-                        "flex h-6 w-full items-center justify-center rounded-md tt-meta font-medium transition-all cursor-pointer",
+                        "flex h-6 w-full items-center justify-center rounded-md app-meta font-medium transition-all cursor-pointer",
                         isCurrentDay
-                          ? "bg-[var(--tt-accent-strong)] text-white font-bold"
+                          ? "bg-[var(--app-accent-strong)] text-white font-bold"
                           : count > 0
-                          ? "bg-[var(--tt-accent)]/15 text-[var(--tt-accent-text)] font-semibold hover:bg-[var(--tt-accent)]/25"
-                          : "text-[var(--tt-muted)] hover:bg-[var(--tt-panel)] hover:text-[var(--tt-text)]"
+                          ? "bg-[var(--app-accent)]/15 text-[var(--app-accent-text)] font-semibold hover:bg-[var(--app-accent)]/25"
+                          : "text-[var(--app-muted)] hover:bg-[var(--app-panel)] hover:text-[var(--app-text)]"
                       )}
                     >
                       {dayNum}

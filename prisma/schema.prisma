@@ -20,7 +20,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // TickTick Task & Productivity models
+  // Workspace Task & Productivity models
   taskLists         TaskList[]
   tasks             Task[]
   tags              Tag[]
@@ -229,7 +229,7 @@ model HabitSection {
 }
 
 // ---------------------------------------------------------------------------
-// Smart filters (ticktick.com/features -> "Filter: Use smart filters")
+// Smart filters
 // ---------------------------------------------------------------------------
 model Filter {
   id        String   @id @default(cuid())
@@ -248,8 +248,7 @@ model Filter {
 }
 
 // ---------------------------------------------------------------------------
-// Multiple / constant reminders (ticktick.com/features -> "Notification",
-// "Constant Reminder", "Repeat Reminder")
+// Multiple / scheduled reminders
 // ---------------------------------------------------------------------------
 model Reminder {
   id            String   @id @default(cuid())
@@ -268,7 +267,6 @@ model Reminder {
 
 // ---------------------------------------------------------------------------
 // Collaboration: shared lists and task assignment
-// (ticktick.com/features -> "Collaboration: Share lists ... assign tasks")
 // ---------------------------------------------------------------------------
 model ListMember {
   id          String   @id @default(cuid())
@@ -300,7 +298,7 @@ model TaskAssignee {
 }
 
 // ---------------------------------------------------------------------------
-// Countdown events (ticktick.com/features -> "Countdown")
+// Countdown events
 // ---------------------------------------------------------------------------
 model Countdown {
   id         String   @id @default(cuid())
@@ -319,8 +317,7 @@ model Countdown {
 }
 
 // ---------------------------------------------------------------------------
-// Subscribed calendars (ticktick.com/features -> "Integration: Subscribe to
-// calendars")
+// Subscribed calendars
 // ---------------------------------------------------------------------------
 model CalendarSubscription {
   id           String    @id @default(cuid())

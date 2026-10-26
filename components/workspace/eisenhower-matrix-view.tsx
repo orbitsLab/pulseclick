@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Plus, Check, Calendar, CheckCircle2 } from "lucide-react";
-import { Task } from "@/hooks/use-ticktick";
+import { Task } from "@/hooks/use-workspace";
 import { getTodayISO } from "@/lib/date-utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -86,7 +86,7 @@ export function EisenhowerMatrixView({
       id: "q4",
       title: "Not Urgent & Not Important",
       subtitle: "Eliminate • Distractions & Time Wasters",
-      color: "border-[var(--tt-border)]/60 bg-[var(--tt-panel-alt)]/5 text-[var(--tt-muted)]",
+      color: "border-[var(--app-border)]/60 bg-[var(--app-panel-alt)]/5 text-[var(--app-muted)]",
       accent: "#94a3b8",
       tasks: q4Tasks,
       defaultPriority: 0,
@@ -112,15 +112,15 @@ export function EisenhowerMatrixView({
       {quadrants.map((quad) => (
         <div
           key={quad.id}
-          className={`flex flex-col rounded-2xl border-2 p-3.5 sm:p-4 transition-all ${quad.color} dark:bg-[var(--tt-rail)]/60 min-h-[300px]`}
+          className={`flex flex-col rounded-2xl border-2 p-3.5 sm:p-4 transition-all ${quad.color} dark:bg-[var(--app-rail)]/60 min-h-[300px]`}
         >
           {/* Header */}
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-current/20">
             <div>
-              <h3 className="tt-overline font-semibold">{quad.title}</h3>
-              <p className="tt-meta opacity-80">{quad.subtitle}</p>
+              <h3 className="app-overline font-semibold">{quad.title}</h3>
+              <p className="app-meta opacity-80">{quad.subtitle}</p>
             </div>
-            <span className="rounded-full px-2 py-0.5 tt-label font-semibold bg-current/10">
+            <span className="rounded-full px-2 py-0.5 app-label font-semibold bg-current/10">
               {quad.tasks.length}
             </span>
           </div>
@@ -137,7 +137,7 @@ export function EisenhowerMatrixView({
                 }
               }}
               placeholder="+ Add task to this quadrant..."
-              className="flex-1 rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel)] px-2.5 py-1.5 tt-label text-[var(--tt-text)] placeholder-[var(--tt-muted)] focus:outline-none focus:border-current"
+              className="flex-1 rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1.5 app-label text-[var(--app-text)] placeholder-[var(--app-muted)] focus:outline-none focus:border-current"
             />
             <button
               type="button"
@@ -152,17 +152,17 @@ export function EisenhowerMatrixView({
           <div className="flex-1 space-y-1.5 overflow-y-auto max-h-[340px]">
             {isLoading && tasks.length === 0 ? (
               <div className="space-y-1.5 p-1">
-                <div className="flex items-center gap-2 rounded-xl border border-[var(--tt-border)]/40 bg-[var(--tt-panel)]/30 p-2.5">
-                  <Skeleton className="h-4 w-4 rounded-md bg-[var(--tt-panel-alt)] shrink-0" />
-                  <Skeleton className="h-4 w-3/4 rounded bg-[var(--tt-panel-alt)]" />
+                <div className="flex items-center gap-2 rounded-xl border border-[var(--app-border)]/40 bg-[var(--app-panel)]/30 p-2.5">
+                  <Skeleton className="h-4 w-4 rounded-md bg-[var(--app-panel-alt)] shrink-0" />
+                  <Skeleton className="h-4 w-3/4 rounded bg-[var(--app-panel-alt)]" />
                 </div>
-                <div className="flex items-center gap-2 rounded-xl border border-[var(--tt-border)]/40 bg-[var(--tt-panel)]/30 p-2.5">
-                  <Skeleton className="h-4 w-4 rounded-md bg-[var(--tt-panel-alt)] shrink-0" />
-                  <Skeleton className="h-4 w-1/2 rounded bg-[var(--tt-panel-alt)]" />
+                <div className="flex items-center gap-2 rounded-xl border border-[var(--app-border)]/40 bg-[var(--app-panel)]/30 p-2.5">
+                  <Skeleton className="h-4 w-4 rounded-md bg-[var(--app-panel-alt)] shrink-0" />
+                  <Skeleton className="h-4 w-1/2 rounded bg-[var(--app-panel-alt)]" />
                 </div>
               </div>
             ) : quad.tasks.length === 0 ? (
-              <div className="py-8 text-center tt-label opacity-50">No tasks in this quadrant</div>
+              <div className="py-8 text-center app-label opacity-50">No tasks in this quadrant</div>
             ) : (
               quad.tasks.map((task) => {
                 const isSelected = selectedTaskId === task.id;
@@ -170,7 +170,7 @@ export function EisenhowerMatrixView({
                   <div
                     key={task.id}
                     onClick={() => onSelectTask(task.id)}
-                    className={`flex items-center justify-between gap-2 rounded-xl border p-2.5 cursor-pointer transition-all ${ isSelected ? "border-[var(--tt-accent)] bg-[var(--tt-accent)]/10 ring-1 ring-[var(--tt-accent)]" : "border-[var(--tt-border)] bg-[var(--tt-panel)] dark:border-[var(--tt-border)] dark:bg-[var(--tt-bg)]/80 hover:border-[var(--tt-border)]" }`}
+                    className={`flex items-center justify-between gap-2 rounded-xl border p-2.5 cursor-pointer transition-all ${ isSelected ? "border-[var(--app-accent)] bg-[var(--app-accent)]/10 ring-1 ring-[var(--app-accent)]" : "border-[var(--app-border)] bg-[var(--app-panel)] dark:border-[var(--app-border)] dark:bg-[var(--app-bg)]/80 hover:border-[var(--app-border)]" }`}
                   >
                     <div className="flex items-center gap-2 min-w-0 flex-1">
                       <button
@@ -179,17 +179,17 @@ export function EisenhowerMatrixView({
                           e.stopPropagation();
                           onToggleComplete(task.id, !task.completed);
                         }}
-                        className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border border-[var(--tt-border)] hover:border-[var(--tt-accent)]"
+                        className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border border-[var(--app-border)] hover:border-[var(--app-accent)]"
                       >
-                        {task.completed && <Check className="h-3 w-3 text-[var(--tt-accent-text)]" />}
+                        {task.completed && <Check className="h-3 w-3 text-[var(--app-accent-text)]" />}
                       </button>
-                      <span className="tt-heading font-semibold text-[var(--tt-text)] truncate">
+                      <span className="app-heading font-semibold text-[var(--app-text)] truncate">
                         {task.title}
                       </span>
                     </div>
 
                     {task.dueDate && (
-                      <span className="tt-meta text-[var(--tt-muted)] flex items-center gap-1 flex-shrink-0">
+                      <span className="app-meta text-[var(--app-muted)] flex items-center gap-1 flex-shrink-0">
                         <Calendar className="h-2.5 w-2.5" />
                         {task.dueDate}
                       </span>

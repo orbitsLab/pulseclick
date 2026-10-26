@@ -222,7 +222,7 @@ export function MonthView({
                         <Popover modal>
                           <PopoverTrigger asChild>
                             <button
-                              className="mt-(--event-gap) flex h-(--event-height) w-full select-none items-center overflow-hidden px-1 text-left tt-meta text-muted-foreground outline-none backdrop-blur-md transition hover:bg-muted/50 hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:px-2 sm:tt-label cursor-pointer"
+                              className="mt-(--event-gap) flex h-(--event-height) w-full select-none items-center overflow-hidden px-1 text-left app-meta text-muted-foreground outline-none backdrop-blur-md transition hover:bg-muted/50 hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:px-2 sm:app-label cursor-pointer"
                               onClick={(e) => e.stopPropagation()}
                               type="button"
                             >

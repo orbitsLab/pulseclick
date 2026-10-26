@@ -1,7 +1,7 @@
 /**
  * Smart filter query model.
  *
- * TickTick exposes "Filter: Use smart filters to focus on what matters most."
+ * Translates saved filter criteria into Prisma query conditions.
  * A filter is stored as JSON on the `Filter` model and translated into a
  * Prisma `where` fragment by `buildFilterWhere`.
  */

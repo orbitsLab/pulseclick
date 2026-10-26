@@ -281,7 +281,7 @@ export function EventCalendar({
   return (
     <div
       className={cn(
-        "flex flex-1 min-h-0 flex-col rounded-2xl border border-[var(--tt-border)] bg-[var(--tt-panel)] overflow-hidden transition-colors shadow-sm",
+        "flex flex-1 min-h-0 flex-col rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] overflow-hidden transition-colors shadow-sm",
         className
       )}
       style={
@@ -294,14 +294,14 @@ export function EventCalendar({
     >
       <CalendarDndProvider onEventUpdate={handleEventUpdate}>
         {/* Navigation Toolbar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4 border-b border-[var(--tt-border)] bg-[var(--tt-panel)]">
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4 border-b border-[var(--app-border)] bg-[var(--app-panel)]">
           {/* Left Controls: Today, Prev/Next, Title */}
           <div className="flex items-center gap-2 sm:gap-3">
             <Button
               onClick={handleToday}
               variant="outline"
               size="sm"
-              className="border-[var(--tt-border)] bg-[var(--tt-panel-alt)] text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/80 tt-label font-medium"
+              className="border-[var(--app-border)] bg-[var(--app-panel-alt)] text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/80 app-label font-medium"
             >
               <RiCalendarCheckLine
                 aria-hidden="true"
@@ -311,12 +311,12 @@ export function EventCalendar({
               <span className="hidden sm:inline">Today</span>
             </Button>
 
-            <div className="flex items-center rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] p-0.5">
+            <div className="flex items-center rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] p-0.5">
               <button
                 type="button"
                 aria-label="Previous period"
                 onClick={handlePrevious}
-                className="p-1.5 text-[var(--tt-text)] hover:text-white rounded-md transition-colors cursor-pointer"
+                className="p-1.5 text-[var(--app-text)] hover:text-white rounded-md transition-colors cursor-pointer"
               >
                 <ChevronLeftIcon aria-hidden="true" size={16} />
               </button>
@@ -324,14 +324,14 @@ export function EventCalendar({
                 type="button"
                 aria-label="Next period"
                 onClick={handleNext}
-                className="p-1.5 text-[var(--tt-text)] hover:text-white rounded-md transition-colors cursor-pointer"
+                className="p-1.5 text-[var(--app-text)] hover:text-white rounded-md transition-colors cursor-pointer"
               >
                 <ChevronRightIcon aria-hidden="true" size={16} />
               </button>
             </div>
 
-            <h2 className="tt-heading font-semibold text-[var(--tt-text)] ml-1 flex items-center gap-2">
-              <CalendarDays className="h-4 w-4 text-[var(--tt-accent-text)] hidden sm:inline-block" />
+            <h2 className="app-heading font-semibold text-[var(--app-text)] ml-1 flex items-center gap-2">
+              <CalendarDays className="h-4 w-4 text-[var(--app-accent-text)] hidden sm:inline-block" />
               <span>{viewTitle}</span>
             </h2>
           </div>
@@ -339,7 +339,7 @@ export function EventCalendar({
           {/* Right Controls: View Switcher & New Task */}
           <div className="flex items-center gap-2">
             {/* Desktop Segmented View Switcher */}
-            <div className="hidden md:flex items-center rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] p-0.5">
+            <div className="hidden md:flex items-center rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] p-0.5">
               {(
                 [
                   { id: "month", label: "Month", shortcut: "M" },
@@ -355,10 +355,10 @@ export function EventCalendar({
                   onClick={() => setView(v.id)}
                   title={`${v.label} (${v.shortcut})`}
                   className={cn(
-                    "rounded-md px-2.5 py-1 tt-label font-medium transition-colors cursor-pointer",
+                    "rounded-md px-2.5 py-1 app-label font-medium transition-colors cursor-pointer",
                     view === v.id
-                      ? "bg-[var(--tt-panel)] text-[var(--tt-accent-text)] shadow-xs font-semibold border border-[var(--tt-border)]/60"
-                      : "text-[var(--tt-muted)] hover:text-[var(--tt-text)]"
+                      ? "bg-[var(--app-panel)] text-[var(--app-accent-text)] shadow-xs font-semibold border border-[var(--app-border)]/60"
+                      : "text-[var(--app-muted)] hover:text-[var(--app-text)]"
                   )}
                 >
                   {v.label}
@@ -371,7 +371,7 @@ export function EventCalendar({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    className="gap-1.5 border-[var(--tt-border)] bg-[var(--tt-panel-alt)] text-[var(--tt-text)]"
+                    className="gap-1.5 border-[var(--app-border)] bg-[var(--app-panel-alt)] text-[var(--app-text)]"
                     variant="outline"
                     size="sm"
                   >
@@ -385,7 +385,7 @@ export function EventCalendar({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="min-w-32 bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)]"
+                  className="min-w-32 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)]"
                 >
                   <DropdownMenuItem onClick={() => setView("month")}>
                     Month <DropdownMenuShortcut>M</DropdownMenuShortcut>
@@ -413,9 +413,9 @@ export function EventCalendar({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="gap-1.5 border-[var(--tt-border)] bg-[var(--tt-panel-alt)] text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/80 tt-label font-medium cursor-pointer"
+                    className="gap-1.5 border-[var(--app-border)] bg-[var(--app-panel-alt)] text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/80 app-label font-medium cursor-pointer"
                   >
-                    <Folder className="h-3.5 w-3.5 text-[var(--tt-muted)]" />
+                    <Folder className="h-3.5 w-3.5 text-[var(--app-muted)]" />
                     <span className="hidden sm:inline">
                       {selectedListId === "all"
                         ? "All Lists"
@@ -426,7 +426,7 @@ export function EventCalendar({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="min-w-36 bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)]"
+                  className="min-w-36 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)]"
                 >
                   <DropdownMenuItem onClick={() => setSelectedListId("all")} className="cursor-pointer">
                     All Lists
@@ -454,7 +454,7 @@ export function EventCalendar({
                 handleEventCreate(new Date());
               }}
               size="sm"
-              className="bg-[var(--tt-accent-strong)] text-white hover:bg-[var(--tt-accent-strong)]/90 gap-1.5 rounded-lg shadow-sm cursor-pointer"
+              className="bg-[var(--app-accent-strong)] text-white hover:bg-[var(--app-accent-strong)]/90 gap-1.5 rounded-lg shadow-sm cursor-pointer"
             >
               <PlusIcon aria-hidden="true" size={16} />
               <span className="hidden sm:inline">New task</span>

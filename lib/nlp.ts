@@ -1,10 +1,8 @@
 /**
  * Natural-language task parsing.
  *
- * TickTick markets "NLP: Utilize NLP for task time setting. Just type in your
- * information, and it will be identified instantly." This module implements
- * that behaviour for the clone: a quick-add string is split into a clean title
- * plus the date, time, recurrence, priority, tags and duration it encodes.
+ * Provides intelligent date, time, recurrence, priority, tags, and duration
+ * extraction from quick-add task strings.
  *
  * Everything is pure and date-local so it can be reused on the client (live
  * preview while typing) and on the server (authoritative parsing on save).

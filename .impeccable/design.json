@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generatedAt": "2026-10-23T18:55:00Z",
-  "title": "Design System: PulseTick",
+  "title": "Design System: PulseFlow",
   "extensions": {
     "colorMeta": {
       "primary": {
@@ -106,10 +106,10 @@
   ],
   "narrative": {
     "northStar": "The Quiet Day",
-    "overview": "PulseTick's design system is named for the day it serves. The owner of the deployment sits down with the product to capture a thought, place it on a day, keep a practice going, and read what the week actually looked like. The visual system exists to answer 'what now?' quietly and precisely, without narrating the process. Mood is calm plus precise: flat-tonal surfaces, restrained type, an accent that appears only when a decision is needed.",
+    "overview": "PulseFlow's design system is named for the day it serves. The owner of the deployment sits down with the product to capture a thought, place it on a day, keep a practice going, and read what the week actually looked like. The visual system exists to answer 'what now?' quietly and precisely, without narrating the process. Mood is calm plus precise: flat-tonal surfaces, restrained type, an accent that appears only when a decision is needed.",
     "keyCharacteristics": [
       "The module title is always display type (Instrument Serif, 26px) — one per screen, no exceptions.",
-      "Body text always routes through a named role (tt-body 13px → tt-heading 15px → tt-title 17px → tt-display 26px); ad-hoc sizes are banned.",
+      "Body text always routes through a named role (app-body 13px → app-heading 15px → app-title 17px → app-display 26px); ad-hoc sizes are banned.",
       "Depth is tonal at rest, never shadow-based for in-app surfaces."
     ],
     "rules": [
@@ -120,12 +120,12 @@
       },
       {
         "name": "The Single-Source Rule",
-        "body": "Every product typeface and size routes through the @utility role set (tt-display, tt-title, tt-heading, tt-body, tt-label, tt-meta, tt-overline, tt-figure) or the shadcn primitives mapped onto those roles. Ad-hoc font-size utilities (text-[Npx], text-xs, text-sm) are banned from product surfaces.",
+        "body": "Every product typeface and size routes through the @utility role set (app-display, app-title, app-heading, app-body, app-label, app-meta, app-overline, app-figure) or the shadcn primitives mapped onto those roles. Ad-hoc font-size utilities (text-[Npx], text-xs, text-sm) are banned from product surfaces.",
         "section": "typography"
       }
     ],
     "dos": [
-      "Do use the tt-* role utilities (or mapped shadcn primitives) for all product typography.",
+      "Do use the app-* role utilities (or mapped shadcn primitives) for all product typography.",
       "Do keep the module title as display type and let smaller roles carry the rest of the hierarchy.",
       "Do express priority and state through text/icon/dot signals before fill."
     ],

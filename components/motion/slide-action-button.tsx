@@ -128,7 +128,7 @@ export function SlideActionButton({
       ref={trackRef}
       className={cn(
         "relative h-12 w-64 overflow-hidden rounded-[16px] bg-muted/70 p-1",
-        "ring-1 ring-[var(--tt-border)]",
+        "ring-1 ring-[var(--app-border)]",
         TOUCH_GESTURE_CONTENT_CLASS,
         className
       )}
@@ -138,7 +138,7 @@ export function SlideActionButton({
         aria-hidden="true"
         style={{ scaleX: fillProgress }}
         className={cn(
-          "absolute inset-0 origin-left bg-[var(--tt-accent)] will-change-transform",
+          "absolute inset-0 origin-left bg-[var(--app-accent)] will-change-transform",
           fillClassName
         )}
       />
@@ -146,7 +146,7 @@ export function SlideActionButton({
       <motion.span
         aria-hidden="true"
         style={{ opacity: labelOpacity }}
-        className="pointer-events-none absolute inset-0 grid place-items-center pl-8 tt-label font-medium text-[var(--tt-text)]"
+        className="pointer-events-none absolute inset-0 grid place-items-center pl-8 app-label font-medium text-[var(--app-text)]"
       >
         {children}
       </motion.span>
@@ -155,7 +155,7 @@ export function SlideActionButton({
         aria-live="polite"
         animate={{ opacity: completed ? 1 : 0 }}
         transition={{ duration: reduce ? 0 : 0.15, ease: EASE_OUT }}
-        className="pointer-events-none absolute inset-0 grid place-items-center tt-label font-medium text-white"
+        className="pointer-events-none absolute inset-0 grid place-items-center app-label font-medium text-white"
       >
         {completed ? completeLabel : null}
       </motion.span>
@@ -177,10 +177,10 @@ export function SlideActionButton({
         whileTap={reduce || completed ? undefined : { scale: 0.94 }}
         transition={SPRING_PRESS}
         className={cn(
-          "relative z-10 grid size-10 touch-none cursor-grab place-items-center rounded-[12px] bg-[var(--tt-accent)] text-white shadow-sm",
+          "relative z-10 grid size-10 touch-none cursor-grab place-items-center rounded-[12px] bg-[var(--app-accent)] text-white shadow-sm",
           TOUCH_GESTURE_CLASS,
-          "outline-none active:cursor-grabbing focus-visible:ring-2 focus-visible:ring-[var(--tt-accent)]",
-          completed && "cursor-default bg-[var(--tt-panel)] text-[var(--tt-text)]",
+          "outline-none active:cursor-grabbing focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]",
+          completed && "cursor-default bg-[var(--app-panel)] text-[var(--app-text)]",
           thumbClassName
         )}
       >

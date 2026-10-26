@@ -19,7 +19,7 @@ function getAudioContext(): AudioContext | null {
 }
 
 /**
- * TickTick signature satisfying task completion chime (pleasant ascending notes)
+ * Satisfying task completion chime with ascending harmonic notes
  */
 export function playTaskCompleteSound() {
   try {
@@ -89,7 +89,7 @@ export function playPomodoroBellSound() {
 }
 
 /**
- * Subtle click tick sound for timer start/pause
+ * Subtle mechanical click for timer start/pause
  */
 export function playClickSound() {
   try {

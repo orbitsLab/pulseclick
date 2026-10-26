@@ -277,7 +277,7 @@ export interface HabitAnalyticsData {
   }[];
 }
 
-export function useTickTick(filters: {
+export function useWorkspace(filters: {
   view: string;
   listId?: string | null;
   tag?: string | null;
@@ -294,7 +294,7 @@ export function useTickTick(filters: {
 
   // 1. Tasks Query
   const tasksQueryKey = [
-    "ticktick-tasks",
+    "workspace-tasks",
     filters.view,
     filters.listId,
     filters.tag,
@@ -321,7 +321,7 @@ export function useTickTick(filters: {
 
   // 2. Task Lists Query
   const listsQuery = useQuery({
-    queryKey: ["ticktick-lists"],
+    queryKey: ["workspace-lists"],
     queryFn: async () => {
       const res = await fetch("/api/tasks/lists");
       if (!res.ok) throw new Error("Failed to load lists");
@@ -339,7 +339,7 @@ export function useTickTick(filters: {
 
   // 3. Tags Query
   const tagsQuery = useQuery({
-    queryKey: ["ticktick-tags"],
+    queryKey: ["workspace-tags"],
     queryFn: async () => {
       const res = await fetch("/api/tasks/tags");
       if (!res.ok) throw new Error("Failed to load tags");
@@ -351,7 +351,7 @@ export function useTickTick(filters: {
 
   // 4. Pomodoro Stats Query
   const pomodoroQuery = useQuery({
-    queryKey: ["ticktick-pomodoro"],
+    queryKey: ["workspace-pomodoro"],
     queryFn: async () => {
       const res = await fetch("/api/pomodoro");
       if (!res.ok) return { sessions: [], todayTotalMinutes: 0, todayPomoCount: 0 };
@@ -363,7 +363,7 @@ export function useTickTick(filters: {
   // 5. Habits Query
   const habitStatus = filters.habitStatus || "ACTIVE";
   const habitsQuery = useQuery({
-    queryKey: ["ticktick-habits", habitStatus],
+    queryKey: ["workspace-habits", habitStatus],
     queryFn: async () => {
       const res = await fetch(`/api/habits?status=${habitStatus}`);
       if (!res.ok) return [];
@@ -375,7 +375,7 @@ export function useTickTick(filters: {
 
   // 5b. Habit Sections Query
   const habitSectionsQuery = useQuery({
-    queryKey: ["ticktick-habit-sections"],
+    queryKey: ["workspace-habit-sections"],
     queryFn: async () => {
       const res = await fetch("/api/habits/sections");
       if (!res.ok) return [];
@@ -388,7 +388,7 @@ export function useTickTick(filters: {
   // 5c. Habit Analytics Query (Heatmap, Insights, Achievements)
   const habitAnalyticsHabitId = filters.habitAnalyticsHabitId || "all";
   const habitAnalyticsQuery = useQuery({
-    queryKey: ["ticktick-habit-analytics", habitAnalyticsHabitId],
+    queryKey: ["workspace-habit-analytics", habitAnalyticsHabitId],
     queryFn: async () => {
       const res = await fetch(`/api/habits/analytics?habitId=${habitAnalyticsHabitId}`);
       if (!res.ok) return null;
@@ -399,7 +399,7 @@ export function useTickTick(filters: {
 
   // 6. Smart Filters Query
   const filtersQuery = useQuery({
-    queryKey: ["ticktick-filters"],
+    queryKey: ["workspace-filters"],
     queryFn: async () => {
       const res = await fetch("/api/filters");
       if (!res.ok) return [];
@@ -410,7 +410,7 @@ export function useTickTick(filters: {
 
   // 7. Countdowns Query
   const countdownsQuery = useQuery({
-    queryKey: ["ticktick-countdowns"],
+    queryKey: ["workspace-countdowns"],
     queryFn: async () => {
       const res = await fetch("/api/countdowns");
       if (!res.ok) return [];
@@ -422,7 +422,7 @@ export function useTickTick(filters: {
   // 8. Statistics Query
   const statsRange = filters.statsRange ?? "month";
   const statsQuery = useQuery({
-    queryKey: ["ticktick-stats", statsRange],
+    queryKey: ["workspace-stats", statsRange],
     queryFn: async () => {
       const res = await fetch(`/api/stats?range=${statsRange}`);
       if (!res.ok) return null;
@@ -432,7 +432,7 @@ export function useTickTick(filters: {
 
   // 9. Settings Query
   const settingsQuery = useQuery({
-    queryKey: ["ticktick-settings"],
+    queryKey: ["workspace-settings"],
     queryFn: async () => {
       const res = await fetch("/api/settings");
       if (!res.ok) return null;
@@ -443,7 +443,7 @@ export function useTickTick(filters: {
   // 10. Reminders Query (for the selected task)
   const remindersTaskId = filters.remindersTaskId ?? null;
   const remindersQuery = useQuery({
-    queryKey: ["ticktick-reminders", remindersTaskId],
+    queryKey: ["workspace-reminders", remindersTaskId],
     queryFn: async () => {
       if (!remindersTaskId) return [];
       const res = await fetch(`/api/reminders?taskId=${remindersTaskId}`);
@@ -461,7 +461,7 @@ export function useTickTick(filters: {
     return task?.listId ?? null;
   }, [tasksQuery.data, filters.remindersTaskId]);
   const membersQuery = useQuery({
-    queryKey: ["ticktick-members", membersListId],
+    queryKey: ["workspace-members", membersListId],
     queryFn: async () => {
       if (!membersListId) return [];
       const res = await fetch(`/api/lists/${membersListId}/members`);
@@ -475,7 +475,7 @@ export function useTickTick(filters: {
   // 12. Task Assignees Query
   const assigneesTaskId = filters.assigneesTaskId ?? null;
   const assigneesQuery = useQuery({
-    queryKey: ["ticktick-assignees", assigneesTaskId],
+    queryKey: ["workspace-assignees", assigneesTaskId],
     queryFn: async () => {
       if (!assigneesTaskId) return [];
       const res = await fetch(`/api/tasks/${assigneesTaskId}/assignees`);
@@ -488,7 +488,7 @@ export function useTickTick(filters: {
 
   // 13. Calendar Subscriptions Query
   const subscriptionsQuery = useQuery({
-    queryKey: ["ticktick-subscriptions"],
+    queryKey: ["workspace-subscriptions"],
     queryFn: async () => {
       const res = await fetch("/api/calendars/subscriptions");
       if (!res.ok) return [];
@@ -538,8 +538,8 @@ export function useTickTick(filters: {
       notify.error("Failed to toggle task", _err?.message || "Changes reverted.");
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-lists"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-lists"] });
     },
   });
 
@@ -580,8 +580,8 @@ export function useTickTick(filters: {
     onMutate: async (newTask) => {
       await queryClient.cancelQueries({ queryKey: tasksQueryKey });
       const prevTasks = queryClient.getQueryData<Task[]>(tasksQueryKey) || [];
-      const currentLists = queryClient.getQueryData<{ lists: TaskList[] }>(["ticktick-lists"])?.lists || [];
-      const currentTags = queryClient.getQueryData<Tag[]>(["ticktick-tags"]) || [];
+      const currentLists = queryClient.getQueryData<{ lists: TaskList[] }>(["workspace-lists"])?.lists || [];
+      const currentTags = queryClient.getQueryData<Tag[]>(["workspace-tags"]) || [];
 
       const listObj = newTask.listId ? currentLists.find((l) => l.id === newTask.listId) || null : null;
       const taskTags: TaskTag[] = (newTask.tags || []).map((tagName) => {
@@ -648,9 +648,9 @@ export function useTickTick(filters: {
         const reconciled = prevTasks.map((t) => (t.id === context.tempId ? data.task : t));
         queryClient.setQueryData(tasksQueryKey, reconciled);
       }
-      queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-lists"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-tags"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-lists"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-tags"] });
     },
   });
 
@@ -668,7 +668,7 @@ export function useTickTick(filters: {
     onMutate: async ({ taskId, ...updates }) => {
       await queryClient.cancelQueries({ queryKey: tasksQueryKey });
       const prevTasks = queryClient.getQueryData<Task[]>(tasksQueryKey) || [];
-      const allTags = queryClient.getQueryData<Tag[]>(["ticktick-tags"]) || [];
+      const allTags = queryClient.getQueryData<Tag[]>(["workspace-tags"]) || [];
 
       const updated = prevTasks.map((t) => {
         if (t.id !== taskId) return t;
@@ -739,9 +739,9 @@ export function useTickTick(filters: {
       notify.error("Failed to update task", err?.message || "Changes reverted.");
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-lists"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-tags"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-lists"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-tags"] });
     },
   });
 
@@ -768,8 +768,8 @@ export function useTickTick(filters: {
       notify.error("Failed to delete task", err?.message || "Task could not be deleted.");
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-lists"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-lists"] });
     },
   });
 
@@ -823,8 +823,8 @@ export function useTickTick(filters: {
       notify.error("Batch action failed", err?.message || "Operations reverted.");
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-lists"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-lists"] });
     },
   });
 
@@ -843,7 +843,7 @@ export function useTickTick(filters: {
       notify.error("Failed to create list", err?.message || "Could not create list.");
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-lists"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-lists"] });
     },
   });
 
@@ -862,8 +862,8 @@ export function useTickTick(filters: {
       notify.error("Failed to update list", err?.message || "Could not update list.");
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-lists"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-lists"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
     },
   });
 
@@ -875,20 +875,20 @@ export function useTickTick(filters: {
       return res.json();
     },
     onMutate: async (id: string) => {
-      await queryClient.cancelQueries({ queryKey: ["ticktick-lists"] });
+      await queryClient.cancelQueries({ queryKey: ["workspace-lists"] });
       await queryClient.cancelQueries({ queryKey: tasksQueryKey });
 
-      const prevLists = queryClient.getQueryData<TaskList[]>(["ticktick-lists"]) || [];
+      const prevLists = queryClient.getQueryData<TaskList[]>(["workspace-lists"]) || [];
 
       // Optimistically remove list
       queryClient.setQueryData<TaskList[]>(
-        ["ticktick-lists"],
+        ["workspace-lists"],
         prevLists.filter((l) => l.id !== id)
       );
 
       // Tasks in deleted list move to Inbox (listId = null)
       queryClient.setQueriesData<Task[]>(
-        { queryKey: ["ticktick-tasks"] },
+        { queryKey: ["workspace-tasks"] },
         (oldTasks) => {
           if (!oldTasks || !Array.isArray(oldTasks)) return oldTasks;
           return oldTasks.map((t) => (t.listId === id ? { ...t, listId: null } : t));
@@ -899,14 +899,14 @@ export function useTickTick(filters: {
     },
     onError: (err: any, _id, context) => {
       if (context?.prevLists) {
-        queryClient.setQueryData(["ticktick-lists"], context.prevLists);
+        queryClient.setQueryData(["workspace-lists"], context.prevLists);
       }
-      queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
       notify.error("Failed to delete list", err?.message || "Could not delete list.");
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-lists"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-lists"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
     },
   });
 
@@ -926,12 +926,12 @@ export function useTickTick(filters: {
     },
     onSuccess: (data) => {
       if (data?.tag) {
-        queryClient.setQueryData<Tag[]>(["ticktick-tags"], (old = []) => {
+        queryClient.setQueryData<Tag[]>(["workspace-tags"], (old = []) => {
           if (old.some((t) => t.id === data.tag.id)) return old;
           return [...old, data.tag];
         });
       }
-      queryClient.invalidateQueries({ queryKey: ["ticktick-tags"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-tags"] });
     },
   });
 
@@ -943,20 +943,20 @@ export function useTickTick(filters: {
       return res.json();
     },
     onMutate: async (id: string) => {
-      await queryClient.cancelQueries({ queryKey: ["ticktick-tags"] });
+      await queryClient.cancelQueries({ queryKey: ["workspace-tags"] });
       await queryClient.cancelQueries({ queryKey: tasksQueryKey });
 
-      const prevTags = queryClient.getQueryData<Tag[]>(["ticktick-tags"]) || [];
+      const prevTags = queryClient.getQueryData<Tag[]>(["workspace-tags"]) || [];
 
       // Optimistically remove tag from tags list
       queryClient.setQueryData<Tag[]>(
-        ["ticktick-tags"],
+        ["workspace-tags"],
         prevTags.filter((t) => t.id !== id)
       );
 
       // Optimistically remove tag from all tasks in any cached task query
       queryClient.setQueriesData<Task[]>(
-        { queryKey: ["ticktick-tasks"] },
+        { queryKey: ["workspace-tasks"] },
         (oldTasks) => {
           if (!oldTasks || !Array.isArray(oldTasks)) return oldTasks;
           return oldTasks.map((task) => {
@@ -974,14 +974,14 @@ export function useTickTick(filters: {
     },
     onError: (err: any, _id, context) => {
       if (context?.prevTags) {
-        queryClient.setQueryData(["ticktick-tags"], context.prevTags);
+        queryClient.setQueryData(["workspace-tags"], context.prevTags);
       }
-      queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
       notify.error("Failed to delete tag", err?.message || "Could not delete tag.");
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-tags"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-tags"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
     },
   });
 
@@ -998,8 +998,8 @@ export function useTickTick(filters: {
     },
     onSuccess: () => {
       playPomodoroBellSound();
-      queryClient.invalidateQueries({ queryKey: ["ticktick-pomodoro"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-pomodoro"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
     },
   });
 
@@ -1028,8 +1028,8 @@ export function useTickTick(filters: {
       return res.json();
     },
     onMutate: async (newHabit) => {
-      await queryClient.cancelQueries({ queryKey: ["ticktick-habits"] });
-      const prevHabits = queryClient.getQueryData<Habit[]>(["ticktick-habits", habitStatus]) || [];
+      await queryClient.cancelQueries({ queryKey: ["workspace-habits"] });
+      const prevHabits = queryClient.getQueryData<Habit[]>(["workspace-habits", habitStatus]) || [];
       const tempHabit: Habit = {
         id: `temp-habit-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
         userId: "current-user",
@@ -1050,22 +1050,22 @@ export function useTickTick(filters: {
         reminderEnabled: newHabit.reminderEnabled ?? false,
         logs: [],
       };
-      queryClient.setQueryData(["ticktick-habits", habitStatus], [...prevHabits, tempHabit]);
+      queryClient.setQueryData(["workspace-habits", habitStatus], [...prevHabits, tempHabit]);
       return { prevHabits, tempId: tempHabit.id };
     },
     onError: (err: any, _vars, context) => {
-      if (context?.prevHabits) queryClient.setQueryData(["ticktick-habits"], context.prevHabits);
+      if (context?.prevHabits) queryClient.setQueryData(["workspace-habits"], context.prevHabits);
       notify.error("Failed to create habit", err?.message || "Habit could not be saved.");
     },
     onSuccess: (data, _vars, context) => {
       if (data?.habit && context?.tempId) {
-        const prev = queryClient.getQueryData<Habit[]>(["ticktick-habits"]) || [];
+        const prev = queryClient.getQueryData<Habit[]>(["workspace-habits"]) || [];
         queryClient.setQueryData(
-          ["ticktick-habits"],
+          ["workspace-habits"],
           prev.map((h) => (h.id === context.tempId ? data.habit : h))
         );
       }
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habits"] });
     },
   });
 
@@ -1082,8 +1082,8 @@ export function useTickTick(filters: {
     },
     onMutate: async ({ habitId, date }) => {
       playTaskCompleteSound();
-      await queryClient.cancelQueries({ queryKey: ["ticktick-habits"] });
-      const prevHabits = queryClient.getQueryData<Habit[]>(["ticktick-habits", habitStatus]) || [];
+      await queryClient.cancelQueries({ queryKey: ["workspace-habits"] });
+      const prevHabits = queryClient.getQueryData<Habit[]>(["workspace-habits", habitStatus]) || [];
 
       const todayStr = new Date().toISOString().split("T")[0];
       const updated = prevHabits.map((h) => {
@@ -1115,17 +1115,17 @@ export function useTickTick(filters: {
         };
       });
 
-      queryClient.setQueryData(["ticktick-habits", habitStatus], updated);
+      queryClient.setQueryData(["workspace-habits", habitStatus], updated);
       return { prevHabits };
     },
     onError: (err: any, _vars, context) => {
-      if (context?.prevHabits) queryClient.setQueryData(["ticktick-habits", habitStatus], context.prevHabits);
+      if (context?.prevHabits) queryClient.setQueryData(["workspace-habits", habitStatus], context.prevHabits);
       notify.error("Failed to update habit check-in", err?.message || "Changes reverted.");
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-stats"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-analytics"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habits"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habit-analytics"] });
     },
   });
 
@@ -1137,22 +1137,22 @@ export function useTickTick(filters: {
       return res.json();
     },
     onMutate: async (habitId: string) => {
-      await queryClient.cancelQueries({ queryKey: ["ticktick-habits"] });
-      const prevHabits = queryClient.getQueryData<Habit[]>(["ticktick-habits", habitStatus]) || [];
+      await queryClient.cancelQueries({ queryKey: ["workspace-habits"] });
+      const prevHabits = queryClient.getQueryData<Habit[]>(["workspace-habits", habitStatus]) || [];
       queryClient.setQueryData(
-        ["ticktick-habits", habitStatus],
+        ["workspace-habits", habitStatus],
         prevHabits.filter((h) => h.id !== habitId)
       );
       return { prevHabits };
     },
     onError: (err: any, _vars, context) => {
-      if (context?.prevHabits) queryClient.setQueryData(["ticktick-habits", habitStatus], context.prevHabits);
+      if (context?.prevHabits) queryClient.setQueryData(["workspace-habits", habitStatus], context.prevHabits);
       notify.error("Failed to delete habit", err?.message || "Habit could not be deleted.");
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-stats"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-analytics"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habits"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habit-analytics"] });
     },
   });
 
@@ -1168,8 +1168,8 @@ export function useTickTick(filters: {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-analytics"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habits"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habit-analytics"] });
     },
   });
 
@@ -1184,9 +1184,9 @@ export function useTickTick(filters: {
     },
     onSuccess: (data) => {
       notify.success(data?.archived ? "Habit archived" : "Habit restored", "Habit status updated.");
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-sections"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-analytics"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habits"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habit-sections"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habit-analytics"] });
     },
   });
 
@@ -1203,8 +1203,8 @@ export function useTickTick(filters: {
     },
     onSuccess: () => {
       notify.info("Habit skipped for today", "Your streak remains protected.");
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-analytics"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habits"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habit-analytics"] });
     },
   });
 
@@ -1220,9 +1220,9 @@ export function useTickTick(filters: {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-stats"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-analytics"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habits"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habit-analytics"] });
     },
   });
 
@@ -1238,7 +1238,7 @@ export function useTickTick(filters: {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-sections"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habit-sections"] });
     },
   });
 
@@ -1254,7 +1254,7 @@ export function useTickTick(filters: {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-sections"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habit-sections"] });
     },
   });
 
@@ -1266,17 +1266,17 @@ export function useTickTick(filters: {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habit-sections"] });
-      queryClient.invalidateQueries({ queryKey: ["ticktick-habits"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habit-sections"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-habits"] });
     },
   });
 
   // ---------------- NEW FEATURE MUTATIONS ---------------- //
 
   const invalidateTasks = () => {
-    queryClient.invalidateQueries({ queryKey: ["ticktick-tasks"] });
-    queryClient.invalidateQueries({ queryKey: ["ticktick-lists"] });
-    queryClient.invalidateQueries({ queryKey: ["ticktick-stats"] });
+    queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
+    queryClient.invalidateQueries({ queryKey: ["workspace-lists"] });
+    queryClient.invalidateQueries({ queryKey: ["workspace-stats"] });
   };
 
   // Smart filters
@@ -1295,7 +1295,7 @@ export function useTickTick(filters: {
       if (!res.ok) throw new Error("Failed to create filter");
       return res.json();
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["ticktick-filters"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workspace-filters"] }),
   });
 
   const updateFilterMutation = useMutation({
@@ -1311,7 +1311,7 @@ export function useTickTick(filters: {
       if (!res.ok) throw new Error("Failed to update filter");
       return res.json();
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["ticktick-filters"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workspace-filters"] }),
   });
 
   const deleteFilterMutation = useMutation({
@@ -1320,7 +1320,7 @@ export function useTickTick(filters: {
       if (!res.ok) throw new Error("Failed to delete filter");
       return res.json();
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["ticktick-filters"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workspace-filters"] }),
   });
 
   // Countdowns
@@ -1340,7 +1340,7 @@ export function useTickTick(filters: {
       if (!res.ok) throw new Error("Failed to add countdown");
       return res.json();
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["ticktick-countdowns"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workspace-countdowns"] }),
   });
 
   const updateCountdownMutation = useMutation({
@@ -1353,7 +1353,7 @@ export function useTickTick(filters: {
       if (!res.ok) throw new Error("Failed to update countdown");
       return res.json();
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["ticktick-countdowns"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workspace-countdowns"] }),
   });
 
   const deleteCountdownMutation = useMutation({
@@ -1362,7 +1362,7 @@ export function useTickTick(filters: {
       if (!res.ok) throw new Error("Failed to delete countdown");
       return res.json();
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["ticktick-countdowns"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workspace-countdowns"] }),
   });
 
   // Settings (theme / timezone)
@@ -1376,7 +1376,7 @@ export function useTickTick(filters: {
       if (!res.ok) throw new Error("Failed to update settings");
       return res.json();
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["ticktick-settings"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workspace-settings"] }),
   });
 
   // Reminders
@@ -1395,7 +1395,7 @@ export function useTickTick(filters: {
       if (!res.ok) throw new Error("Failed to add reminder");
       return res.json();
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["ticktick-reminders"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workspace-reminders"] }),
   });
 
   const updateReminderMutation = useMutation({
@@ -1408,7 +1408,7 @@ export function useTickTick(filters: {
       if (!res.ok) throw new Error("Failed to update reminder");
       return res.json();
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["ticktick-reminders"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workspace-reminders"] }),
   });
 
   const deleteReminderMutation = useMutation({
@@ -1417,7 +1417,7 @@ export function useTickTick(filters: {
       if (!res.ok) throw new Error("Failed to delete reminder");
       return res.json();
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["ticktick-reminders"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workspace-reminders"] }),
   });
 
   // Collaboration
@@ -1437,7 +1437,7 @@ export function useTickTick(filters: {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-members"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-members"] });
       invalidateTasks();
     },
   });
@@ -1455,7 +1455,7 @@ export function useTickTick(filters: {
       if (!res.ok) throw new Error("Failed to update member");
       return res.json();
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["ticktick-members"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workspace-members"] }),
   });
 
   const removeMemberMutation = useMutation({
@@ -1465,7 +1465,7 @@ export function useTickTick(filters: {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-members"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-members"] });
       invalidateTasks();
     },
   });
@@ -1481,7 +1481,7 @@ export function useTickTick(filters: {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-assignees"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-assignees"] });
       invalidateTasks();
     },
   });
@@ -1503,7 +1503,7 @@ export function useTickTick(filters: {
       return res.json();
     },
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["ticktick-subscriptions"] }),
+      queryClient.invalidateQueries({ queryKey: ["workspace-subscriptions"] }),
   });
 
   const deleteSubscriptionMutation = useMutation({
@@ -1513,7 +1513,7 @@ export function useTickTick(filters: {
       return res.json();
     },
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["ticktick-subscriptions"] }),
+      queryClient.invalidateQueries({ queryKey: ["workspace-subscriptions"] }),
   });
 
   const syncSubscriptionMutation = useMutation({
@@ -1526,7 +1526,7 @@ export function useTickTick(filters: {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticktick-subscriptions"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-subscriptions"] });
       invalidateTasks();
     },
   });

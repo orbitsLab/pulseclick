@@ -22,9 +22,9 @@ import {
   PanelLeftClose,
   PanelLeft,
 } from "lucide-react";
-import { TaskList, Tag } from "@/hooks/use-ticktick";
+import { TaskList, Tag } from "@/hooks/use-workspace";
 import { toISODate, getTodayISO } from "@/lib/date-utils";
-import { TickTickContext } from "@/context/ticktick-context";
+import { WorkspaceContext } from "@/context/workspace-context";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -50,15 +50,15 @@ function SidebarItemSkeleton({
         >
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
             {hasDot && (
-              <Skeleton className={cn(dotClass, "shrink-0 bg-[var(--tt-panel)]/80")} />
+              <Skeleton className={cn(dotClass, "shrink-0 bg-[var(--app-panel)]/80")} />
             )}
             <Skeleton
-              className="h-3.5 rounded bg-[var(--tt-panel)]/80"
+              className="h-3.5 rounded bg-[var(--app-panel)]/80"
               style={{ width: `${widths[i % widths.length]}px` }}
             />
           </div>
           {i % 2 === 0 && (
-            <Skeleton className="h-3 w-4 rounded-full bg-[var(--tt-panel)]/60 shrink-0" />
+            <Skeleton className="h-3 w-4 rounded-full bg-[var(--app-panel)]/60 shrink-0" />
           )}
         </div>
       ))}
@@ -98,8 +98,8 @@ interface SidebarProps {
   isInitialLoadingFilters?: boolean;
 }
 
-export function TickTickSidebar(props: SidebarProps = {}) {
-  const context = useContext(TickTickContext);
+export function WorkspaceSidebar(props: SidebarProps = {}) {
+  const context = useContext(WorkspaceContext);
 
   const activeView = props.activeView ?? context?.activeView ?? "today";
   const activeListId = props.activeListId !== undefined ? props.activeListId : (context?.activeListId ?? null);
@@ -225,8 +225,8 @@ export function TickTickSidebar(props: SidebarProps = {}) {
   }
 
   const smartLists = [
-    { id: "all", label: "All", icon: <ListTodo className="h-4 w-4 text-[var(--tt-muted)]" />, count: allCount },
-    { id: "today", label: "Today", icon: <CalendarIcon className="h-4 w-4 text-[var(--tt-accent-text)]" />, count: todayCount },
+    { id: "all", label: "All", icon: <ListTodo className="h-4 w-4 text-[var(--app-muted)]" />, count: allCount },
+    { id: "today", label: "Today", icon: <CalendarIcon className="h-4 w-4 text-[var(--app-accent-text)]" />, count: todayCount },
     { id: "tomorrow", label: "Tomorrow", icon: <Sunrise className="h-4 w-4 text-amber-400" />, count: tomorrowCount },
     { id: "next7", label: "Next 7 Days", icon: <CalendarDays className="h-4 w-4 text-indigo-400" /> },
     { id: "inbox", label: "Inbox", icon: <Inbox className="h-4 w-4 text-blue-400" />, count: inboxCount },
@@ -249,22 +249,22 @@ export function TickTickSidebar(props: SidebarProps = {}) {
     <aside
       style={{ width: isSidebarOpen ? `${sidebarWidth}px` : 0 }}
       className={cn(
-        "relative flex flex-col h-full border-r border-[var(--tt-border)] bg-[var(--tt-panel-alt)] select-none flex-shrink-0 overflow-hidden",
+        "relative flex flex-col h-full border-r border-[var(--app-border)] bg-[var(--app-panel-alt)] select-none flex-shrink-0 overflow-hidden",
         isResizing ? "transition-none select-none" : "transition-[width] duration-200 ease-out",
         !isSidebarOpen && "border-r-0"
       )}
     >
       <div style={{ width: `${sidebarWidth}px` }} className="flex flex-col h-full min-w-0">
         {/* Search Input & Collapse Button */}
-        <div className="p-3 border-b border-[var(--tt-border)]/80 flex items-center gap-2">
+        <div className="p-3 border-b border-[var(--app-border)]/80 flex items-center gap-2">
           <div className="relative flex-1 min-w-0">
-            <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-[var(--tt-muted)]" />
+            <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-[var(--app-muted)]" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Search tasks..."
-              className="w-full rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel)] py-1.5 pl-8 pr-3 tt-label text-[var(--tt-text)] placeholder-[var(--tt-muted)] focus:border-[var(--tt-accent)] focus:outline-none"
+              className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] py-1.5 pl-8 pr-3 app-label text-[var(--app-text)] placeholder-[var(--app-muted)] focus:border-[var(--app-accent)] focus:outline-none"
             />
           </div>
 
@@ -273,7 +273,7 @@ export function TickTickSidebar(props: SidebarProps = {}) {
             onClick={onToggleCollapse}
             title="Collapse sidebar (Ctrl+B)"
             aria-label="Collapse sidebar"
-            className="p-1.5 rounded-lg text-[var(--tt-muted)] hover:text-[var(--tt-text)] hover:bg-[var(--tt-panel)] border border-transparent hover:border-[var(--tt-border)] transition-colors cursor-pointer shrink-0"
+            className="p-1.5 rounded-lg text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel)] border border-transparent hover:border-[var(--app-border)] transition-colors cursor-pointer shrink-0"
           >
             <PanelLeftClose className="h-4 w-4" />
           </button>
@@ -289,14 +289,14 @@ export function TickTickSidebar(props: SidebarProps = {}) {
                 key={item.id}
                 type="button"
                 onClick={() => onSelectView(item.id, null, null)}
-                className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 tt-label font-medium transition-colors ${ isSelected ? "bg-[var(--tt-accent)]/10 text-[var(--tt-accent-text)] dark:bg-[var(--tt-accent)]/15 font-bold" : "text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/60 dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]/60" }`}
+                className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 app-label font-medium transition-colors ${ isSelected ? "bg-[var(--app-accent)]/10 text-[var(--app-accent-text)] dark:bg-[var(--app-accent)]/15 font-bold" : "text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/60 dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]/60" }`}
               >
                 <div className="flex items-center gap-2.5">
                   {item.icon}
                   <span>{item.label}</span>
                 </div>
                 {item.count !== undefined && item.count > 0 && (
-                  <span className="rounded-full bg-[var(--tt-panel-alt)]/80 px-1.5 py-0.5 tt-meta text-[var(--tt-text)] font-bold">
+                  <span className="rounded-full bg-[var(--app-panel-alt)]/80 px-1.5 py-0.5 app-meta text-[var(--app-text)] font-bold">
                     {item.count}
                   </span>
                 )}
@@ -309,7 +309,7 @@ export function TickTickSidebar(props: SidebarProps = {}) {
         {(filters.length > 0 || Boolean(props.onOpenFilterPanel || context?.setIsFilterPanelOpen)) && (
           <div className="space-y-0.5">
             <div className="flex items-center justify-between px-2.5 pb-1">
-              <span className="tt-overline font-semibold text-[var(--tt-muted)]">
+              <span className="app-overline font-semibold text-[var(--app-muted)]">
                 Filters
               </span>
               {onOpenFilterPanel && (
@@ -318,7 +318,7 @@ export function TickTickSidebar(props: SidebarProps = {}) {
                   onClick={onOpenFilterPanel}
                   title="Manage smart filters"
                   aria-label="Manage smart filters"
-                  className="rounded p-0.5 text-[var(--tt-muted)] transition-colors hover:bg-[var(--tt-panel-alt)]/60 hover:text-[var(--tt-text)] dark:hover:bg-[var(--tt-panel-alt)] dark:hover:text-[var(--tt-text)]"
+                  className="rounded p-0.5 text-[var(--app-muted)] transition-colors hover:bg-[var(--app-panel-alt)]/60 hover:text-[var(--app-text)] dark:hover:bg-[var(--app-panel-alt)] dark:hover:text-[var(--app-text)]"
                 >
                   <Plus className="h-3.5 w-3.5" />
                 </button>
@@ -331,7 +331,7 @@ export function TickTickSidebar(props: SidebarProps = {}) {
               <button
                 type="button"
                 onClick={onOpenFilterPanel}
-                className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 tt-label font-medium text-[var(--tt-muted)] transition-colors hover:bg-[var(--tt-panel-alt)]/60"
+                className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 app-label font-medium text-[var(--app-muted)] transition-colors hover:bg-[var(--app-panel-alt)]/60"
               >
                 <Filter className="h-4 w-4" />
                 <span>Create a filter</span>
@@ -344,7 +344,7 @@ export function TickTickSidebar(props: SidebarProps = {}) {
                     key={filter.id}
                     type="button"
                     onClick={() => onSelectFilter?.(isSelected ? null : filter.id)}
-                    className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 tt-label font-medium transition-colors ${ isSelected ? "bg-[var(--tt-accent)]/10 text-[var(--tt-accent-text)] font-bold" : "text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/60 dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]/60" }`}
+                    className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 app-label font-medium transition-colors ${ isSelected ? "bg-[var(--app-accent)]/10 text-[var(--app-accent-text)] font-bold" : "text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/60 dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]/60" }`}
                   >
                     <span
                       className="h-2 w-2 shrink-0 rounded-full"
@@ -360,20 +360,20 @@ export function TickTickSidebar(props: SidebarProps = {}) {
 
         {/* Custom Lists Section */}
         <div>
-          <div className="flex items-center justify-between px-2 py-1 text-[var(--tt-muted)]">
+          <div className="flex items-center justify-between px-2 py-1 text-[var(--app-muted)]">
             <button
               type="button"
               onClick={() => setListsCollapsed(!listsCollapsed)}
-              className="flex items-center gap-1 hover:text-[var(--tt-text)]"
+              className="flex items-center gap-1 hover:text-[var(--app-text)]"
             >
               {listsCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-              <span className="tt-overline font-semibold">Lists</span>
+              <span className="app-overline font-semibold">Lists</span>
             </button>
             <button
               type="button"
               onClick={() => setShowAddList(true)}
               title="Add List"
-              className="rounded p-0.5 hover:bg-[var(--tt-panel-alt)] hover:text-[var(--tt-text)]"
+              className="rounded p-0.5 hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-text)]"
             >
               <Plus className="h-3.5 w-3.5" />
             </button>
@@ -391,7 +391,7 @@ export function TickTickSidebar(props: SidebarProps = {}) {
                     <div
                       key={list.id}
                       onClick={() => onSelectView("list", list.id, null)}
-                      className={`group flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 tt-label font-medium transition-colors cursor-pointer ${ isSelected ? "bg-[var(--tt-accent)]/10 text-[var(--tt-accent-text)] dark:bg-[var(--tt-accent)]/15 font-bold" : "text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/60 dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]/60" }`}
+                      className={`group flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 app-label font-medium transition-colors cursor-pointer ${ isSelected ? "bg-[var(--app-accent)]/10 text-[var(--app-accent-text)] dark:bg-[var(--app-accent)]/15 font-bold" : "text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/60 dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]/60" }`}
                     >
                       <div className="flex items-center gap-2.5 truncate flex-1 min-w-0">
                         <span
@@ -404,7 +404,7 @@ export function TickTickSidebar(props: SidebarProps = {}) {
                       <div className="flex items-center gap-1">
                         {/* Count badge (hidden on group hover if actions exist) */}
                         {count > 0 && (
-                          <span className="group-hover:hidden rounded-full bg-[var(--tt-panel-alt)]/80 px-1.5 py-0.5 tt-meta text-[var(--tt-text)] font-bold">
+                          <span className="group-hover:hidden rounded-full bg-[var(--app-panel-alt)]/80 px-1.5 py-0.5 app-meta text-[var(--app-text)] font-bold">
                             {count}
                           </span>
                         )}
@@ -420,7 +420,7 @@ export function TickTickSidebar(props: SidebarProps = {}) {
                               setEditListColor(list.color);
                             }}
                             title="Edit List"
-                            className="rounded p-0.5 text-[var(--tt-muted)] hover:text-white hover:bg-[var(--tt-panel-alt)]/50"
+                            className="rounded p-0.5 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)]/50"
                           >
                             <Pencil className="h-3 w-3" />
                           </button>
@@ -428,7 +428,7 @@ export function TickTickSidebar(props: SidebarProps = {}) {
                             type="button"
                             onClick={(e) => handleDeleteListClick(e, list.id, list.name)}
                             title="Delete List"
-                            className="rounded p-0.5 text-[var(--tt-muted)] hover:text-rose-400 hover:bg-[var(--tt-panel-alt)]/50"
+                            className="rounded p-0.5 text-[var(--app-muted)] hover:text-rose-400 hover:bg-[var(--app-panel-alt)]/50"
                           >
                             <Trash2 className="h-3 w-3" />
                           </button>
@@ -444,20 +444,20 @@ export function TickTickSidebar(props: SidebarProps = {}) {
 
         {/* Tags Section */}
         <div>
-          <div className="flex items-center justify-between px-2 py-1 text-[var(--tt-muted)]">
+          <div className="flex items-center justify-between px-2 py-1 text-[var(--app-muted)]">
             <button
               type="button"
               onClick={() => setTagsCollapsed(!tagsCollapsed)}
-              className="flex items-center gap-1 hover:text-[var(--tt-text)]"
+              className="flex items-center gap-1 hover:text-[var(--app-text)]"
             >
               {tagsCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-              <span className="tt-overline font-semibold">Tags</span>
+              <span className="app-overline font-semibold">Tags</span>
             </button>
             <button
               type="button"
               onClick={() => setShowAddTag(true)}
               title="Add Tag"
-              className="rounded p-0.5 hover:bg-[var(--tt-panel-alt)] hover:text-[var(--tt-text)]"
+              className="rounded p-0.5 hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-text)]"
             >
               <Plus className="h-3.5 w-3.5" />
             </button>
@@ -475,7 +475,7 @@ export function TickTickSidebar(props: SidebarProps = {}) {
                     <div
                       key={tag.id}
                       onClick={() => onSelectView("tag", null, tag.name)}
-                      className={`group flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 tt-label font-medium transition-colors cursor-pointer ${ isSelected ? "bg-indigo-500/15 text-indigo-400 font-bold" : "text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/60 dark:text-[var(--tt-muted)] dark:hover:bg-[var(--tt-panel-alt)]/60" }`}
+                      className={`group flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 app-label font-medium transition-colors cursor-pointer ${ isSelected ? "bg-indigo-500/15 text-indigo-400 font-bold" : "text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/60 dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]/60" }`}
                     >
                       <div className="flex items-center gap-2 truncate flex-1 min-w-0">
                         <TagIcon className="h-3 w-3 text-indigo-400 flex-shrink-0" />
@@ -484,14 +484,14 @@ export function TickTickSidebar(props: SidebarProps = {}) {
 
                       <div className="flex items-center gap-1">
                         {count > 0 && (
-                          <span className="group-hover:hidden tt-meta text-[var(--tt-muted)]">{count}</span>
+                          <span className="group-hover:hidden app-meta text-[var(--app-muted)]">{count}</span>
                         )}
 
                         <button
                           type="button"
                           onClick={(e) => handleDeleteTagClick(e, tag.id, tag.name)}
                           title="Delete Tag"
-                          className="hidden group-hover:block rounded p-0.5 text-[var(--tt-muted)] hover:text-rose-400 hover:bg-[var(--tt-panel-alt)]/50"
+                          className="hidden group-hover:block rounded p-0.5 text-[var(--app-muted)] hover:text-rose-400 hover:bg-[var(--app-panel-alt)]/50"
                         >
                           <X className="h-3 w-3" />
                         </button>
@@ -504,30 +504,30 @@ export function TickTickSidebar(props: SidebarProps = {}) {
           )}
         </div>
 
-        {/* TickTick Signature Mini Calendar Widget */}
-        <div className="border-t border-[var(--tt-border)]/80 pt-3">
-          <div className="flex items-center justify-between px-2 py-1 text-[var(--tt-muted)]">
+        {/* Interactive Mini Calendar Widget */}
+        <div className="border-t border-[var(--app-border)]/80 pt-3">
+          <div className="flex items-center justify-between px-2 py-1 text-[var(--app-muted)]">
             <button
               type="button"
               onClick={() => setMiniCalCollapsed(!miniCalCollapsed)}
-              className="flex items-center gap-1 hover:text-[var(--tt-text)]"
+              className="flex items-center gap-1 hover:text-[var(--app-text)]"
             >
               {miniCalCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-              <span className="tt-overline font-semibold">Mini Calendar</span>
+              <span className="app-overline font-semibold">Mini Calendar</span>
             </button>
             <div className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => setMiniCalDate(new Date(calYear, calMonth - 1, 1))}
-                className="rounded p-0.5 text-[var(--tt-muted)] hover:text-white hover:bg-[var(--tt-panel-alt)]"
+                className="rounded p-0.5 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)]"
               >
                 <ChevronLeft className="h-3 w-3" />
               </button>
-              <span className="tt-meta font-semibold text-[var(--tt-muted)]">{miniCalLabel}</span>
+              <span className="app-meta font-semibold text-[var(--app-muted)]">{miniCalLabel}</span>
               <button
                 type="button"
                 onClick={() => setMiniCalDate(new Date(calYear, calMonth + 1, 1))}
-                className="rounded p-0.5 text-[var(--tt-muted)] hover:text-white hover:bg-[var(--tt-panel-alt)]"
+                className="rounded p-0.5 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)]"
               >
                 <ChevronRight className="h-3 w-3" />
               </button>
@@ -536,7 +536,7 @@ export function TickTickSidebar(props: SidebarProps = {}) {
 
           {!miniCalCollapsed && (
             <div className="p-1 mt-1">
-              <div className="grid grid-cols-7 gap-0.5 text-center tt-meta font-bold text-[var(--tt-muted)] uppercase pb-1">
+              <div className="grid grid-cols-7 gap-0.5 text-center app-meta font-bold text-[var(--app-muted)] uppercase pb-1">
                 <span>M</span>
                 <span>T</span>
                 <span>W</span>
@@ -545,7 +545,7 @@ export function TickTickSidebar(props: SidebarProps = {}) {
                 <span>S</span>
                 <span>S</span>
               </div>
-              <div className="grid grid-cols-7 gap-0.5 text-center tt-meta">
+              <div className="grid grid-cols-7 gap-0.5 text-center app-meta">
                 {Array.from({ length: calStartOffset }).map((_, i) => (
                   <span key={`off-${i}`} className="h-6 w-6" />
                 ))}
@@ -560,7 +560,7 @@ export function TickTickSidebar(props: SidebarProps = {}) {
                       key={dayNum}
                       type="button"
                       onClick={() => onSelectDate?.(iso)}
-                      className={`flex h-6 w-6 items-center justify-center rounded-md font-semibold transition-all ${ isToday ? "bg-[var(--tt-accent-strong)] text-white font-bold shadow-xs" : "text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)] hover:text-[var(--tt-text)] dark:text-[var(--tt-muted)] dark:hover:text-white" }`}
+                      className={`flex h-6 w-6 items-center justify-center rounded-md font-semibold transition-all ${ isToday ? "bg-[var(--app-accent-strong)] text-white font-bold shadow-xs" : "text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)] dark:hover:text-white" }`}
                     >
                       {dayNum}
                     </button>
@@ -576,8 +576,8 @@ export function TickTickSidebar(props: SidebarProps = {}) {
       {/* New List Modal */}
       {showAddList && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-xs rounded-xl border border-[var(--tt-border)] bg-[var(--tt-rail)] p-4 text-[var(--tt-text)] shadow-xl">
-            <h4 className="tt-label font-semibold mb-3 uppercase tracking-wider">New List</h4>
+          <div className="w-full max-w-xs rounded-xl border border-[var(--app-border)] bg-[var(--app-rail)] p-4 text-[var(--app-text)] shadow-xl">
+            <h4 className="app-label font-semibold mb-3 uppercase tracking-wider">New List</h4>
             <form onSubmit={handleCreateList} className="space-y-3">
               <input
                 type="text"
@@ -586,16 +586,16 @@ export function TickTickSidebar(props: SidebarProps = {}) {
                 value={newListName}
                 onChange={(e) => setNewListName(e.target.value)}
                 placeholder="List name (e.g. Work, Shopping)"
-                className="w-full rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-3 py-2 tt-label text-white focus:outline-none focus:border-[var(--tt-accent)]"
+                className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
               />
               <div className="flex items-center gap-2">
-                <span className="tt-label text-[var(--tt-muted)]">Color:</span>
+                <span className="app-label text-[var(--app-muted)]">Color:</span>
                 {colorPalette.map((c) => (
                   <button
                     key={c}
                     type="button"
                     onClick={() => setNewListColor(c)}
-                    className={`h-5 w-5 rounded-full ${newListColor === c ? "ring-2 ring-[var(--tt-panel)] ring-offset-1 ring-offset-[var(--tt-panel)]" : ""}`}
+                    className={`h-5 w-5 rounded-full ${newListColor === c ? "ring-2 ring-[var(--app-panel)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
                     style={{ backgroundColor: c }}
                   />
                 ))}
@@ -604,13 +604,13 @@ export function TickTickSidebar(props: SidebarProps = {}) {
                 <button
                   type="button"
                   onClick={() => setShowAddList(false)}
-                  className="rounded px-2.5 py-1 tt-label text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)]"
+                  className="rounded px-2.5 py-1 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded bg-[var(--tt-accent-strong)] px-3 py-1 tt-label font-medium text-white hover:bg-[var(--tt-accent-strong)]"
+                  className="rounded bg-[var(--app-accent-strong)] px-3 py-1 app-label font-medium text-white hover:bg-[var(--app-accent-strong)]"
                 >
                   Save
                 </button>
@@ -623,8 +623,8 @@ export function TickTickSidebar(props: SidebarProps = {}) {
       {/* Edit List Modal */}
       {editingList && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-xs rounded-xl border border-[var(--tt-border)] bg-[var(--tt-rail)] p-4 text-[var(--tt-text)] shadow-xl">
-            <h4 className="tt-label font-semibold mb-3 uppercase tracking-wider">Edit List</h4>
+          <div className="w-full max-w-xs rounded-xl border border-[var(--app-border)] bg-[var(--app-rail)] p-4 text-[var(--app-text)] shadow-xl">
+            <h4 className="app-label font-semibold mb-3 uppercase tracking-wider">Edit List</h4>
             <form onSubmit={handleSaveEditList} className="space-y-3">
               <input
                 type="text"
@@ -633,16 +633,16 @@ export function TickTickSidebar(props: SidebarProps = {}) {
                 value={editListName}
                 onChange={(e) => setEditListName(e.target.value)}
                 placeholder="List name"
-                className="w-full rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-3 py-2 tt-label text-white focus:outline-none focus:border-[var(--tt-accent)]"
+                className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
               />
               <div className="flex items-center gap-2">
-                <span className="tt-label text-[var(--tt-muted)]">Color:</span>
+                <span className="app-label text-[var(--app-muted)]">Color:</span>
                 {colorPalette.map((c) => (
                   <button
                     key={c}
                     type="button"
                     onClick={() => setEditListColor(c)}
-                    className={`h-5 w-5 rounded-full ${editListColor === c ? "ring-2 ring-[var(--tt-panel)] ring-offset-1 ring-offset-[var(--tt-panel)]" : ""}`}
+                    className={`h-5 w-5 rounded-full ${editListColor === c ? "ring-2 ring-[var(--app-panel)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
                     style={{ backgroundColor: c }}
                   />
                 ))}
@@ -651,13 +651,13 @@ export function TickTickSidebar(props: SidebarProps = {}) {
                 <button
                   type="button"
                   onClick={() => setEditingList(null)}
-                  className="rounded px-2.5 py-1 tt-label text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)]"
+                  className="rounded px-2.5 py-1 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded bg-[var(--tt-accent-strong)] px-3 py-1 tt-label font-medium text-white hover:bg-[var(--tt-accent-strong)]"
+                  className="rounded bg-[var(--app-accent-strong)] px-3 py-1 app-label font-medium text-white hover:bg-[var(--app-accent-strong)]"
                 >
                   Update
                 </button>
@@ -670,8 +670,8 @@ export function TickTickSidebar(props: SidebarProps = {}) {
       {/* New Tag Modal */}
       {showAddTag && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-xs rounded-xl border border-[var(--tt-border)] bg-[var(--tt-rail)] p-4 text-[var(--tt-text)] shadow-xl">
-            <h4 className="tt-label font-semibold mb-3 uppercase tracking-wider">New Tag</h4>
+          <div className="w-full max-w-xs rounded-xl border border-[var(--app-border)] bg-[var(--app-rail)] p-4 text-[var(--app-text)] shadow-xl">
+            <h4 className="app-label font-semibold mb-3 uppercase tracking-wider">New Tag</h4>
             <form onSubmit={handleCreateTag} className="space-y-3">
               <input
                 type="text"
@@ -680,19 +680,19 @@ export function TickTickSidebar(props: SidebarProps = {}) {
                 value={newTagName}
                 onChange={(e) => setNewTagName(e.target.value)}
                 placeholder="Tag name (e.g. urgent, idea)"
-                className="w-full rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-3 py-2 tt-label text-white focus:outline-none focus:border-[var(--tt-accent)]"
+                className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
               />
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowAddTag(false)}
-                  className="rounded px-2.5 py-1 tt-label text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)]"
+                  className="rounded px-2.5 py-1 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded bg-[var(--tt-accent-strong)] px-3 py-1 tt-label font-medium text-white hover:bg-[var(--tt-accent-strong)]"
+                  className="rounded bg-[var(--app-accent-strong)] px-3 py-1 app-label font-medium text-white hover:bg-[var(--app-accent-strong)]"
                 >
                   Save
                 </button>
@@ -742,9 +742,9 @@ export function TickTickSidebar(props: SidebarProps = {}) {
           onMouseDown={handleMouseDown}
           onDoubleClick={() => onWidthChange(260)}
           title="Drag to resize, double-click to reset width"
-          className="absolute top-0 right-0 w-1.5 h-full cursor-col-resize hover:bg-[var(--tt-accent)]/50 active:bg-[var(--tt-accent)] transition-colors z-20 group"
+          className="absolute top-0 right-0 w-1.5 h-full cursor-col-resize hover:bg-[var(--app-accent)]/50 active:bg-[var(--app-accent)] transition-colors z-20 group"
         >
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-full bg-[var(--tt-border)] group-hover:bg-[var(--tt-accent)] transition-colors opacity-0 group-hover:opacity-100" />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-full bg-[var(--app-border)] group-hover:bg-[var(--app-accent)] transition-colors opacity-0 group-hover:opacity-100" />
         </div>
       )}
     </aside>

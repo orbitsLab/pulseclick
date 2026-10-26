@@ -66,7 +66,7 @@ export function ThemePicker({
         if (!open) onClose();
       }}
     >
-      <DialogContent className="max-h-[88vh] gap-0 overflow-hidden border border-[var(--tt-border)] bg-[var(--tt-panel)] p-0 text-[var(--tt-text)] ring-0 sm:max-w-3xl">
+      <DialogContent className="max-h-[88vh] gap-0 overflow-hidden border border-[var(--app-border)] bg-[var(--app-panel)] p-0 text-[var(--app-text)] ring-0 sm:max-w-3xl">
         <ThemePickerBody
           isOpen={isOpen}
           themeId={themeId}
@@ -111,11 +111,11 @@ function ThemePickerBody({
 
   return (
     <div className="flex max-h-[88vh] flex-col">
-      <DialogHeader className="border-b border-[var(--tt-border)] py-4 pr-12 pl-5">
-        <DialogTitle className="font-extrabold tracking-tight text-[var(--tt-text)]">
+      <DialogHeader className="border-b border-[var(--app-border)] py-4 pr-12 pl-5">
+        <DialogTitle className="font-extrabold tracking-tight text-[var(--app-text)]">
           Themes
         </DialogTitle>
-        <DialogDescription className="tt-label text-[var(--tt-muted)]">
+        <DialogDescription className="app-label text-[var(--app-muted)]">
           Choose from {THEMES.length} themes to personalize your workspace.
         </DialogDescription>
       </DialogHeader>
@@ -123,7 +123,7 @@ function ThemePickerBody({
       <div className="flex-1 space-y-5 overflow-y-auto px-5 py-4">
         {/* Theme grid */}
         <section>
-          <h3 className="mb-2 tt-label font-semibold text-[var(--tt-text)]">
+          <h3 className="mb-2 app-label font-semibold text-[var(--app-text)]">
             Workspace theme
           </h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -137,10 +137,10 @@ function ThemePickerBody({
                   aria-label={`Use ${theme.name} theme`}
                   onClick={() => handleSelect(theme.id)}
                   className={cn(
-                    "flex flex-col gap-2 rounded-xl border p-2 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tt-accent)]/50",
+                    "flex flex-col gap-2 rounded-xl border p-2 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/50",
                     isSelected
-                      ? "border-[var(--tt-border)]"
-                      : "border-[var(--tt-border)] hover:border-[var(--tt-border)] dark:border-[var(--tt-border)] dark:hover:border-[var(--tt-border)]"
+                      ? "border-[var(--app-border)]"
+                      : "border-[var(--app-border)] hover:border-[var(--app-border)] dark:border-[var(--app-border)] dark:hover:border-[var(--app-border)]"
                   )}
                   style={
                     isSelected
@@ -160,14 +160,14 @@ function ThemePickerBody({
                     )}
                   </div>
                   <div className="flex items-center justify-between gap-1.5">
-                    <span className="truncate tt-meta font-bold text-[var(--tt-text)]">
+                    <span className="truncate app-meta font-bold text-[var(--app-text)]">
                       {theme.name}
                     </span>
                     <span
                       className={cn(
-                        "shrink-0 rounded-full border px-1.5 py-0.5 tt-meta font-bold tracking-wider uppercase",
+                        "shrink-0 rounded-full border px-1.5 py-0.5 app-meta font-bold tracking-wider uppercase",
                         theme.mode === "dark"
-                          ? "border-[var(--tt-border)] bg-[var(--tt-panel-alt)] text-[var(--tt-text)] dark:border-[var(--tt-border)] dark:bg-[var(--tt-panel-alt)] dark:text-[var(--tt-muted)]"
+                          ? "border-[var(--app-border)] bg-[var(--app-panel-alt)] text-[var(--app-text)] dark:border-[var(--app-border)] dark:bg-[var(--app-panel-alt)] dark:text-[var(--app-muted)]"
                           : "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300"
                       )}
                     >
@@ -182,10 +182,10 @@ function ThemePickerBody({
 
         {/* List backgrounds (read-only preview gallery) */}
         <section>
-          <h3 className="mb-1 tt-label font-semibold text-[var(--tt-text)]">
+          <h3 className="mb-1 app-label font-semibold text-[var(--app-text)]">
             List backgrounds
           </h3>
-          <p className="mb-2 tt-meta text-[var(--tt-muted)]">
+          <p className="mb-2 app-meta text-[var(--app-muted)]">
             Preview only — per-list backgrounds are customised in Settings.
           </p>
           <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-8">
@@ -199,10 +199,10 @@ function ThemePickerBody({
                 >
                   <div
                     aria-hidden="true"
-                    className="h-10 w-full rounded-lg border border-[var(--tt-border)]"
+                    className="h-10 w-full rounded-lg border border-[var(--app-border)]"
                     style={{ background: background.css }}
                   />
-                  <span className="w-full truncate text-center tt-meta text-[var(--tt-muted)]">
+                  <span className="w-full truncate text-center app-meta text-[var(--app-muted)]">
                     {background.name}
                   </span>
                 </div>
@@ -212,8 +212,8 @@ function ThemePickerBody({
         </section>
       </div>
 
-      <div className="flex items-center justify-end gap-2 border-t border-[var(--tt-border)] px-5 py-3">
-        <span className="mr-auto tt-meta text-[var(--tt-muted)]">
+      <div className="flex items-center justify-end gap-2 border-t border-[var(--app-border)] px-5 py-3">
+        <span className="mr-auto app-meta text-[var(--app-muted)]">
           {activeTheme.name} · {activeTheme.mode} mode
         </span>
         <Button

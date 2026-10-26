@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getTheme, DEFAULT_THEME_ID } from "@/lib/themes";
 
 export async function GET() {
   try {
@@ -17,8 +18,10 @@ export async function GET() {
       select: { id: true, background: true },
     });
 
+    const effectiveThemeId = getTheme(settings?.themeId).id;
+
     return NextResponse.json({
-      themeId: settings?.themeId ?? "ticktick-blue",
+      themeId: effectiveThemeId,
       timezone: settings?.timezone ?? "UTC",
       listBackgrounds: Object.fromEntries(
         lists.map((l) => [l.id, l.background ?? "none"])
@@ -36,7 +39,9 @@ export async function PATCH(req: Request) {
 
     const body = await req.json();
     const updateData: any = {};
-    if (body.themeId !== undefined) updateData.themeId = String(body.themeId);
+    if (body.themeId !== undefined) {
+      updateData.themeId = getTheme(String(body.themeId)).id;
+    }
     if (body.timezone !== undefined) updateData.timezone = String(body.timezone);
 
     if (Object.keys(updateData).length) {
@@ -49,7 +54,7 @@ export async function PATCH(req: Request) {
     });
 
     return NextResponse.json({
-      themeId: updated?.themeId ?? "ticktick-blue",
+      themeId: getTheme(updated?.themeId).id,
       timezone: updated?.timezone ?? "UTC",
     });
   } catch (err: any) {

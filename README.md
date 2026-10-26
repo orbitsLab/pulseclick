@@ -1,169 +1,178 @@
-# PulseTick — Tasks, Schedule, Habits & Focus
+# PulseFlow — Tasks, Schedule, Habits & Focus
 
-A personal productivity workspace built with **Next.js 16**, **React 19**, **Prisma ORM**,
-**PostgreSQL**, **TanStack Query v5**, and the **Web Audio API**.
+A modern, unified personal productivity workspace built with **Next.js 16**, **React 19**, **Prisma ORM**, **PostgreSQL**, **TanStack Query v5**, and the **Web Audio API**.
 
-PulseTick is a reimplementation of the capability set that **TickTick** advertises on
-ticktick.com — it is not an official TickTick product and carries no TickTick branding.
-The feature set was derived from the live product site using the
-[REA reverse-engineering tooling](https://github.com/morluto/rea): the public marketing pages were
-captured in a real browser (DOM, accessibility tree, network, screenshots) and the shipped web
-bundle was statically analysed. Every module below maps to a capability the product advertises.
+PulseFlow combines task management, calendar scheduling, habit tracking, and deep focus into a cohesive, quiet, and fast daily workspace.
 
 ---
 
-## Evidence trail — what was observed and where it came from
+## Features
 
-| Evidence | Method | What it produced |
-| --- | --- | --- |
-| `https://ticktick.com/` | Browser scenario (DOM + a11y + network + screenshot) | Marketing IA, brand palette (`#4772fa`, `#191919`, `#fafafa`), font family, nav structure |
-| `https://ticktick.com/features` | Browser scenario + HTML extraction | The authoritative feature inventory reproduced below |
-| `https://ticktick.com/signin` | Browser scenario (a11y tree) | Auth surface: email/password, Google, Apple, forgot-password |
-| `d107mjio2rjf74.cloudfront.net/web/static/build/...` | `analyze_javascript_application` (REA) | The real web app's SPA bundle graph (807 tools, partial coverage) |
-| `https://ticktick.com/sitemap.xml` | HTTP fetch | Full public page inventory |
-| The running clone | Browser scenario + screenshot review | Runtime verification of every module |
+### ⚡ Quick Capture & Natural Language Parsing
+- **NLP Time Setting** (`lib/nlp.ts`) — Parses natural language directly into dates, times, recurrence rules, priorities, tags, and durations. Features live "Understood" previews in both the quick-add input bar and the modal dialog. Handles expressions like `tomorrow`, `next monday`, `in 3 days`, `every weekday`, `at 5pm`, `#work`, and `!3` (high priority).
+- **Voice Dictation** — Speech-to-text capture using the Web Speech API in quick-add surfaces.
+- **Global Command Palette** (`⌘K` / `Ctrl+K`) — Jump directly between modules, search tasks and lists, or switch views instantly.
 
----
+### 📋 Comprehensive Task Management
+- **Multiple Views**:
+  - **Task List View** — Group by list, tag, date, or priority; sorting, drag-to-reorder, and floating batch actions.
+  - **Kanban Board** — Visual columns organized by status or priority with drag-and-drop movement.
+  - **Eisenhower Matrix** — 4-quadrant prioritization (Urgent/Important, Important, Urgent, Neither) with drag-to-reprioritize.
+  - **Timeline Schedule** — Gantt-style daily timeline with drag-to-move, drag-to-resize duration, and snap-to-grid.
+  - **Calendar View** — Full month, week, day, and agenda views with appointment-style time slots and multi-day spans.
+- **Task Inspector** — In-depth task sidebar for markdown descriptions, checkable subtasks, file attachments, reminders, due dates, and recurrence rules.
+- **Smart Filters** — Saved filter builder with criteria for priorities, tags, lists, due date windows, completion status, and keyword matching.
 
-## Feature parity map
+### 🔥 Daily Habit Tracker
+- **Habit Sections** — Organize routines into custom time-of-day sections (e.g., Morning Routine, Afternoon Focus, Evening Wind-down).
+- **Streak & Consistency Tracking** — Best and current streaks, completion rates, and monthly consistency.
+- **Visual Heatmap** — Year-at-a-glance GitHub-style activity grid showing daily completion density.
+- **Value & Check Habits** — Track binary check-offs or numeric targets (glasses of water, pages read, meditation minutes).
+- **Habit Logs & Archiving** — Complete historical logging with notes and ability to archive habits without losing data.
 
-Observed on ticktick.com/features → implemented here.
+### ⏱ Pomodoro & Focus Timer
+- **Customizable Intervals** — Standard 25/5 work-rest splits or fully customized durations.
+- **Ambient Soundscapes** — Synthesized real-time audio generators for White Noise, Rain, Ocean Waves, and Cafe ambience via the Web Audio API without external audio file dependencies.
+- **Task Association & Stats** — Link focus sessions to specific tasks and view daily, weekly, and all-time focus statistics.
 
-### Capture tasks quickly
-- **NLP time setting** — `lib/nlp.ts` parses natural language into date, time, repeat rule,
-  priority, tags and duration. Live "Understood" preview in the quick-add bar and the floating
-  quick-add modal. Handles `tomorrow`, `next monday`, `in 3 days`, `jan 5 2027`, `25-12`,
-  `every friday`, `every 2 weeks`, `every weekday`, `on the 1st`, `5pm`, `at 9am`, `tonight`,
-  `eod`, `end of week`, `for 90m`, `#tag`, `!1`/`!2`/`!3`, `high/medium/low`.
-- **Voice input** — Web Speech API dictation button in both quick-add surfaces.
-- **Quick capture** — floating action button + always-visible task input bar.
+### ⏳ Event Countdowns & Milestones
+- **Live Countdown Cards** — Track upcoming deadlines, milestones, anniversaries, and holidays.
+- **Progress Tracking** — Visual progress bars toward target dates with custom emoji icons and colors.
 
-### Effortless task management
-- **Lists** — unlimited coloured lists with per-list background, task counts, create/rename/delete.
-- **Smart filters** — saved filter model (`Filter`), criteria builder (priority, tags, lists,
-  due range, status, description/subtask presence, pinned, keyword), live criteria summary,
-  sidebar entries, server-side query translation (`lib/filters.ts`).
-- **Tags** — coloured tag chips, per-task tag toggles, tag counts.
+### 🎨 Personalization & Multi-Theme Engine
+- **40+ Themes** (`lib/themes.ts`) — Curated light, dark, and OLED midnight themes with instant CSS variable switching.
+- **Custom List Backgrounds** — Gradients and subtle geometric patterns for individual list headers.
+- **Three-Voice Typography** — Onest for clean UI grotesque readability, Instrument Serif for elegant editorial display headers, and Geist Mono for tabular figures and clocks.
 
-### Powerful reminder features
-- **Multiple notifications** — `Reminder` model, several reminders per task, each independently
-  toggled and removable.
-- **Constant reminder** — `CONSTANT` reminder type ("keeps ringing until done").
-- **Repeat reminder** — daily / weekly / monthly / yearly / custom, with interval, weekday
-  selection and an end date; the real recurrence engine (`lib/recurrence.ts`) advances a recurring
-  task to its next occurrence on completion instead of duplicating it.
-- **Email / location / daily reminders** — *not shipped.* The `Reminder` model carries the
-  in-app kinds only (`AT_TIME`, `5_MIN`, `15_MIN`, `30_MIN`, `1_HOUR`, `1_DAY`, `CONSTANT`).
-  Email delivery, location geofencing and lock-screen notifications are native-app features.
-
-### Schedule your day
-- **Calendar** — Month, **Week**, **Agenda** and **Year** views, multi-day and multi-week
-  navigation, mini calendar in the sidebar.
-- **Timeline** — Gantt-style schedule with drag-to-move, drag-to-resize, duration editing,
-  today marker, unscheduled tray.
-
-### Multiple view modes
-- **List** — three-pane layout (lists · tasks · details) with grouping, sorting, bulk actions,
-  priority stripes.
-- **Kanban** — grouped columns with quick move and quick add.
-- **Timeline** — see above.
-
-### Powerful productivity tools
-- **Habit tracker** — daily/weekly habits, streaks, completion rates, per-day check-in.
-- **Pomodoro** — focus / short break / long break, circular countdown, task linking, today's
-  focus minutes and session count.
-- **Eisenhower matrix** — four quadrants with inline quick-add that sets priority and due date.
-- **Countdown** — event countdowns with live day/hour/minute/second ticks, yearly recurrence,
-  progress bars, emoji and colour.
-
-### Explore more features
-- **Keyboard shortcuts & command menus** — ⌘K command palette, module rail, filter shortcuts.
-- **Collaboration** — share a list by email, member roles (owner / editor / viewer), assign tasks
-  to members, invitation state.
-- **Integrations** — subscribe to any public ICS calendar and import its events as scheduled
-  tasks (RFC 5545 parser in `lib/ics.ts`), plus a timezone setting.
-- **Statistics** — created/completed over time, completion rate gauge, priority mix, focus time,
-  per-list breakdown, habit streaks, busiest days, with week/month/quarter/year ranges.
-- **Themes** — 57 workspace themes published as CSS custom properties (`lib/themes.ts`) plus
-  20 per-list backgrounds. Each palette derives a legible accent-text tone and a darker accent
-  for filled controls, so the accent stays readable in every theme.
-- **List background** — per-list backdrop from the background gallery.
-- **Time zone** — user time zone drives schedule planning and reminders while travelling.
+### 👥 Collaboration & Integrations
+- **Shared Lists & Member Roles** — Invite collaborators as Editors or Viewers with task assignments.
+- **Calendar Subscriptions** — Subscribe to external `.ics` / iCal calendar feeds.
+- **Multi-Notification Reminders** — Configure multiple alarms per task with custom lead times.
 
 ---
 
-## Architecture
+## Tech Stack
 
+| Layer | Technology |
+| :--- | :--- |
+| **Framework** | Next.js 16 (App Router, Server & Client Components) |
+| **UI Library** | React 19, Tailwind CSS v4, Lucide Icons |
+| **State & Data Layer** | TanStack React Query v5 (Optimistic UI, Query Invalidation) |
+| **Database & ORM** | PostgreSQL, Prisma ORM 6 |
+| **Audio Engine** | Web Audio API (Synthesized timers, completion chimes, ambient noise) |
+| **Drag & Drop** | `@dnd-kit` (Sortable, Core, Modifiers) |
+| **Charts** | Recharts (Responsive bar charts, streak analytics) |
+| **Authentication** | Jose JWT sessions, Bcrypt password hashing |
+
+---
+
+## Project Structure
+
+```text
+├── app/
+│   ├── api/                 # REST API endpoints (tasks, habits, filters, settings, auth)
+│   ├── fonts.ts             # Typography configurations (Onest, Instrument Serif, Geist Mono)
+│   ├── globals.css          # Design system tokens (--app-*) and utility typography
+│   ├── layout.tsx           # Root application layout
+│   └── page.tsx             # Main workspace client entry
+├── components/
+│   ├── auth/                # Sign-in & registration modals
+│   ├── event-calendar/      # Month, week, day, and agenda calendar components
+│   ├── providers/           # TanStack Query client provider
+│   ├── ui/                  # Primitives (dialogs, tooltips, buttons, popovers)
+│   └── workspace/           # Core product modules
+│       ├── command-palette.tsx
+│       ├── countdown-view.tsx
+│       ├── eisenhower-matrix-view.tsx
+│       ├── filter-panel.tsx
+│       ├── habit-view.tsx
+│       ├── module-rail.tsx
+│       ├── pomodoro-view.tsx
+│       ├── quick-add-modal.tsx
+│       ├── settings-view.tsx
+│       ├── sidebar.tsx
+│       ├── statistics-view.tsx
+│       ├── task-calendar-view.tsx
+│       ├── task-input-bar.tsx
+│       ├── task-inspector.tsx
+│       ├── task-kanban-view.tsx
+│       ├── task-list-view.tsx
+│       ├── theme-picker.tsx
+│       ├── timeline-view.tsx
+│       └── workspace-app.tsx
+├── context/
+│   └── workspace-context.tsx# Global workspace state and mutation context
+├── hooks/
+│   └── use-workspace.ts     # TanStack Query hooks, caches, and optimistic mutations
+├── lib/
+│   ├── auth.ts              # JWT signing and session management
+│   ├── filters.ts           # Saved filter query compilation
+│   ├── nlp.ts               # Natural language task parser
+│   ├── recurrence.ts        # Recurring task advance & schedule calculation
+│   ├── seed-user.ts         # Initial workspace starter data seeder
+│   ├── sound-utils.ts       # Web Audio API chimes and white-noise soundscapes
+│   └── themes.ts            # 40+ workspace themes & CSS custom property engine
+└── prisma/
+    └── schema.prisma        # Database schema definitions
 ```
-app/
-  api/                     Route handlers (Next 16 `params: Promise<{id}>`)
-    tasks/                 CRUD + batch + lists + tags + assignees
-    filters/  countdowns/  reminders/  stats/  settings/
-    calendars/subscriptions/  ICS subscription + sync
-    lists/[id]/members/    Collaboration
-    habits/  pomodoro/  auth/
-components/ticktick/       Product surface (one file per module)
-hooks/use-ticktick.ts      TanStack Query data layer + optimistic mutations
-app/fonts.ts              Type system: Onest (UI) · Instrument Serif (display) · Geist Mono (data)
-lib/
-  nlp.ts                   Natural-language task parsing
-  recurrence.ts            Recurrence rules and next-occurrence engine
-  filters.ts               Smart filter query model → Prisma where
-  themes.ts                Theme + list background palettes
-  ics.ts                   RFC 5545 calendar reader
-lib/prisma.ts              Prisma singleton
-prisma/schema.prisma       Data model
-```
-
-**Stack**: Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Prisma 6 +
-PostgreSQL · TanStack Query v5 · Web Audio API · Web Speech API · lucide-react · recharts ·
-date-fns · jose + bcryptjs (HTTP-only cookie sessions).
-
-**Type system**: three voices with one job each (`app/fonts.ts`) — Onest for the product
-voice (labels, controls, task titles), Instrument Serif for the one display role (the module
-title), Geist Mono for the data voice (timers, countdowns, clock times). Size is expressed as
-role, not value: `tt-display`, `tt-title`, `tt-heading`, `tt-body`, `tt-label`, `tt-meta`,
-`tt-overline`, `tt-figure` (`@utility` in `app/globals.css`).
 
 ---
 
-## Getting started
+## Getting Started
 
-### 1. Database
+### 1. Prerequisites
+- **Node.js**: `v20.x` or higher
+- **pnpm**: `v9.x` or higher
+- **PostgreSQL**: Running instance or connection URI
+
+### 2. Environment Setup
+Copy the example environment file and set your database connection:
 
 ```bash
-# .env
-DATABASE_URL="postgresql://user:pass@host:5432/db?sslmode=require&pgbouncer=true&connection_limit=5"
-JWT_SECRET="change-me"
+cp .env.example .env
 ```
 
-Supabase's pooler needs `sslmode=require&pgbouncer=true`; keep `connection_limit` low because the
-pooler caps concurrent clients.
+Ensure `.env` contains:
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/pulseflow?schema=public"
+JWT_SECRET="your-secure-random-secret"
+```
 
-### 2. Schema
-
+### 3. Install Dependencies
 ```bash
-npx prisma db push
-npx prisma generate
+pnpm install
 ```
 
-### 3. Run
-
+### 4. Database Migration & Client Generation
 ```bash
-pnpm dev     # http://localhost:3000
+pnpm exec prisma db push
+pnpm exec prisma generate
 ```
 
-Registering an account automatically seeds lists, tags, tasks, habits, reminders, filters,
-countdowns, a collaboration member and scheduled timeline blocks.
+### 5. Run the Development Server
+```bash
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+A pre-populated demo account is available out of the box with sample tasks, habits, and schedules:
+- **Email**: `demo@pulseflow.app`
+- **Password**: `password123`
 
 ---
 
-## Notes and limits
+## Build & Production
 
-- The clone reproduces the **web** product. Native-only capabilities (lock-screen reminders,
-  location geofencing, system widgets, desktop global shortcut, voice capture on mobile) are
-  represented in the data model but not shipped as native integrations.
-- Offline sync, multi-device conflict resolution and the paid plan tiers are out of scope.
-- Static analysis of the real web bundle was partial (REA reported `partial` application and
-  semantic coverage with 23,963 retained unknowns), so route and copy reconstruction leaned on
-  the public product pages, which are authoritative for the advertised feature set.
+To verify types and generate an optimized production build:
+
+```bash
+# Type check
+pnpm exec tsc --noEmit
+
+# Production build
+pnpm build
+
+# Start production server
+pnpm start
+```

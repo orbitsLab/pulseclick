@@ -34,9 +34,9 @@ import {
   ChevronUp,
   Check,
 } from "lucide-react";
-import { Task } from "@/hooks/use-ticktick";
+import { Task } from "@/hooks/use-workspace";
 import { formatShortDate, getTodayISO, addDays } from "@/lib/date-utils";
-import { useTickTickContext } from "@/context/ticktick-context";
+import { useWorkspaceContext } from "@/context/workspace-context";
 import { cn } from "@/lib/utils";
 
 const COLUMN_CONFIG: Record<
@@ -122,7 +122,7 @@ function TaskCard({
   // Priority and completion card styling
   const priorityCardStyles = useMemo(() => {
     if (task.completed) {
-      return "bg-[var(--tt-panel-alt)]/50 border-[var(--tt-border)]/60 text-[var(--tt-muted)]";
+      return "bg-[var(--app-panel-alt)]/50 border-[var(--app-border)]/60 text-[var(--app-muted)]";
     }
     if (task.priority === 3) {
       return "border-rose-500/35 bg-rose-500/10 hover:bg-rose-500/15";
@@ -133,7 +133,7 @@ function TaskCard({
     if (task.priority === 1) {
       return "border-sky-500/35 bg-sky-500/10 hover:bg-sky-500/15";
     }
-    return "border-[var(--tt-border)] bg-[var(--tt-panel)] hover:border-[var(--tt-border)]/80";
+    return "border-[var(--app-border)] bg-[var(--app-panel)] hover:border-[var(--app-border)]/80";
   }, [task.completed, task.priority]);
 
   const cardContent = (
@@ -145,9 +145,9 @@ function TaskCard({
         priorityCardStyles,
         asHandle && !isOverlay && "cursor-grab active:cursor-grabbing",
         isSelected &&
-          "ring-2 ring-[var(--tt-accent)] border-[var(--tt-accent)] shadow-sm",
+          "ring-2 ring-[var(--app-accent)] border-[var(--app-accent)] shadow-sm",
         isOverlay &&
-          "rotate-1 shadow-2xl border-[var(--tt-accent)] ring-2 ring-[var(--tt-accent)]/30 cursor-grabbing",
+          "rotate-1 shadow-2xl border-[var(--app-accent)] ring-2 ring-[var(--app-accent)]/30 cursor-grabbing",
         !isSelected &&
           !isOverlay &&
           "hover:shadow-xs"
@@ -163,7 +163,7 @@ function TaskCard({
                 e.stopPropagation();
                 onToggleComplete?.(!task.completed);
               }}
-              className="text-[var(--tt-muted)] hover:text-emerald-500 transition-colors mt-0.5 shrink-0 cursor-pointer"
+              className="text-[var(--app-muted)] hover:text-emerald-500 transition-colors mt-0.5 shrink-0 cursor-pointer"
               title={task.completed ? "Mark incomplete" : "Mark complete"}
             >
               {task.completed ? (
@@ -174,9 +174,9 @@ function TaskCard({
             </button>
             <span
               className={cn(
-                "line-clamp-2 tt-heading font-semibold text-[var(--tt-text)] flex-1",
+                "line-clamp-2 app-heading font-semibold text-[var(--app-text)] flex-1",
                 task.completed &&
-                  "line-through opacity-60 text-[var(--tt-muted)]"
+                  "line-through opacity-60 text-[var(--app-muted)]"
               )}
             >
               {task.title}
@@ -187,7 +187,7 @@ function TaskCard({
           {task.priority === 3 && (
             <Badge
               variant="destructive-outline"
-              className="pointer-events-none h-5 shrink-0 rounded-md px-1.5 tt-meta font-semibold"
+              className="pointer-events-none h-5 shrink-0 rounded-md px-1.5 app-meta font-semibold"
             >
               High
             </Badge>
@@ -195,7 +195,7 @@ function TaskCard({
           {task.priority === 2 && (
             <Badge
               variant="warning-outline"
-              className="pointer-events-none h-5 shrink-0 rounded-md px-1.5 tt-meta font-semibold"
+              className="pointer-events-none h-5 shrink-0 rounded-md px-1.5 app-meta font-semibold"
             >
               Medium
             </Badge>
@@ -203,7 +203,7 @@ function TaskCard({
           {task.priority === 1 && (
             <Badge
               variant="primary-outline"
-              className="pointer-events-none h-5 shrink-0 rounded-md px-1.5 tt-meta font-semibold"
+              className="pointer-events-none h-5 shrink-0 rounded-md px-1.5 app-meta font-semibold"
             >
               Low
             </Badge>
@@ -212,7 +212,7 @@ function TaskCard({
 
         {/* Task Description */}
         {task.description && (
-          <p className="line-clamp-2 text-xs leading-relaxed text-[var(--tt-muted)] tt-body pl-6">
+          <p className="line-clamp-2 text-xs leading-relaxed text-[var(--app-muted)] app-body pl-6">
             {task.description}
           </p>
         )}
@@ -223,7 +223,7 @@ function TaskCard({
             className={cn(
               "overflow-hidden transition-all duration-300 ease-in-out",
               isExpanded
-                ? "max-h-96 opacity-100 mt-1 pt-1 pb-0.5 border-t border-[var(--tt-border)]/40"
+                ? "max-h-96 opacity-100 mt-1 pt-1 pb-0.5 border-t border-[var(--app-border)]/40"
                 : "max-h-0 opacity-0"
             )}
           >
@@ -235,7 +235,7 @@ function TaskCard({
                     e.stopPropagation();
                     onToggleSubtask?.(task.id, st.id, !st.completed);
                   }}
-                  className="group/subtask flex items-center gap-2 py-0.5 px-1 rounded hover:bg-[var(--tt-panel-alt)]/60 transition-colors cursor-pointer"
+                  className="group/subtask flex items-center gap-2 py-0.5 px-1 rounded hover:bg-[var(--app-panel-alt)]/60 transition-colors cursor-pointer"
                 >
                   <button
                     type="button"
@@ -247,7 +247,7 @@ function TaskCard({
                       "flex h-3.5 w-3.5 items-center justify-center rounded border transition-all mt-0.5 shrink-0 cursor-pointer",
                       st.completed
                         ? "border-emerald-500 bg-emerald-500 text-white"
-                        : "border-[var(--tt-border)] hover:border-[var(--tt-accent)] text-transparent"
+                        : "border-[var(--app-border)] hover:border-[var(--app-accent)] text-transparent"
                     )}
                     title={st.completed ? "Mark incomplete" : "Mark complete"}
                   >
@@ -255,8 +255,8 @@ function TaskCard({
                   </button>
                   <span
                     className={cn(
-                      "tt-body text-xs text-[var(--tt-text)] flex-1 min-w-0 truncate select-none",
-                      st.completed && "line-through text-[var(--tt-muted)] opacity-60"
+                      "app-body text-xs text-[var(--app-text)] flex-1 min-w-0 truncate select-none",
+                      st.completed && "line-through text-[var(--app-muted)] opacity-60"
                     )}
                   >
                     {st.title}
@@ -268,19 +268,19 @@ function TaskCard({
         )}
 
         {/* Unified Bottom Row: List, Date, Tags, Subtasks expander, Assignee + Status Actions */}
-        <div className="flex items-center justify-between gap-1.5 pt-1.5 border-t border-[var(--tt-border)]/60 tt-meta text-[var(--tt-muted)]">
+        <div className="flex items-center justify-between gap-1.5 pt-1.5 border-t border-[var(--app-border)]/60 app-meta text-[var(--app-muted)]">
           {/* Left: Metadata chips */}
           <div className="flex items-center gap-1.5 flex-wrap flex-1 min-w-0">
             {/* List */}
             {task.list && (
               <span
-                className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 tt-meta font-medium bg-[var(--tt-panel-alt)] border border-[var(--tt-border)]/80 shrink-0"
+                className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 app-meta font-medium bg-[var(--app-panel-alt)] border border-[var(--app-border)]/80 shrink-0"
                 style={{ color: task.list.color || undefined }}
               >
                 <span
                   className="h-1.5 w-1.5 rounded-full shrink-0"
                   style={{
-                    backgroundColor: task.list.color || "var(--tt-accent)",
+                    backgroundColor: task.list.color || "var(--app-accent)",
                   }}
                 />
                 <span className="truncate max-w-24">{task.list.name}</span>
@@ -291,14 +291,14 @@ function TaskCard({
             {task.dueDate && (
               <div
                 className={cn(
-                  "inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium tabular-nums tt-meta shrink-0",
+                  "inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium tabular-nums app-meta shrink-0",
                   isOverdue
                     ? "bg-rose-500/15 text-rose-400 border border-rose-500/30 font-bold"
                     : task.dueDate === today
-                    ? "bg-[var(--tt-accent)]/15 text-[var(--tt-accent-text)] font-bold border border-[var(--tt-accent)]/30"
+                    ? "bg-[var(--app-accent)]/15 text-[var(--app-accent-text)] font-bold border border-[var(--app-accent)]/30"
                     : task.dueDate === tomorrow
                     ? "bg-amber-500/15 text-amber-400 font-bold border border-amber-500/30"
-                    : "bg-[var(--tt-panel-alt)] text-[var(--tt-muted)] border border-[var(--tt-border)]/60"
+                    : "bg-[var(--app-panel-alt)] text-[var(--app-muted)] border border-[var(--app-border)]/60"
                 )}
               >
                 <Calendar className="h-2.5 w-2.5 shrink-0" />
@@ -318,7 +318,7 @@ function TaskCard({
               task.tags.map((t) => (
                 <span
                   key={t.tag?.id || t.tagId}
-                  className="inline-flex items-center rounded px-1.5 py-0.5 tt-meta text-[var(--tt-muted)] bg-[var(--tt-panel-alt)]/60 border border-[var(--tt-border)]/50 shrink-0"
+                  className="inline-flex items-center rounded px-1.5 py-0.5 app-meta text-[var(--app-muted)] bg-[var(--app-panel-alt)]/60 border border-[var(--app-border)]/50 shrink-0"
                 >
                   #{t.tag?.name || "tag"}
                 </span>
@@ -333,10 +333,10 @@ function TaskCard({
                   setIsExpanded((prev) => !prev);
                 }}
                 className={cn(
-                  "inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 tt-meta font-medium transition-colors cursor-pointer shrink-0",
+                  "inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 app-meta font-medium transition-colors cursor-pointer shrink-0",
                   isExpanded
-                    ? "bg-[var(--tt-accent)]/20 text-[var(--tt-accent-text)] border border-[var(--tt-accent)]/40"
-                    : "bg-[var(--tt-panel-alt)] text-[var(--tt-muted)] hover:text-[var(--tt-text)] border border-[var(--tt-border)]/70"
+                    ? "bg-[var(--app-accent)]/20 text-[var(--app-accent-text)] border border-[var(--app-accent)]/40"
+                    : "bg-[var(--app-panel-alt)] text-[var(--app-muted)] hover:text-[var(--app-text)] border border-[var(--app-border)]/70"
                 )}
                 title={isExpanded ? "Collapse subtasks" : "Expand subtasks"}
               >
@@ -359,8 +359,8 @@ function TaskCard({
                 {task.assignees.slice(0, 2).map((a, i) => {
                   const name = a.member?.displayName || a.member?.email || "?";
                   return (
-                    <Avatar key={i} className="size-4 border border-[var(--tt-panel)]">
-                      <AvatarFallback className="tt-meta bg-[var(--tt-panel-alt)] text-[var(--tt-text)] font-semibold">
+                    <Avatar key={i} className="size-4 border border-[var(--app-panel)]">
+                      <AvatarFallback className="app-meta bg-[var(--app-panel-alt)] text-[var(--app-text)] font-semibold">
                         {name.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
@@ -380,7 +380,7 @@ function TaskCard({
                     e.stopPropagation();
                     onMoveStatus("TODO");
                   }}
-                  className="rounded px-1.5 py-0.5 tt-meta font-medium text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)] hover:text-[var(--tt-text)] transition-colors flex items-center gap-0.5 cursor-pointer whitespace-nowrap"
+                  className="rounded px-1.5 py-0.5 app-meta font-medium text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-text)] transition-colors flex items-center gap-0.5 cursor-pointer whitespace-nowrap"
                   title="Move to To Do"
                 >
                   <ArrowLeft className="h-2.5 w-2.5" /> To Do
@@ -393,7 +393,7 @@ function TaskCard({
                     e.stopPropagation();
                     onMoveStatus("IN_PROGRESS");
                   }}
-                  className="rounded px-1.5 py-0.5 tt-meta font-medium text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 transition-colors flex items-center gap-0.5 cursor-pointer whitespace-nowrap"
+                  className="rounded px-1.5 py-0.5 app-meta font-medium text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 transition-colors flex items-center gap-0.5 cursor-pointer whitespace-nowrap"
                   title="Move to In Progress"
                 >
                   In Progress
@@ -406,7 +406,7 @@ function TaskCard({
                     e.stopPropagation();
                     onMoveStatus("DONE");
                   }}
-                  className="rounded px-1.5 py-0.5 tt-meta font-medium text-emerald-500 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors flex items-center gap-0.5 cursor-pointer whitespace-nowrap"
+                  className="rounded px-1.5 py-0.5 app-meta font-medium text-emerald-500 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors flex items-center gap-0.5 cursor-pointer whitespace-nowrap"
                   title="Move to Done"
                 >
                   Done <ArrowRight className="h-2.5 w-2.5" />
@@ -436,31 +436,31 @@ export function KanbanColumnSkeleton({ count = 3 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="flex flex-col gap-2 rounded-xl border border-[var(--tt-border)]/60 bg-[var(--tt-panel)]/40 p-2.5"
+          className="flex flex-col gap-2 rounded-xl border border-[var(--app-border)]/60 bg-[var(--app-panel)]/40 p-2.5"
           style={{ opacity: Math.max(0.35, 1 - i * 0.25) }}
         >
           {/* Header: Checkbox + Title + Priority */}
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <Skeleton className="h-4 w-4 rounded-full shrink-0 bg-[var(--tt-panel-alt)]" />
+              <Skeleton className="h-4 w-4 rounded-full shrink-0 bg-[var(--app-panel-alt)]" />
               <Skeleton
-                className="h-4 rounded bg-[var(--tt-panel-alt)]"
+                className="h-4 rounded bg-[var(--app-panel-alt)]"
                 style={{ width: `${Math.max(40, 75 - i * 15)}%` }}
               />
             </div>
-            <Skeleton className="h-4.5 w-10 rounded-md bg-[var(--tt-panel-alt)]/70 shrink-0" />
+            <Skeleton className="h-4.5 w-10 rounded-md bg-[var(--app-panel-alt)]/70 shrink-0" />
           </div>
 
           {/* Description line placeholder */}
-          <Skeleton className="h-3 rounded w-1/2 bg-[var(--tt-panel-alt)]/50 ml-6" />
+          <Skeleton className="h-3 rounded w-1/2 bg-[var(--app-panel-alt)]/50 ml-6" />
 
           {/* Bottom metadata row */}
-          <div className="flex items-center justify-between gap-2 pt-1 border-t border-[var(--tt-border)]/40">
+          <div className="flex items-center justify-between gap-2 pt-1 border-t border-[var(--app-border)]/40">
             <div className="flex items-center gap-1.5">
-              <Skeleton className="h-4 w-16 rounded bg-[var(--tt-panel-alt)]/60" />
-              <Skeleton className="h-4 w-14 rounded bg-[var(--tt-panel-alt)]/60" />
+              <Skeleton className="h-4 w-16 rounded bg-[var(--app-panel-alt)]/60" />
+              <Skeleton className="h-4 w-14 rounded bg-[var(--app-panel-alt)]/60" />
             </div>
-            <Skeleton className="h-4 w-16 rounded bg-[var(--tt-panel-alt)]/60" />
+            <Skeleton className="h-4 w-16 rounded bg-[var(--app-panel-alt)]/60" />
           </div>
         </div>
       ))}
@@ -512,18 +512,18 @@ function TaskColumn({
         isOverlay && "opacity-90 rotate-0.5 shadow-2xl cursor-grabbing"
       )}
     >
-      <Card className="flex flex-col h-full rounded-2xl border border-[var(--tt-border)] bg-[var(--tt-panel-alt)]/40 p-3 shadow-xs min-h-0 overflow-hidden">
-        <CardHeader className="flex items-center justify-between pb-3 mb-2.5 border-b border-[var(--tt-border)]/80 p-0 shrink-0">
+      <Card className="flex flex-col h-full rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel-alt)]/40 p-3 shadow-xs min-h-0 overflow-hidden">
+        <CardHeader className="flex items-center justify-between pb-3 mb-2.5 border-b border-[var(--app-border)]/80 p-0 shrink-0">
           <div className="flex items-center gap-2">
             <span
               className={cn("h-2.5 w-2.5 rounded-full shrink-0", config.dotColor)}
             />
-            <span className="tt-heading font-semibold text-[var(--tt-text)]">
+            <span className="app-heading font-semibold text-[var(--app-text)]">
               {config.title}
             </span>
             <Badge
               variant="outline"
-              className="border-[var(--tt-border)] bg-[var(--tt-panel)] text-[var(--tt-muted)] h-5 px-1.5 tt-meta font-bold rounded-md"
+              className="border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-muted)] h-5 px-1.5 app-meta font-bold rounded-md"
             >
               {tasks.length}
             </Badge>
@@ -535,7 +535,7 @@ function TaskColumn({
               onClick={() =>
                 onQuickAdd(value as "TODO" | "IN_PROGRESS" | "DONE")
               }
-              className="text-[var(--tt-muted)] hover:text-[var(--tt-text)] hover:bg-[var(--tt-panel)] cursor-pointer"
+              className="text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel)] cursor-pointer"
               title={`Add task to ${config.title}`}
             >
               <Plus className="h-3.5 w-3.5" />
@@ -546,7 +546,7 @@ function TaskColumn({
                   {...handleProps}
                   size="icon-xs"
                   variant="ghost"
-                  className="text-[var(--tt-muted)] hover:text-[var(--tt-text)] hover:bg-[var(--tt-panel)] cursor-grab active:cursor-grabbing"
+                  className="text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel)] cursor-grab active:cursor-grabbing"
                   title="Drag column"
                 >
                   <GripVerticalIcon className="h-3.5 w-3.5" />
@@ -565,7 +565,7 @@ function TaskColumn({
               {isLoading && tasks.length === 0 ? (
                 <KanbanColumnSkeleton count={2} />
               ) : tasks.length === 0 ? (
-                <div className="flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-[var(--tt-border)]/60 p-6 text-center tt-meta text-[var(--tt-muted)] min-h-[140px] gap-2">
+                <div className="flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-[var(--app-border)]/60 p-6 text-center app-meta text-[var(--app-muted)] min-h-[140px] gap-2">
                   <span>No tasks in {config.title}</span>
                   <Button
                     size="sm"
@@ -573,7 +573,7 @@ function TaskColumn({
                     onClick={() =>
                       onQuickAdd(value as "TODO" | "IN_PROGRESS" | "DONE")
                     }
-                    className="h-7 text-xs text-[var(--tt-accent-text)] hover:text-[var(--tt-accent-text)] hover:bg-[var(--tt-accent)]/10 cursor-pointer"
+                    className="h-7 text-xs text-[var(--app-accent-text)] hover:text-[var(--app-accent-text)] hover:bg-[var(--app-accent)]/10 cursor-pointer"
                   >
                     <Plus className="h-3 w-3 mr-1" /> Add task
                   </Button>
@@ -622,7 +622,7 @@ export function TaskKanbanView({
   onUpdateStatus,
   onQuickAdd,
 }: TaskKanbanViewProps) {
-  const context = useTickTickContext();
+  const context = useWorkspaceContext();
   const today = getTodayISO();
 
   // Initialize and synchronize columns from live tasks

@@ -18,7 +18,7 @@ import {
   Settings2,
 } from "lucide-react";
 
-export type TickTickModule =
+export type WorkspaceModule =
   | "tasks"
   | "calendar"
   | "timeline"
@@ -30,8 +30,8 @@ export type TickTickModule =
   | "settings";
 
 interface ModuleRailProps {
-  activeModule: TickTickModule;
-  onSelectModule: (mod: TickTickModule) => void;
+  activeModule: WorkspaceModule;
+  onSelectModule: (mod: WorkspaceModule) => void;
   isDark: boolean;
   onToggleTheme: () => void;
   user: { email: string; name?: string | null } | null;
@@ -48,7 +48,7 @@ export function ModuleRail({
   onLogout,
   onOpenThemePicker,
 }: ModuleRailProps) {
-  const modules: { id: TickTickModule; label: string; icon: React.ReactNode }[] = [
+  const modules: { id: WorkspaceModule; label: string; icon: React.ReactNode }[] = [
     { id: "tasks", label: "Tasks", icon: <CheckSquare className="h-5 w-5" /> },
     { id: "calendar", label: "Calendar", icon: <CalendarIcon className="h-5 w-5" /> },
     { id: "timeline", label: "Timeline", icon: <GanttChartSquare className="h-5 w-5" /> },
@@ -61,12 +61,12 @@ export function ModuleRail({
   ];
 
   return (
-    <aside className="flex flex-col items-center justify-between border-r border-[var(--tt-border)] bg-[var(--tt-rail)] py-4 px-2 text-[var(--tt-muted)] select-none z-30 w-16 flex-shrink-0">
+    <aside className="flex flex-col items-center justify-between border-r border-[var(--app-border)] bg-[var(--app-rail)] py-4 px-2 text-[var(--app-muted)] select-none z-30 w-16 flex-shrink-0">
       {/* Brand icon / User avatar */}
       <div className="flex flex-col items-center gap-4">
         <div
-          title="PulseTick"
-          className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--tt-accent)] to-indigo-600 font-extrabold text-white text-xl shadow-md shadow-[var(--tt-accent)]/25 cursor-pointer"
+          title="PulseFlow"
+          className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--app-accent)] to-indigo-600 font-extrabold text-white text-xl shadow-md shadow-[var(--app-accent)]/25 cursor-pointer"
         >
           ✓
         </div>
@@ -81,11 +81,11 @@ export function ModuleRail({
                 type="button"
                 onClick={() => onSelectModule(m.id)}
                 title={m.label}
-                className={`relative flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-150 ${ isActive ? "bg-[var(--tt-accent-strong)] text-white shadow-lg shadow-[var(--tt-accent)]/30 font-bold" : "text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)] hover:text-[var(--tt-text)]" }`}
+                className={`relative flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-150 ${ isActive ? "bg-[var(--app-accent-strong)] text-white shadow-lg shadow-[var(--app-accent)]/30 font-bold" : "text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-text)]" }`}
               >
                 {m.icon}
                 {isActive && (
-                  <span className="absolute -left-2 top-2 bottom-2 w-1 rounded-r-full bg-[var(--tt-accent)]" />
+                  <span className="absolute -left-2 top-2 bottom-2 w-1 rounded-r-full bg-[var(--app-accent)]" />
                 )}
               </button>
             );
@@ -100,7 +100,7 @@ export function ModuleRail({
             type="button"
             onClick={onOpenThemePicker}
             title="Themes"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)] hover:text-[var(--tt-accent-text)] transition-colors"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-accent-text)] transition-colors"
           >
             <Palette className="h-4 w-4" />
           </button>
@@ -110,7 +110,7 @@ export function ModuleRail({
           type="button"
           onClick={onToggleTheme}
           title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--tt-muted)] hover:bg-[var(--tt-panel-alt)] hover:text-amber-400 transition-colors"
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)] hover:text-amber-400 transition-colors"
         >
           {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </button>
@@ -120,7 +120,7 @@ export function ModuleRail({
             type="button"
             onClick={onLogout}
             title={`Sign out (${user.email})`}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--tt-muted)] hover:bg-rose-500/20 hover:text-rose-400 transition-colors"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--app-muted)] hover:bg-rose-500/20 hover:text-rose-400 transition-colors"
           >
             <LogOut className="h-4 w-4" />
           </button>

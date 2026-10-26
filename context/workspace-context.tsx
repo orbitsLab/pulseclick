@@ -2,9 +2,9 @@
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
 import { useIsFetching, useQueryClient } from "@tanstack/react-query";
-import { TickTickModule } from "@/components/ticktick/module-rail";
+import { WorkspaceModule } from "@/components/workspace/module-rail";
 import {
-  useTickTick,
+  useWorkspace,
   Task,
   TaskList,
   Tag,
@@ -18,12 +18,12 @@ import {
   ListMember,
   CalendarSubscription,
   PomodoroStats,
-} from "@/hooks/use-ticktick";
+} from "@/hooks/use-workspace";
 
-export interface TickTickContextType {
+export interface WorkspaceContextType {
   // Navigation & View State
-  activeModule: TickTickModule;
-  setActiveModule: (mod: TickTickModule) => void;
+  activeModule: WorkspaceModule;
+  setActiveModule: (mod: WorkspaceModule) => void;
   activeView: string;
   setActiveView: (view: string) => void;
   activeListId: string | null;
@@ -53,7 +53,7 @@ export interface TickTickContextType {
   // View Navigation Helpers
   selectView: (view: string, listId?: string | null, tag?: string | null) => void;
   selectFilter: (filterId: string) => void;
-  selectModule: (mod: TickTickModule) => void;
+  selectModule: (mod: WorkspaceModule) => void;
 
   // Modals State
   isCommandPaletteOpen: boolean;
@@ -196,15 +196,15 @@ export interface TickTickContextType {
   syncSubscription: (id: string) => Promise<any>;
 }
 
-export const TickTickContext = createContext<TickTickContextType | null>(null);
+export const WorkspaceContext = createContext<WorkspaceContextType | null>(null);
 
-export function TickTickProvider({ children }: { children: React.ReactNode }) {
+export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
   const fetchingCount = useIsFetching();
   const isBackgroundFetching = fetchingCount > 0;
 
   // Navigation State
-  const [activeModule, setActiveModule] = useState<TickTickModule>("tasks");
+  const [activeModule, setActiveModule] = useState<WorkspaceModule>("tasks");
   const [activeView, setActiveView] = useState<string>("today");
   const [activeListId, setActiveListId] = useState<string | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
@@ -217,7 +217,7 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
   // Expandable Sidebar State
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("ticktick-sidebar-open");
+      const saved = localStorage.getItem("workspace-sidebar-open");
       return saved !== null ? saved === "true" : true;
     }
     return true;
@@ -225,7 +225,7 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
 
   const [sidebarWidth, setSidebarWidth] = useState(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("ticktick-sidebar-width");
+      const saved = localStorage.getItem("workspace-sidebar-width");
       const num = Number(saved);
       if (num >= 200 && num <= 450) return num;
     }
@@ -240,13 +240,13 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
     const clamped = Math.max(200, Math.min(450, w));
     setSidebarWidth(clamped);
     if (typeof window !== "undefined") {
-      localStorage.setItem("ticktick-sidebar-width", String(clamped));
+      localStorage.setItem("workspace-sidebar-width", String(clamped));
     }
   };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("ticktick-sidebar-open", String(isSidebarOpen));
+      localStorage.setItem("workspace-sidebar-open", String(isSidebarOpen));
     }
   }, [isSidebarOpen]);
 
@@ -280,7 +280,7 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
   const [habitAnalyticsHabitId, setHabitAnalyticsHabitId] = useState<string>("all");
 
   // TanStack Query Hook integration
-  const ticktick = useTickTick({
+  const workspace = useWorkspace({
     view:
       activeModule === "timeline" || activeModule === "calendar"
         ? activeModule
@@ -304,45 +304,45 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
   const [hasLoadedFiltersOnce, setHasLoadedFiltersOnce] = useState(false);
 
   useEffect(() => {
-    if (!ticktick.isLoadingTasks || ticktick.tasks.length > 0) {
+    if (!workspace.isLoadingTasks || workspace.tasks.length > 0) {
       setHasLoadedTasksOnce(true);
     }
-  }, [ticktick.isLoadingTasks, ticktick.tasks]);
+  }, [workspace.isLoadingTasks, workspace.tasks]);
 
   useEffect(() => {
-    if (!ticktick.isLoadingHabits || ticktick.habits.length > 0) {
+    if (!workspace.isLoadingHabits || workspace.habits.length > 0) {
       setHasLoadedHabitsOnce(true);
     }
-  }, [ticktick.isLoadingHabits, ticktick.habits]);
+  }, [workspace.isLoadingHabits, workspace.habits]);
 
   useEffect(() => {
-    if (!ticktick.isLoadingLists || ticktick.lists.length > 0) {
+    if (!workspace.isLoadingLists || workspace.lists.length > 0) {
       setHasLoadedListsOnce(true);
     }
-  }, [ticktick.isLoadingLists, ticktick.lists]);
+  }, [workspace.isLoadingLists, workspace.lists]);
 
   useEffect(() => {
-    if (!ticktick.isLoadingTags || ticktick.tags.length > 0) {
+    if (!workspace.isLoadingTags || workspace.tags.length > 0) {
       setHasLoadedTagsOnce(true);
     }
-  }, [ticktick.isLoadingTags, ticktick.tags]);
+  }, [workspace.isLoadingTags, workspace.tags]);
 
   useEffect(() => {
-    if (!ticktick.isLoadingFilters || ticktick.filters.length > 0) {
+    if (!workspace.isLoadingFilters || workspace.filters.length > 0) {
       setHasLoadedFiltersOnce(true);
     }
-  }, [ticktick.isLoadingFilters, ticktick.filters]);
+  }, [workspace.isLoadingFilters, workspace.filters]);
 
-  const isInitialLoadingTasks = !hasLoadedTasksOnce && ticktick.isLoadingTasks && ticktick.tasks.length === 0;
-  const isInitialLoadingHabits = !hasLoadedHabitsOnce && ticktick.isLoadingHabits && ticktick.habits.length === 0;
-  const isInitialLoadingLists = !hasLoadedListsOnce && ticktick.isLoadingLists && ticktick.lists.length === 0;
-  const isInitialLoadingTags = !hasLoadedTagsOnce && ticktick.isLoadingTags && ticktick.tags.length === 0;
-  const isInitialLoadingFilters = !hasLoadedFiltersOnce && ticktick.isLoadingFilters && ticktick.filters.length === 0;
+  const isInitialLoadingTasks = !hasLoadedTasksOnce && workspace.isLoadingTasks && workspace.tasks.length === 0;
+  const isInitialLoadingHabits = !hasLoadedHabitsOnce && workspace.isLoadingHabits && workspace.habits.length === 0;
+  const isInitialLoadingLists = !hasLoadedListsOnce && workspace.isLoadingLists && workspace.lists.length === 0;
+  const isInitialLoadingTags = !hasLoadedTagsOnce && workspace.isLoadingTags && workspace.tags.length === 0;
+  const isInitialLoadingFilters = !hasLoadedFiltersOnce && workspace.isLoadingFilters && workspace.filters.length === 0;
 
   // Calculate current list/view name
   const currentListName = useMemo(() => {
     if (activeListId) {
-      const l = ticktick.lists.find((item) => item.id === activeListId);
+      const l = workspace.lists.find((item) => item.id === activeListId);
       return l ? l.name : "List";
     }
     if (activeTag) {
@@ -366,12 +366,12 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
       default:
         return "Tasks";
     }
-  }, [activeListId, activeTag, activeView, ticktick.lists]);
+  }, [activeListId, activeTag, activeView, workspace.lists]);
 
   // Selected Task
   const selectedTask = useMemo(
-    () => ticktick.tasks.find((t) => t.id === selectedTaskId) || null,
-    [ticktick.tasks, selectedTaskId]
+    () => workspace.tasks.find((t) => t.id === selectedTaskId) || null,
+    [workspace.tasks, selectedTaskId]
   );
 
   // Global keydown listener for Cmd+K / Ctrl+K
@@ -403,7 +403,7 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
     setSelectedTaskId(null);
   };
 
-  const selectModule = (mod: TickTickModule) => {
+  const selectModule = (mod: WorkspaceModule) => {
     setActiveModule(mod);
     setSelectedTaskId(null);
   };
@@ -412,7 +412,7 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
     await queryClient.invalidateQueries();
   };
 
-  const contextValue: TickTickContextType = {
+  const contextValue: WorkspaceContextType = {
     activeModule,
     setActiveModule,
     activeView,
@@ -457,102 +457,102 @@ export function TickTickProvider({ children }: { children: React.ReactNode }) {
     isBackgroundFetching,
     refetchAll,
 
-    // Data from useTickTick
-    tasks: ticktick.tasks,
-    isLoadingTasks: ticktick.isLoadingTasks,
+    // Data from useWorkspace
+    tasks: workspace.tasks,
+    isLoadingTasks: workspace.isLoadingTasks,
     isInitialLoadingTasks,
     hasLoadedTasksOnce,
-    lists: ticktick.lists,
-    isLoadingLists: ticktick.isLoadingLists,
+    lists: workspace.lists,
+    isLoadingLists: workspace.isLoadingLists,
     isInitialLoadingLists,
     hasLoadedListsOnce,
-    inboxCount: ticktick.inboxCount,
-    todayCount: ticktick.todayCount,
-    tomorrowCount: ticktick.tomorrowCount,
-    allCount: ticktick.allCount,
-    tags: ticktick.tags,
-    isLoadingTags: ticktick.isLoadingTags,
+    inboxCount: workspace.inboxCount,
+    todayCount: workspace.todayCount,
+    tomorrowCount: workspace.tomorrowCount,
+    allCount: workspace.allCount,
+    tags: workspace.tags,
+    isLoadingTags: workspace.isLoadingTags,
     isInitialLoadingTags,
     hasLoadedTagsOnce,
-    pomodoroStats: ticktick.pomodoroStats,
-    habits: ticktick.habits,
-    isLoadingHabits: ticktick.isLoadingHabits,
+    pomodoroStats: workspace.pomodoroStats,
+    habits: workspace.habits,
+    isLoadingHabits: workspace.isLoadingHabits,
     isInitialLoadingHabits,
     hasLoadedHabitsOnce,
-    habitSections: ticktick.habitSections,
-    isLoadingHabitSections: ticktick.isLoadingHabitSections,
+    habitSections: workspace.habitSections,
+    isLoadingHabitSections: workspace.isLoadingHabitSections,
     habitStatus,
     setHabitStatus,
-    habitAnalytics: ticktick.habitAnalytics,
-    isLoadingHabitAnalytics: ticktick.isLoadingHabitAnalytics,
+    habitAnalytics: workspace.habitAnalytics,
+    isLoadingHabitAnalytics: workspace.isLoadingHabitAnalytics,
     habitAnalyticsHabitId,
     setHabitAnalyticsHabitId,
-    filters: ticktick.filters,
-    isLoadingFilters: ticktick.isLoadingFilters,
+    filters: workspace.filters,
+    isLoadingFilters: workspace.isLoadingFilters,
     isInitialLoadingFilters,
     hasLoadedFiltersOnce,
-    countdowns: ticktick.countdowns,
-    stats: ticktick.stats,
-    isLoadingStats: ticktick.isLoadingStats,
-    settings: ticktick.settings,
-    reminders: ticktick.reminders,
-    members: ticktick.members,
-    assignees: ticktick.assignees,
-    subscriptions: ticktick.subscriptions,
+    countdowns: workspace.countdowns,
+    stats: workspace.stats,
+    isLoadingStats: workspace.isLoadingStats,
+    settings: workspace.settings,
+    reminders: workspace.reminders,
+    members: workspace.members,
+    assignees: workspace.assignees,
+    subscriptions: workspace.subscriptions,
 
-    // Mutations from useTickTick
-    toggleComplete: ticktick.toggleComplete,
-    addTask: ticktick.addTask,
-    updateTask: ticktick.updateTask,
-    deleteTask: ticktick.deleteTask,
-    batchAction: ticktick.batchAction,
-    addList: ticktick.addList,
-    updateList: ticktick.updateList,
-    deleteList: ticktick.deleteList,
-    addTag: ticktick.addTag,
-    deleteTag: ticktick.deleteTag,
-    logPomodoro: ticktick.logPomodoro,
-    addHabit: ticktick.addHabit,
-    updateHabit: ticktick.updateHabit,
-    archiveHabit: ticktick.archiveHabit,
-    restoreHabit: ticktick.restoreHabit,
-    skipHabitDay: ticktick.skipHabitDay,
-    logHabitValue: ticktick.logHabitValue,
-    toggleHabitCheck: ticktick.toggleHabitCheck,
-    deleteHabit: ticktick.deleteHabit,
-    addHabitSection: ticktick.addHabitSection,
-    updateHabitSection: ticktick.updateHabitSection,
-    deleteHabitSection: ticktick.deleteHabitSection,
-    createFilter: ticktick.createFilter,
-    updateFilter: ticktick.updateFilter,
-    deleteFilter: ticktick.deleteFilter,
-    addCountdown: ticktick.addCountdown,
-    updateCountdown: ticktick.updateCountdown,
-    deleteCountdown: ticktick.deleteCountdown,
-    updateSettings: ticktick.updateSettings,
-    addReminder: ticktick.addReminder,
-    updateReminder: ticktick.updateReminder,
-    deleteReminder: ticktick.deleteReminder,
-    inviteMember: ticktick.inviteMember,
-    updateMember: ticktick.updateMember,
-    removeMember: ticktick.removeMember,
-    setAssignees: ticktick.setAssignees,
-    addSubscription: ticktick.addSubscription,
-    deleteSubscription: ticktick.deleteSubscription,
-    syncSubscription: ticktick.syncSubscription,
+    // Mutations from useWorkspace
+    toggleComplete: workspace.toggleComplete,
+    addTask: workspace.addTask,
+    updateTask: workspace.updateTask,
+    deleteTask: workspace.deleteTask,
+    batchAction: workspace.batchAction,
+    addList: workspace.addList,
+    updateList: workspace.updateList,
+    deleteList: workspace.deleteList,
+    addTag: workspace.addTag,
+    deleteTag: workspace.deleteTag,
+    logPomodoro: workspace.logPomodoro,
+    addHabit: workspace.addHabit,
+    updateHabit: workspace.updateHabit,
+    archiveHabit: workspace.archiveHabit,
+    restoreHabit: workspace.restoreHabit,
+    skipHabitDay: workspace.skipHabitDay,
+    logHabitValue: workspace.logHabitValue,
+    toggleHabitCheck: workspace.toggleHabitCheck,
+    deleteHabit: workspace.deleteHabit,
+    addHabitSection: workspace.addHabitSection,
+    updateHabitSection: workspace.updateHabitSection,
+    deleteHabitSection: workspace.deleteHabitSection,
+    createFilter: workspace.createFilter,
+    updateFilter: workspace.updateFilter,
+    deleteFilter: workspace.deleteFilter,
+    addCountdown: workspace.addCountdown,
+    updateCountdown: workspace.updateCountdown,
+    deleteCountdown: workspace.deleteCountdown,
+    updateSettings: workspace.updateSettings,
+    addReminder: workspace.addReminder,
+    updateReminder: workspace.updateReminder,
+    deleteReminder: workspace.deleteReminder,
+    inviteMember: workspace.inviteMember,
+    updateMember: workspace.updateMember,
+    removeMember: workspace.removeMember,
+    setAssignees: workspace.setAssignees,
+    addSubscription: workspace.addSubscription,
+    deleteSubscription: workspace.deleteSubscription,
+    syncSubscription: workspace.syncSubscription,
   };
 
   return (
-    <TickTickContext.Provider value={contextValue}>
+    <WorkspaceContext.Provider value={contextValue}>
       {children}
-    </TickTickContext.Provider>
+    </WorkspaceContext.Provider>
   );
 }
 
-export function useTickTickContext() {
-  const context = useContext(TickTickContext);
+export function useWorkspaceContext() {
+  const context = useContext(WorkspaceContext);
   if (!context) {
-    throw new Error("useTickTickContext must be used within a TickTickProvider");
+    throw new Error("useWorkspaceContext must be used within a WorkspaceProvider");
   }
   return context;
 }

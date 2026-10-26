@@ -245,9 +245,9 @@ export function EventDialog({
 
   return (
     <Dialog onOpenChange={(open) => !open && onClose()} open={isOpen}>
-      <DialogContent className="sm:max-w-[480px] bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)]">
+      <DialogContent className="sm:max-w-[480px] bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)]">
         <DialogHeader>
-          <DialogTitle className="tt-heading font-semibold text-[var(--tt-text)]">
+          <DialogTitle className="app-heading font-semibold text-[var(--app-text)]">
             {event?.id ? "Edit Task" : "New Scheduled Task"}
           </DialogTitle>
           <DialogDescription className="sr-only">
@@ -266,7 +266,7 @@ export function EventDialog({
         <div className="grid gap-3.5 py-2 max-h-[70vh] overflow-y-auto pr-1">
           {/* Title */}
           <div className="space-y-1">
-            <Label htmlFor="title" className="tt-label text-[var(--tt-text)]">
+            <Label htmlFor="title" className="app-label text-[var(--app-text)]">
               Task Title
             </Label>
             <Input
@@ -274,14 +274,14 @@ export function EventDialog({
               placeholder="What needs to be done?"
               onChange={(e) => setTitle(e.target.value)}
               value={title}
-              className="bg-[var(--tt-panel-alt)] border-[var(--tt-border)] text-[var(--tt-text)] placeholder:text-[var(--tt-muted)] focus-visible:ring-[var(--tt-accent)]"
+              className="bg-[var(--app-panel-alt)] border-[var(--app-border)] text-[var(--app-text)] placeholder:text-[var(--app-muted)] focus-visible:ring-[var(--app-accent)]"
             />
           </div>
 
           {/* List selection */}
           {lists.length > 0 && (
             <div className="space-y-1">
-              <Label htmlFor="task-list" className="tt-label text-[var(--tt-text)]">
+              <Label htmlFor="task-list" className="app-label text-[var(--app-text)]">
                 List
               </Label>
               <Select
@@ -290,11 +290,11 @@ export function EventDialog({
               >
                 <SelectTrigger
                   id="task-list"
-                  className="bg-[var(--tt-panel-alt)] border-[var(--tt-border)] text-[var(--tt-text)]"
+                  className="bg-[var(--app-panel-alt)] border-[var(--app-border)] text-[var(--app-text)]"
                 >
                   <SelectValue placeholder="Inbox" />
                 </SelectTrigger>
-                <SelectContent className="bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)]">
+                <SelectContent className="bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)]">
                   <SelectItem value="inbox">Inbox</SelectItem>
                   {lists.map((l) => (
                     <SelectItem key={l.id} value={l.id}>
@@ -309,15 +309,15 @@ export function EventDialog({
           {/* Start Date & Time */}
           <div className="flex gap-3">
             <div className="flex-1 space-y-1">
-              <Label htmlFor="start-date" className="tt-label text-[var(--tt-text)]">
+              <Label htmlFor="start-date" className="app-label text-[var(--app-text)]">
                 Start / Due Date
               </Label>
               <Popover onOpenChange={setStartDateOpen} open={startDateOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     className={cn(
-                      "w-full justify-between border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-3 font-normal text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/80",
-                      !startDate && "text-[var(--tt-muted)]",
+                      "w-full justify-between border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 font-normal text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/80",
+                      !startDate && "text-[var(--app-muted)]",
                     )}
                     id="start-date"
                     variant="outline"
@@ -327,12 +327,12 @@ export function EventDialog({
                     </span>
                     <RiCalendarLine
                       aria-hidden="true"
-                      className="shrink-0 text-[var(--tt-muted)]"
+                      className="shrink-0 text-[var(--app-muted)]"
                       size={16}
                     />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent align="start" className="w-auto p-2 bg-[var(--tt-panel)] border-[var(--tt-border)]">
+                <PopoverContent align="start" className="w-auto p-2 bg-[var(--app-panel)] border-[var(--app-border)]">
                   <Calendar
                     defaultMonth={startDate}
                     mode="single"
@@ -353,17 +353,17 @@ export function EventDialog({
 
             {!allDay && (
               <div className="w-32 space-y-1">
-                <Label htmlFor="start-time" className="tt-label text-[var(--tt-text)]">
+                <Label htmlFor="start-time" className="app-label text-[var(--app-text)]">
                   Start Time
                 </Label>
                 <Select onValueChange={setStartTime} value={startTime}>
                   <SelectTrigger
                     id="start-time"
-                    className="bg-[var(--tt-panel-alt)] border-[var(--tt-border)] text-[var(--tt-text)]"
+                    className="bg-[var(--app-panel-alt)] border-[var(--app-border)] text-[var(--app-text)]"
                   >
                     <SelectValue placeholder="Time" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)] max-h-56">
+                  <SelectContent className="bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] max-h-56">
                     {timeOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
@@ -378,15 +378,15 @@ export function EventDialog({
           {/* End Date & Time */}
           <div className="flex gap-3">
             <div className="flex-1 space-y-1">
-              <Label htmlFor="end-date" className="tt-label text-[var(--tt-text)]">
+              <Label htmlFor="end-date" className="app-label text-[var(--app-text)]">
                 End Date
               </Label>
               <Popover onOpenChange={setEndDateOpen} open={endDateOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     className={cn(
-                      "w-full justify-between border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-3 font-normal text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/80",
-                      !endDate && "text-[var(--tt-muted)]",
+                      "w-full justify-between border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 font-normal text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/80",
+                      !endDate && "text-[var(--app-muted)]",
                     )}
                     id="end-date"
                     variant="outline"
@@ -396,12 +396,12 @@ export function EventDialog({
                     </span>
                     <RiCalendarLine
                       aria-hidden="true"
-                      className="shrink-0 text-[var(--tt-muted)]"
+                      className="shrink-0 text-[var(--app-muted)]"
                       size={16}
                     />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent align="start" className="w-auto p-2 bg-[var(--tt-panel)] border-[var(--tt-border)]">
+                <PopoverContent align="start" className="w-auto p-2 bg-[var(--app-panel)] border-[var(--app-border)]">
                   <Calendar
                     defaultMonth={endDate}
                     disabled={{ before: startDate }}
@@ -420,17 +420,17 @@ export function EventDialog({
 
             {!allDay && (
               <div className="w-32 space-y-1">
-                <Label htmlFor="end-time" className="tt-label text-[var(--tt-text)]">
+                <Label htmlFor="end-time" className="app-label text-[var(--app-text)]">
                   End Time
                 </Label>
                 <Select onValueChange={setEndTime} value={endTime}>
                   <SelectTrigger
                     id="end-time"
-                    className="bg-[var(--tt-panel-alt)] border-[var(--tt-border)] text-[var(--tt-text)]"
+                    className="bg-[var(--app-panel-alt)] border-[var(--app-border)] text-[var(--app-text)]"
                   >
                     <SelectValue placeholder="Time" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[var(--tt-panel)] border-[var(--tt-border)] text-[var(--tt-text)] max-h-56">
+                  <SelectContent className="bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] max-h-56">
                     {timeOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
@@ -443,14 +443,14 @@ export function EventDialog({
           </div>
 
           {/* All day & Completed Toggles */}
-          <div className="flex items-center justify-between py-1 border-y border-[var(--tt-border)]/60">
+          <div className="flex items-center justify-between py-1 border-y border-[var(--app-border)]/60">
             <div className="flex items-center gap-2">
               <Checkbox
                 checked={allDay}
                 id="all-day"
                 onCheckedChange={(checked) => setAllDay(checked === true)}
               />
-              <Label htmlFor="all-day" className="tt-label text-[var(--tt-text)] cursor-pointer">
+              <Label htmlFor="all-day" className="app-label text-[var(--app-text)] cursor-pointer">
                 All day
               </Label>
             </div>
@@ -462,7 +462,7 @@ export function EventDialog({
                   id="task-completed"
                   onCheckedChange={(checked) => setCompleted(checked === true)}
                 />
-                <Label htmlFor="task-completed" className="tt-label text-[var(--tt-text)] cursor-pointer">
+                <Label htmlFor="task-completed" className="app-label text-[var(--app-text)] cursor-pointer">
                   Completed
                 </Label>
               </div>
@@ -471,7 +471,7 @@ export function EventDialog({
 
           {/* Description */}
           <div className="space-y-1">
-            <Label htmlFor="desc" className="tt-label text-[var(--tt-text)]">
+            <Label htmlFor="desc" className="app-label text-[var(--app-text)]">
               Description / Notes
             </Label>
             <Textarea
@@ -480,13 +480,13 @@ export function EventDialog({
               placeholder="Add description..."
               onChange={(e) => setDescription(e.target.value)}
               value={description}
-              className="bg-[var(--tt-panel-alt)] border-[var(--tt-border)] text-[var(--tt-text)] placeholder:text-[var(--tt-muted)] resize-none"
+              className="bg-[var(--app-panel-alt)] border-[var(--app-border)] text-[var(--app-text)] placeholder:text-[var(--app-muted)] resize-none"
             />
           </div>
 
           {/* Priority & Color */}
           <fieldset className="space-y-2">
-            <legend className="tt-label font-medium text-[var(--tt-text)]">
+            <legend className="app-label font-medium text-[var(--app-text)]">
               Priority & Color
             </legend>
             <RadioGroup
@@ -513,7 +513,7 @@ export function EventDialog({
           </fieldset>
         </div>
 
-        <DialogFooter className="flex-row items-center justify-between gap-2 pt-3 border-t border-[var(--tt-border)]">
+        <DialogFooter className="flex-row items-center justify-between gap-2 pt-3 border-t border-[var(--app-border)]">
           <div className="flex items-center gap-2">
             {event?.id && (
               <Button
@@ -537,7 +537,7 @@ export function EventDialog({
                 }}
                 size="sm"
                 variant="outline"
-                className="gap-1.5 border-[var(--tt-border)] bg-[var(--tt-panel-alt)] text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/80"
+                className="gap-1.5 border-[var(--app-border)] bg-[var(--app-panel-alt)] text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/80"
               >
                 <ExternalLink className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Full Details</span>
@@ -550,14 +550,14 @@ export function EventDialog({
               onClick={onClose}
               variant="outline"
               size="sm"
-              className="border-[var(--tt-border)] bg-[var(--tt-panel-alt)] text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/80"
+              className="border-[var(--app-border)] bg-[var(--app-panel-alt)] text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/80"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSave}
               size="sm"
-              className="bg-[var(--tt-accent-strong)] text-white hover:bg-[var(--tt-accent-strong)]/90"
+              className="bg-[var(--app-accent-strong)] text-white hover:bg-[var(--app-accent-strong)]/90"
             >
               Save
             </Button>

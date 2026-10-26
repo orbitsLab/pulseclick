@@ -24,7 +24,7 @@ export function HabitEncouragementToast({
   habitTitle,
   streak,
   encouragement,
-  color = "var(--tt-accent)",
+  color = "var(--app-accent)",
   onDismiss,
 }: HabitEncouragementProps) {
   useEffect(() => {
@@ -41,7 +41,7 @@ export function HabitEncouragementToast({
 
   return (
     <div className="fixed bottom-6 right-6 z-50 max-w-sm w-full animate-in slide-in-from-bottom-5 fade-in duration-200">
-      <div className="relative overflow-hidden rounded-2xl border border-[var(--tt-border)] bg-[var(--tt-panel)] p-4 shadow-2xl backdrop-blur-md">
+      <div className="relative overflow-hidden rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4 shadow-2xl backdrop-blur-md">
         {/* Glow accent */}
         <div
           className="absolute -top-12 -right-12 h-28 w-28 rounded-full opacity-20 blur-2xl pointer-events-none"
@@ -58,18 +58,18 @@ export function HabitEncouragementToast({
 
           <div className="flex-1 min-w-0 pr-4">
             <div className="flex items-center gap-2">
-              <span className="tt-label font-bold text-[var(--tt-text)] truncate">
+              <span className="app-label font-bold text-[var(--app-text)] truncate">
                 {habitTitle} completed!
               </span>
               {streak > 0 && (
-                <span className="flex items-center gap-0.5 rounded-full bg-amber-500/15 px-2 py-0.5 tt-meta font-bold text-amber-500 shrink-0">
+                <span className="flex items-center gap-0.5 rounded-full bg-amber-500/15 px-2 py-0.5 app-meta font-bold text-amber-500 shrink-0">
                   <Flame className="h-3 w-3 fill-current" />
                   {streak}d
                 </span>
               )}
             </div>
 
-            <p className="tt-body text-[var(--tt-muted)] text-xs mt-1 italic leading-relaxed">
+            <p className="app-body text-[var(--app-muted)] text-xs mt-1 italic leading-relaxed">
               &ldquo;{quote}&rdquo;
             </p>
           </div>
@@ -77,7 +77,7 @@ export function HabitEncouragementToast({
           <button
             type="button"
             onClick={onDismiss}
-            className="rounded-lg p-1 text-[var(--tt-muted)] hover:text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)] transition-colors"
+            className="rounded-lg p-1 text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] transition-colors"
           >
             <X className="h-4 w-4" />
           </button>

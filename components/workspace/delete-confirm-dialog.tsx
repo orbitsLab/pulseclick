@@ -50,10 +50,10 @@ export function DeleteConfirmDialog({
               <AlertTriangleIcon className="size-5" />
             </div>
             <div className="flex flex-col gap-1">
-              <DialogTitle className="tt-heading font-semibold text-[var(--tt-text)]">
+              <DialogTitle className="app-heading font-semibold text-[var(--app-text)]">
                 {title}
               </DialogTitle>
-              <DialogDescription className="tt-body text-[var(--tt-muted)]">
+              <DialogDescription className="app-body text-[var(--app-muted)]">
                 {description}
               </DialogDescription>
             </div>
@@ -64,7 +64,7 @@ export function DeleteConfirmDialog({
             <Button
               variant="outline"
               disabled={isDeleting}
-              className="border-[var(--tt-border)] bg-[var(--tt-panel-alt)] hover:bg-[var(--tt-panel-alt)]/80 text-[var(--tt-text)]"
+              className="border-[var(--app-border)] bg-[var(--app-panel-alt)] hover:bg-[var(--app-panel-alt)]/80 text-[var(--app-text)]"
             >
               Cancel
             </Button>

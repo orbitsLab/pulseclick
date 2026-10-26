@@ -1,5 +1,5 @@
 ---
-name: PulseTick
+name: PulseFlow
 description: A quiet, flat-tonal personal planner that keeps one person's tasks, schedule, habits and focus in a single day-first workspace.
 colors:
   primary: "#4772fa"
@@ -51,13 +51,13 @@ components:
     backgroundColor: "{colors.accent-strong}"
 ---
 
-# Design System: PulseTick
+# Design System: PulseFlow
 
 ## Overview
 
 **Creative North Star: "The Quiet Day"**
 
-PulseTick's design system is named for the day it serves. The owner of the deployment sits down with the product to capture a thought, place it on a day, keep a practice going, and read what the week actually looked like. The visual system exists to answer "what now?" quietly and precisely, without narrating the process.
+PulseFlow's design system is named for the day it serves. The owner of the deployment sits down with the product to capture a thought, place it on a day, keep a practice going, and read what the week actually looked like. The visual system exists to answer "what now?" quietly and precisely, without narrating the process.
 
 The mood is calm plus precise. Calm is carried by flat-tonal surfaces, restrained type and an accent that appears only when a decision is needed. Precision is carried by exact numbers, fixed type scales and named rules that forbid improvisation. The aesthetic philosophy is day-first: each module opens on the view that answers the daily question before the views that answer everything else.
 
@@ -66,7 +66,7 @@ The system was extracted from the incumbent implementation (Tailwind v4 + shadcn
 **Key Characteristics:**
 
 - The module title is always display type (Instrument Serif, 26px) — one per screen, no exceptions.
-- Body text always routes through a named role (`tt-body` 13px → `tt-heading` 15px → `tt-title` 17px → `tt-display` 26px); ad-hoc sizes are banned.
+- Body text always routes through a named role (`app-body` 13px → `app-heading` 15px → `app-title` 17px → `app-display` 26px); ad-hoc sizes are banned.
 - Depth is tonal at rest, never shadow-based for in-app surfaces.
 - Priority is expressed as a flag/dot signal, never as a card-edge stripe.
 
@@ -113,7 +113,7 @@ Palette character: one brand accent over a neutral slate, carried dark-first (Mi
 
 ### Named Rules
 
-**The Single-Source Rule.** Every product typeface and size routes through the `@utility` role set (`tt-display`, `tt-title`, `tt-heading`, `tt-body`, `tt-label`, `tt-meta`, `tt-overline`, `tt-figure`) or the shadcn primitives mapped onto those roles. Ad-hoc font-size utilities (`text-[Npx]`, `text-xs`, `text-sm`) are banned from product surfaces.
+**The Single-Source Rule.** Every product typeface and size routes through the `@utility` role set (`app-display`, `app-title`, `app-heading`, `app-body`, `app-label`, `app-meta`, `app-overline`, `app-figure`) or the shadcn primitives mapped onto those roles. Ad-hoc font-size utilities (`text-[Npx]`, `text-xs`, `text-sm`) are banned from product surfaces.
 
 ## Layout
 
@@ -176,7 +176,7 @@ For each component, a short character line, then shape, color, states, behavior.
 
 ### Do
 
-- **Do** use the `tt-*` role utilities (or mapped shadcn primitives) for all product typography.
+- **Do** use the `app-*` role utilities (or mapped shadcn primitives) for all product typography.
 - **Do** keep the module title as display type and let smaller roles carry the rest of the hierarchy.
 - **Do** express priority and state through text/icon/dot signals before fill.
 

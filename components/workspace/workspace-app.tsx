@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { ModuleRail } from "./module-rail";
-import { TickTickSidebar } from "./sidebar";
+import { WorkspaceSidebar } from "./sidebar";
 import { TaskInputBar } from "./task-input-bar";
 import { TaskListView } from "./task-list-view";
 import { TaskKanbanView } from "./task-kanban-view";
@@ -20,7 +20,7 @@ import { QuickAddModal } from "./quick-add-modal";
 import { FilterPanel } from "./filter-panel";
 import { ThemePicker } from "./theme-picker";
 import { SyncIndicator } from "./sync-indicator";
-import { TickTickProvider, useTickTickContext } from "@/context/ticktick-context";
+import { WorkspaceProvider, useWorkspaceContext } from "@/context/workspace-context";
 import { applyTheme, DEFAULT_THEME_ID } from "@/lib/themes";
 import { cn } from "@/lib/utils";
 import {
@@ -32,7 +32,7 @@ import {
   PanelLeftOpen,
 } from "lucide-react";
 
-interface TickTickAppProps {
+interface WorkspaceAppProps {
   user: { email: string; name?: string | null } | null;
   isDark: boolean;
   onToggleTheme: () => void;
@@ -40,13 +40,13 @@ interface TickTickAppProps {
   onThemeChange?: (themeId: string) => void;
 }
 
-function TickTickWorkspace({
+function WorkspaceContainer({
   user,
   isDark,
   onToggleTheme,
   onLogout,
   onThemeChange,
-}: TickTickAppProps) {
+}: WorkspaceAppProps) {
   const {
     activeModule,
     setActiveModule,
@@ -130,7 +130,7 @@ function TickTickWorkspace({
     addSubscription,
     deleteSubscription,
     syncSubscription,
-  } = useTickTickContext();
+  } = useWorkspaceContext();
 
   // Publish workspace theme as CSS variables
   useEffect(() => {
@@ -138,7 +138,7 @@ function TickTickWorkspace({
   }, [settings?.themeId]);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[var(--tt-panel-alt)] text-[var(--tt-text)] relative">
+    <div className="flex h-screen w-screen overflow-hidden bg-[var(--app-panel-alt)] text-[var(--app-text)] relative">
       {/* 1. Far Left Module Icon Rail */}
       <ModuleRail
         activeModule={activeModule}
@@ -154,7 +154,7 @@ function TickTickWorkspace({
       <div className="flex flex-1 h-full overflow-hidden">
         {/* Navigation Sidebar (Shown on Tasks only; hidden in Calendar view) */}
         {activeModule === "tasks" && (
-          <TickTickSidebar
+          <WorkspaceSidebar
             activeView={activeView}
             activeListId={activeListId}
             activeTag={activeTag}
@@ -193,9 +193,9 @@ function TickTickWorkspace({
         )}
 
         {/* Middle Main Workspace */}
-        <main className="flex-1 flex flex-col h-full overflow-hidden bg-[var(--tt-panel)] p-4 sm:p-6">
+        <main className="flex-1 flex flex-col h-full overflow-hidden bg-[var(--app-panel)] p-4 sm:p-6">
           {/* View Header */}
-          <div className="flex items-center justify-between pb-3 mb-3 border-b border-[var(--tt-border)]/80">
+          <div className="flex items-center justify-between pb-3 mb-3 border-b border-[var(--app-border)]/80">
             <div className="flex items-center gap-3">
               {activeModule === "tasks" && (
                 <button
@@ -206,8 +206,8 @@ function TickTickWorkspace({
                   className={cn(
                     "p-1.5 rounded-lg border transition-all cursor-pointer shrink-0 flex items-center justify-center",
                     isSidebarOpen
-                      ? "border-[var(--tt-border)] bg-[var(--tt-panel-alt)] text-[var(--tt-muted)] hover:text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)]/80"
-                      : "border-[var(--tt-accent)]/40 bg-[var(--tt-accent)]/10 text-[var(--tt-accent-text)] hover:bg-[var(--tt-accent)]/20 shadow-xs"
+                      ? "border-[var(--app-border)] bg-[var(--app-panel-alt)] text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/80"
+                      : "border-[var(--app-accent)]/40 bg-[var(--app-accent)]/10 text-[var(--app-accent-text)] hover:bg-[var(--app-accent)]/20 shadow-xs"
                   )}
                 >
                   {isSidebarOpen ? (
@@ -218,7 +218,7 @@ function TickTickWorkspace({
                 </button>
               )}
 
-              <h1 className="tt-display text-[var(--tt-text)] capitalize">
+              <h1 className="app-display text-[var(--app-text)] capitalize">
                 {activeModule === "matrix"
                   ? "Eisenhower Matrix"
                   : activeModule === "pomodoro"
@@ -240,7 +240,7 @@ function TickTickWorkspace({
                   : currentListName}
               </h1>
               {activeModule === "tasks" && (
-                <span className="rounded-full bg-[var(--tt-panel-alt)] px-2 py-0.5 tt-label font-semibold text-[var(--tt-muted)]">
+                <span className="rounded-full bg-[var(--app-panel-alt)] px-2 py-0.5 app-label font-semibold text-[var(--app-muted)]">
                   {tasks.filter((t) => !t.completed).length}
                 </span>
               )}
@@ -253,26 +253,26 @@ function TickTickWorkspace({
               <button
                 type="button"
                 onClick={() => setIsCommandPaletteOpen(true)}
-                className="flex items-center gap-1.5 rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-2.5 py-1 tt-label text-[var(--tt-muted)] hover:text-[var(--tt-text)] hover:bg-[var(--tt-panel-alt)] dark:hover:text-[var(--tt-text)] transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-2.5 py-1 app-label text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] dark:hover:text-[var(--app-text)] transition-colors cursor-pointer"
                 title="Open Command Palette (Cmd+K)"
               >
                 <Search className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Search / Commands</span>
-                <kbd className="hidden sm:inline-block rounded bg-[var(--tt-panel-alt)] px-1 tt-meta font-mono">
+                <kbd className="hidden sm:inline-block rounded bg-[var(--app-panel-alt)] px-1 app-meta font-mono">
                   ⌘K
                 </kbd>
               </button>
 
               {activeModule === "tasks" && (
-                <div className="flex items-center rounded-lg border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] p-0.5">
+                <div className="flex items-center rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] p-0.5">
                   <button
                     type="button"
                     onClick={() => setTaskLayout("list")}
                     title="List View"
                     className={`rounded-md p-1.5 transition-colors ${
                       taskLayout === "list"
-                        ? "bg-[var(--tt-panel)] text-[var(--tt-accent-text)] shadow-xs dark:bg-[var(--tt-panel-alt)] dark:text-[var(--tt-accent-text)]"
-                        : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] dark:text-[var(--tt-muted)]"
+                        ? "bg-[var(--app-panel)] text-[var(--app-accent-text)] shadow-xs dark:bg-[var(--app-panel-alt)] dark:text-[var(--app-accent-text)]"
+                        : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)]"
                     }`}
                   >
                     <ListTodo className="h-4 w-4" />
@@ -283,8 +283,8 @@ function TickTickWorkspace({
                     title="Kanban Board View"
                     className={`rounded-md p-1.5 transition-colors ${
                       taskLayout === "kanban"
-                        ? "bg-[var(--tt-panel)] text-[var(--tt-accent-text)] shadow-xs dark:bg-[var(--tt-panel-alt)] dark:text-[var(--tt-accent-text)]"
-                        : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] dark:text-[var(--tt-muted)]"
+                        ? "bg-[var(--app-panel)] text-[var(--app-accent-text)] shadow-xs dark:bg-[var(--app-panel-alt)] dark:text-[var(--app-accent-text)]"
+                        : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)]"
                     }`}
                   >
                     <Columns3 className="h-4 w-4" />
@@ -382,7 +382,7 @@ function TickTickWorkspace({
               subscriptions={subscriptions}
               lists={lists}
               timezone={settings?.timezone ?? "UTC"}
-              themeId={settings?.themeId ?? "ticktick-blue"}
+              themeId={settings?.themeId ?? "flow-blue"}
               onAddSubscription={addSubscription}
               onDeleteSubscription={deleteSubscription}
               onSyncSubscription={syncSubscription}
@@ -483,7 +483,7 @@ function TickTickWorkspace({
       <ThemePicker
         isOpen={isThemePickerOpen}
         onClose={() => setIsThemePickerOpen(false)}
-        themeId={settings?.themeId ?? "ticktick-blue"}
+        themeId={settings?.themeId ?? "flow-blue"}
         onSelectTheme={(themeId: string) => {
           applyTheme(themeId);
           if (onThemeChange) {
@@ -497,10 +497,10 @@ function TickTickWorkspace({
   );
 }
 
-export function TickTickApp(props: TickTickAppProps) {
+export function WorkspaceApp(props: WorkspaceAppProps) {
   return (
-    <TickTickProvider>
-      <TickTickWorkspace {...props} />
-    </TickTickProvider>
+    <WorkspaceProvider>
+      <WorkspaceContainer {...props} />
+    </WorkspaceProvider>
   );
 }

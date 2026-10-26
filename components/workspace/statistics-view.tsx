@@ -106,12 +106,12 @@ const FALLBACK_THEME: ThemeVars = {
 };
 
 const THEME_VAR_NAMES: Record<keyof ThemeVars, string> = {
-  accent: "--tt-accent",
-  text: "--tt-text",
-  muted: "--tt-muted",
-  border: "--tt-border",
-  panel: "--tt-panel",
-  panelAlt: "--tt-panel-alt",
+  accent: "--app-accent",
+  text: "--app-text",
+  muted: "--app-muted",
+  border: "--app-border",
+  panel: "--app-panel",
+  panelAlt: "--app-panel-alt",
 };
 
 function readThemeVars(): ThemeVars {
@@ -156,7 +156,7 @@ function useThemeVars(): ThemeVars {
       observer = new MutationObserver(() => sync());
       observer.observe(document.documentElement, {
         attributes: true,
-        attributeFilter: ["data-tt-theme", "data-tt-mode", "class", "style"],
+        attributeFilter: ["data-app-theme", "data-app-mode", "class", "style"],
       });
     }
 
@@ -262,16 +262,16 @@ function SectionCard({
   action?: React.ReactNode;
 }) {
   return (
-    <section className="rounded-xl border border-[var(--tt-border)] bg-[var(--tt-panel)] p-5 shadow-sm transition-colors">
+    <section className="rounded-xl border border-[var(--app-border)] bg-[var(--app-panel)] p-5 shadow-sm transition-colors">
       <header className="mb-4 flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--tt-panel-alt)] text-[var(--tt-muted)]">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--app-panel-alt)] text-[var(--app-muted)]">
             {icon}
           </span>
           <div>
-            <h3 className="tt-heading font-semibold text-[var(--tt-text)]">{title}</h3>
+            <h3 className="app-heading font-semibold text-[var(--app-text)]">{title}</h3>
             {subtitle ? (
-              <p className="tt-label text-[var(--tt-muted)]">{subtitle}</p>
+              <p className="app-label text-[var(--app-muted)]">{subtitle}</p>
             ) : null}
           </div>
         </div>
@@ -284,9 +284,9 @@ function SectionCard({
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--tt-border)] bg-[var(--tt-panel-alt)]/60 px-4 py-8 text-center">
-      <Sparkles className="h-4 w-4 text-[var(--tt-muted)]" />
-      <p className="tt-label text-[var(--tt-muted)]">{message}</p>
+    <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--app-border)] bg-[var(--app-panel-alt)]/60 px-4 py-8 text-center">
+      <Sparkles className="h-4 w-4 text-[var(--app-muted)]" />
+      <p className="app-label text-[var(--app-muted)]">{message}</p>
     </div>
   );
 }
@@ -305,7 +305,7 @@ function DonutGauge({ percent, accent }: { percent: number; accent: string }) {
         fill="none"
         stroke="#e6e9f0"
         strokeWidth="5"
-        className="dark:stroke-[var(--tt-border)]"
+        className="dark:stroke-[var(--app-border)]"
       />
       <circle
         cx="22"
@@ -411,7 +411,7 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
       {/* Header + range switcher */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="tt-body text-[var(--tt-muted)]">
+          <p className="app-body text-[var(--app-muted)]">
             {isLoading
               ? "Refreshing your insights…"
               : `A snapshot of your productivity for this ${range}.`}
@@ -419,7 +419,7 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
         </div>
 
         <div
-          className="inline-flex w-full items-center gap-1 self-start rounded-xl border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] p-1 sm:w-auto"
+          className="inline-flex w-full items-center gap-1 self-start rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] p-1 sm:w-auto"
           role="tablist"
           aria-label="Statistics range"
         >
@@ -432,7 +432,7 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
                 role="tab"
                 aria-selected={active}
                 onClick={() => onRangeChange(option.id)}
-                className={`flex-1 rounded-lg px-3 py-1.5 tt-label font-semibold transition-all sm:flex-none ${ active ? "text-white shadow-md" : "text-[var(--tt-muted)] hover:text-[var(--tt-text)] dark:text-[var(--tt-muted)] dark:hover:text-white" }`}
+                className={`flex-1 rounded-lg px-3 py-1.5 app-label font-semibold transition-all sm:flex-none ${ active ? "text-white shadow-md" : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)] dark:hover:text-white" }`}
                 style={active ? { backgroundColor: theme.accent } : undefined}
               >
                 {option.label}
@@ -469,16 +469,16 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
           hint="Still to do"
         />
 
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--tt-border)] bg-[var(--tt-panel)] p-4 shadow-sm transition-colors">
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4 shadow-sm transition-colors">
           <div className="flex flex-col gap-1">
-            <span className="flex items-center gap-1.5 tt-label font-medium text-[var(--tt-muted)]">
+            <span className="flex items-center gap-1.5 app-label font-medium text-[var(--app-muted)]">
               <TrendingUp className="h-4 w-4" />
               Completion rate
             </span>
-            <span className="tt-figure font-semibold text-[var(--tt-text)]">
+            <span className="app-figure font-semibold text-[var(--app-text)]">
               {completionPercent}%
             </span>
-            <span className="tt-meta text-[var(--tt-muted)]">
+            <span className="app-meta text-[var(--app-muted)]">
               Completed vs created
             </span>
           </div>
@@ -577,7 +577,7 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
           subtitle="Minutes of deep work"
           icon={<Clock className="h-4 w-4" />}
           action={
-            <span className="rounded-lg bg-[var(--tt-panel-alt)] px-2 py-1 tt-meta font-bold text-[var(--tt-text)]">
+            <span className="rounded-lg bg-[var(--app-panel-alt)] px-2 py-1 app-meta font-bold text-[var(--app-text)]">
               {formatMinutes(focus.totalMinutes ?? 0)}
             </span>
           }
@@ -615,19 +615,19 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
                 </ResponsiveContainer>
               </div>
               <div className="mt-4 grid grid-cols-2 gap-4">
-                <div className="rounded-xl bg-[var(--tt-panel-alt)] p-3">
-                  <span className="tt-overline font-semibold tracking-wide text-[var(--tt-muted)]">
+                <div className="rounded-xl bg-[var(--app-panel-alt)] p-3">
+                  <span className="app-overline font-semibold tracking-wide text-[var(--app-muted)]">
                     Total focus
                   </span>
-                  <p className="mt-1 tt-title font-semibold text-[var(--tt-text)]">
+                  <p className="mt-1 app-title font-semibold text-[var(--app-text)]">
                     {formatMinutes(focus.totalMinutes ?? 0)}
                   </p>
                 </div>
-                <div className="rounded-xl bg-[var(--tt-panel-alt)] p-3">
-                  <span className="tt-overline font-semibold tracking-wide text-[var(--tt-muted)]">
+                <div className="rounded-xl bg-[var(--app-panel-alt)] p-3">
+                  <span className="app-overline font-semibold tracking-wide text-[var(--app-muted)]">
                     Sessions
                   </span>
-                  <p className="mt-1 tt-title font-semibold text-[var(--tt-text)]">
+                  <p className="mt-1 app-title font-semibold text-[var(--app-text)]">
                     {focus.sessions ?? 0}
                   </p>
                 </div>
@@ -656,18 +656,18 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
               return (
                 <div key={entry.listId ?? `list-${index}`} className="space-y-1.5">
                   <div className="flex items-center justify-between gap-3">
-                    <span className="flex min-w-0 items-center gap-2 tt-label font-medium text-[var(--tt-text)]">
+                    <span className="flex min-w-0 items-center gap-2 app-label font-medium text-[var(--app-text)]">
                       <span
                         className="h-2.5 w-2.5 shrink-0 rounded-full"
                         style={{ backgroundColor: dotColor }}
                       />
                       <span className="truncate">{entry.name || "Untitled list"}</span>
                     </span>
-                    <span className="shrink-0 tt-meta text-[var(--tt-muted)]">
+                    <span className="shrink-0 app-meta text-[var(--app-muted)]">
                       {completed}/{count}
                     </span>
                   </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--tt-panel-alt)]">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--app-panel-alt)]">
                     <div
                       className="h-full rounded-full transition-all"
                       style={{ width: `${percent}%`, backgroundColor: dotColor }}
@@ -694,7 +694,7 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
               {habitStreaks.map((habit, index) => (
                 <div
                   key={`${habit.title}-${index}`}
-                  className="flex items-center justify-between gap-3 rounded-xl bg-[var(--tt-panel-alt)] p-3"
+                  className="flex items-center justify-between gap-3 rounded-xl bg-[var(--app-panel-alt)] p-3"
                 >
                   <div className="flex min-w-0 items-center gap-2">
                     <span
@@ -702,15 +702,15 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
                       style={{ backgroundColor: habit.color || theme.accent }}
                     />
                     <div className="min-w-0">
-                      <p className="truncate tt-label font-semibold text-[var(--tt-text)]">
+                      <p className="truncate app-label font-semibold text-[var(--app-text)]">
                         {habit.title || "Untitled habit"}
                       </p>
-                      <p className="tt-meta text-[var(--tt-muted)]">
+                      <p className="app-meta text-[var(--app-muted)]">
                         {toPercent(habit.completionRate)}% complete · {habit.totalLogs ?? 0} logs
                       </p>
                     </div>
                   </div>
-                  <span className="flex shrink-0 items-center gap-1 rounded-lg bg-[var(--tt-panel)] px-2 py-1 tt-label font-semibold text-orange-500 shadow-xs dark:text-orange-400">
+                  <span className="flex shrink-0 items-center gap-1 rounded-lg bg-[var(--app-panel)] px-2 py-1 app-label font-semibold text-orange-500 shadow-xs dark:text-orange-400">
                     <Flame className="h-3.5 w-3.5" />
                     {habit.streak ?? 0}
                   </span>
@@ -732,7 +732,7 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
               {topBusiest.map((entry) => (
                 <span
                   key={entry.date}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-[var(--tt-border)] bg-[var(--tt-panel-alt)] px-3 py-1.5 tt-label font-medium text-[var(--tt-text)]"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-1.5 app-label font-medium text-[var(--app-text)]"
                 >
                   <Activity className="h-3.5 w-3.5" style={{ color: theme.accent }} />
                   {formatDayLabel(entry.date)} — {entry.count ?? 0}
@@ -766,18 +766,18 @@ function KpiCard({
   accentBackground: string;
 }) {
   return (
-    <div className="flex flex-col gap-1 rounded-xl border border-[var(--tt-border)] bg-[var(--tt-panel)] p-4 shadow-sm transition-colors">
+    <div className="flex flex-col gap-1 rounded-xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4 shadow-sm transition-colors">
       <span
         className="flex h-8 w-8 items-center justify-center rounded-lg"
         style={{ backgroundColor: accentBackground, color: accent }}
       >
         {icon}
       </span>
-      <span className="mt-1 tt-label font-medium text-[var(--tt-muted)]">{label}</span>
-      <span className="tt-figure font-semibold text-[var(--tt-text)]">
+      <span className="mt-1 app-label font-medium text-[var(--app-muted)]">{label}</span>
+      <span className="app-figure font-semibold text-[var(--app-text)]">
         {value}
       </span>
-      <span className="tt-meta text-[var(--tt-muted)]">{hint}</span>
+      <span className="app-meta text-[var(--app-muted)]">{hint}</span>
     </div>
   );
 }
