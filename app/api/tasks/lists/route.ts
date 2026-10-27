@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getTodayISO, addDays } from "@/lib/date-utils";
 
 export async function GET(req: Request) {
   try {
@@ -22,45 +21,7 @@ export async function GET(req: Request) {
       },
     });
 
-    // Count smart list tasks
-    const today = getTodayISO();
-    const tomorrow = addDays(today, 1);
-
-    const [inboxCount, todayCount, tomorrowCount, allCount] = await Promise.all([
-      prisma.task.count({
-        where: {
-          userId: user.id,
-          listId: null,
-          completed: false,
-          isTrash: false,
-        },
-      }),
-      prisma.task.count({
-        where: {
-          userId: user.id,
-          completed: false,
-          isTrash: false,
-          dueDate: { lte: today },
-        },
-      }),
-      prisma.task.count({
-        where: {
-          userId: user.id,
-          completed: false,
-          isTrash: false,
-          dueDate: tomorrow,
-        },
-      }),
-      prisma.task.count({
-        where: {
-          userId: user.id,
-          completed: false,
-          isTrash: false,
-        },
-      }),
-    ]);
-
-    return NextResponse.json({ lists, inboxCount, todayCount, tomorrowCount, allCount });
+    return NextResponse.json({ lists, inboxCount: 0, todayCount: 0, tomorrowCount: 0, allCount: 0 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

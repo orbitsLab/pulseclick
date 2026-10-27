@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
 import { useIsFetching, useQueryClient } from "@tanstack/react-query";
 import { WorkspaceModule } from "@/components/workspace/module-rail";
+import { getTodayISO, addDays } from "@/lib/date-utils";
 import {
   useWorkspace,
   Task,
@@ -311,10 +312,10 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [hasLoadedFiltersOnce, setHasLoadedFiltersOnce] = useState(false);
 
   useEffect(() => {
-    if (!workspace.isLoadingTasks || workspace.tasks.length > 0) {
+    if (!workspace.isLoadingTasks || workspace.allActiveTasks.length > 0) {
       setHasLoadedTasksOnce(true);
     }
-  }, [workspace.isLoadingTasks, workspace.tasks]);
+  }, [workspace.isLoadingTasks, workspace.allActiveTasks]);
 
   useEffect(() => {
     if (!workspace.isLoadingHabits || workspace.habits.length > 0) {
@@ -340,11 +341,146 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     }
   }, [workspace.isLoadingFilters, workspace.filters]);
 
-  const isInitialLoadingTasks = !hasLoadedTasksOnce && workspace.isLoadingTasks && workspace.tasks.length === 0;
+  const isInitialLoadingTasks = !hasLoadedTasksOnce && workspace.isLoadingTasks && workspace.allActiveTasks.length === 0;
   const isInitialLoadingHabits = !hasLoadedHabitsOnce && workspace.isLoadingHabits && workspace.habits.length === 0;
   const isInitialLoadingLists = !hasLoadedListsOnce && workspace.isLoadingLists && workspace.lists.length === 0;
   const isInitialLoadingTags = !hasLoadedTagsOnce && workspace.isLoadingTags && workspace.tags.length === 0;
   const isInitialLoadingFilters = !hasLoadedFiltersOnce && workspace.isLoadingFilters && workspace.filters.length === 0;
+
+  const today = getTodayISO();
+  const tomorrow = addDays(today, 1);
+  const next7Days = addDays(today, 7);
+
+  // Dynamic in-memory counts derived directly from allActiveTasks
+  const { inboxCount, todayCount, tomorrowCount, allCount, listCounts, tagCounts } = useMemo(() => {
+    let inbox = 0;
+    let todayC = 0;
+    let tomorrowC = 0;
+    let all = 0;
+    const lCounts: Record<string, number> = {};
+    const tCounts: Record<string, number> = {};
+
+    for (const t of workspace.allActiveTasks) {
+      if (t.isTrash) continue;
+      if (!t.completed) {
+        all++;
+        if (!t.listId) inbox++;
+        if (t.dueDate && t.dueDate <= today) todayC++;
+        if (t.dueDate === tomorrow) tomorrowC++;
+        if (t.listId) {
+          lCounts[t.listId] = (lCounts[t.listId] || 0) + 1;
+        }
+        if (t.tags && Array.isArray(t.tags)) {
+          for (const item of t.tags) {
+            const tagName = item.tag?.name;
+            if (tagName) {
+              tCounts[tagName] = (tCounts[tagName] || 0) + 1;
+            }
+          }
+        }
+      }
+    }
+
+    return {
+      inboxCount: inbox,
+      todayCount: todayC,
+      tomorrowCount: tomorrowC,
+      allCount: all,
+      listCounts: lCounts,
+      tagCounts: tCounts,
+    };
+  }, [workspace.allActiveTasks, today, tomorrow]);
+
+  const listsWithCounts = useMemo(() => {
+    return workspace.lists.map((l) => ({
+      ...l,
+      _count: { tasks: listCounts[l.id] || 0 },
+    }));
+  }, [workspace.lists, listCounts]);
+
+  const tagsWithCounts = useMemo(() => {
+    return workspace.tags.map((tg) => ({
+      ...tg,
+      _count: { tasks: tagCounts[tg.name] || 0 },
+    }));
+  }, [workspace.tags, tagCounts]);
+
+  // In-memory filtered tasks for the active view/filter/search
+  const derivedTasks = useMemo(() => {
+    if (activeView === "trash") {
+      return workspace.trashTasks;
+    }
+
+    let result = workspace.allActiveTasks;
+
+    // 1. Module / View Filter
+    if (activeView === "today") {
+      result = result.filter((t) => t.dueDate && t.dueDate <= today);
+    } else if (activeView === "tomorrow") {
+      result = result.filter((t) => t.dueDate === tomorrow);
+    } else if (activeView === "next7") {
+      result = result.filter((t) => t.dueDate && t.dueDate >= today && t.dueDate <= next7Days);
+    } else if (activeView === "inbox") {
+      result = result.filter((t) => !t.listId);
+    } else if (activeView === "completed") {
+      result = result.filter((t) => t.completed);
+    }
+    // "all", "calendar", "timeline" take all active tasks
+
+    // 2. Custom List Filter
+    if (activeListId && activeListId !== "inbox" && activeListId !== "all") {
+      result = result.filter((t) => t.listId === activeListId);
+    }
+
+    // 3. Tag Filter
+    if (activeTag) {
+      result = result.filter((t) => t.tags?.some((tagItem) => tagItem.tag?.name === activeTag));
+    }
+
+    // 4. Search Filter
+    if (searchQuery && searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      result = result.filter(
+        (t) =>
+          t.title.toLowerCase().includes(q) ||
+          (t.description && t.description.toLowerCase().includes(q))
+      );
+    }
+
+    // 5. Smart Filter
+    if (activeFilterId) {
+      const filter = workspace.filters.find((f: any) => f.id === activeFilterId);
+      if (filter && filter.query) {
+        const queryObj = filter.query;
+        result = result.filter((t) => {
+          if (queryObj.priority !== undefined && queryObj.priority !== null) {
+            if (t.priority !== queryObj.priority) return false;
+          }
+          if (queryObj.completed !== undefined) {
+            if (t.completed !== queryObj.completed) return false;
+          }
+          if (queryObj.listId) {
+            if (t.listId !== queryObj.listId) return false;
+          }
+          return true;
+        });
+      }
+    }
+
+    return result;
+  }, [
+    activeView,
+    activeListId,
+    activeTag,
+    searchQuery,
+    activeFilterId,
+    workspace.allActiveTasks,
+    workspace.trashTasks,
+    workspace.filters,
+    today,
+    tomorrow,
+    next7Days,
+  ]);
 
   // Calculate current list/view name
   const currentListName = useMemo(() => {
@@ -377,8 +513,8 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
 
   // Selected Task
   const selectedTask = useMemo(
-    () => workspace.tasks.find((t) => t.id === selectedTaskId) || null,
-    [workspace.tasks, selectedTaskId]
+    () => (activeView === "trash" ? workspace.trashTasks : workspace.allActiveTasks).find((t) => t.id === selectedTaskId) || null,
+    [workspace.allActiveTasks, workspace.trashTasks, activeView, selectedTaskId]
   );
 
   // Global keydown listener for Cmd+K / Ctrl+K
@@ -465,25 +601,25 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     refetchAll,
 
     // Data from useWorkspace
-    tasks: workspace.tasks,
+    tasks: derivedTasks,
     isLoadingTasks: workspace.isLoadingTasks,
     isInitialLoadingTasks,
     hasLoadedTasksOnce,
     isErrorTasks: workspace.isErrorTasks,
     tasksError: workspace.tasksError,
     refetchTasks: workspace.refetchTasks,
-    lists: workspace.lists,
+    lists: listsWithCounts,
     isLoadingLists: workspace.isLoadingLists,
     isInitialLoadingLists,
     hasLoadedListsOnce,
     isErrorLists: workspace.isErrorLists,
     listsError: workspace.listsError,
     refetchLists: workspace.refetchLists,
-    inboxCount: workspace.inboxCount,
-    todayCount: workspace.todayCount,
-    tomorrowCount: workspace.tomorrowCount,
-    allCount: workspace.allCount,
-    tags: workspace.tags,
+    inboxCount,
+    todayCount,
+    tomorrowCount,
+    allCount,
+    tags: tagsWithCounts,
     isLoadingTags: workspace.isLoadingTags,
     isInitialLoadingTags,
     hasLoadedTagsOnce,

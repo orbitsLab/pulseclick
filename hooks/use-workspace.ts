@@ -293,32 +293,35 @@ export function useWorkspace(filters: {
 }) {
   const queryClient = useQueryClient();
 
-  // 1. Tasks Query
-  const tasksQueryKey = [
-    "workspace-tasks",
-    filters.view,
-    filters.listId,
-    filters.tag,
-    filters.search,
-    filters.filterId,
-  ];
+  const isTrashView = filters.view === "trash";
+
+  // 1a. Active Tasks Query (Single global store for all active tasks)
+  const tasksQueryKey = ["workspace-tasks", "active"];
   const tasksQuery = useQuery({
     queryKey: tasksQueryKey,
     queryFn: async () => {
-      const params = new URLSearchParams();
-      if (filters.view) params.set("view", filters.view);
-      if (filters.listId) params.set("listId", filters.listId);
-      if (filters.tag) params.set("tag", filters.tag);
-      if (filters.search) params.set("search", filters.search);
-      if (filters.filterId) params.set("filter", filters.filterId);
-
-      const res = await fetch(`/api/tasks?${params.toString()}`);
+      const res = await fetch("/api/tasks?view=all");
       if (!res.ok) throw new Error("Failed to load tasks");
       const data = await res.json();
       return (data.tasks || []) as Task[];
     },
     placeholderData: keepPreviousData,
-    staleTime: 10_000,
+    staleTime: 60_000,
+  });
+
+  // 1b. Trash Tasks Query (Loaded on-demand only when trash view is active)
+  const trashTasksQueryKey = ["workspace-tasks", "trash"];
+  const trashTasksQuery = useQuery({
+    queryKey: trashTasksQueryKey,
+    queryFn: async () => {
+      const res = await fetch("/api/tasks?view=trash");
+      if (!res.ok) throw new Error("Failed to load trash tasks");
+      const data = await res.json();
+      return (data.tasks || []) as Task[];
+    },
+    enabled: isTrashView,
+    placeholderData: keepPreviousData,
+    staleTime: 30_000,
   });
 
   // 2. Task Lists Query
@@ -1549,12 +1552,20 @@ export function useWorkspace(filters: {
     },
   });
 
+  const currentTasks = isTrashView ? (trashTasksQuery.data || []) : (tasksQuery.data || []);
+  const isCurrentLoading = isTrashView ? trashTasksQuery.isLoading : tasksQuery.isLoading;
+  const isCurrentError = isTrashView ? trashTasksQuery.isError : tasksQuery.isError;
+  const currentError = isTrashView ? trashTasksQuery.error : tasksQuery.error;
+  const currentRefetch = isTrashView ? trashTasksQuery.refetch : tasksQuery.refetch;
+
   return {
-    tasks: tasksQuery.data || [],
-    isLoadingTasks: tasksQuery.isLoading,
-    isErrorTasks: tasksQuery.isError,
-    tasksError: tasksQuery.error,
-    refetchTasks: tasksQuery.refetch,
+    allActiveTasks: tasksQuery.data || [],
+    trashTasks: trashTasksQuery.data || [],
+    tasks: currentTasks,
+    isLoadingTasks: isCurrentLoading,
+    isErrorTasks: isCurrentError,
+    tasksError: currentError,
+    refetchTasks: currentRefetch,
     lists: listsQuery.data?.lists || [],
     isLoadingLists: listsQuery.isLoading,
     isErrorLists: listsQuery.isError,
