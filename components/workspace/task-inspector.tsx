@@ -22,7 +22,7 @@ import {
   XIcon,
 } from "lucide-react";
 import { Task, TaskList, Tag, TaskReminder, ListMember } from "@/hooks/use-workspace";
-import { getTodayISO, formatShortDate, parseISODate, addDays } from "@/lib/date-utils";
+import { getTodayISO, formatShortDate, parseISODate, addDays, formatTaskSchedule } from "@/lib/date-utils";
 import { TaskDatePickerPopover } from "./task-date-picker-popover";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import { useWorkspaceContext } from "@/context/workspace-context";
@@ -228,6 +228,7 @@ export function TaskInspector({
   const isOverdue = task.dueDate && task.dueDate < today && !task.completed;
   const isDueToday = task.dueDate && task.dueDate === today;
   const isDueTomorrow = task.dueDate && task.dueDate === tomorrow;
+  const schedule = formatTaskSchedule(task);
 
   function handleTitleBlur() {
     if (title.trim() && title !== task?.title) {
@@ -413,13 +414,13 @@ export function TaskInspector({
                   type="button"
                   className={cn(
                     "flex items-center gap-1.5 app-meta font-medium rounded px-1.5 py-0.5 transition-colors cursor-pointer",
-                    isOverdue
+                    schedule?.isOverdue
                       ? "text-rose-500 font-semibold hover:bg-rose-500/10"
-                      : isDueToday
+                      : schedule?.isDueToday
                       ? "text-[var(--app-accent-text)] font-semibold hover:bg-[var(--app-panel-alt)]"
-                      : isDueTomorrow
+                      : schedule?.isDueTomorrow
                       ? "text-amber-400 font-semibold hover:bg-amber-500/10"
-                      : task.dueDate
+                      : schedule
                       ? "text-[var(--app-accent-text)] hover:bg-[var(--app-panel-alt)]"
                       : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]"
                   )}
@@ -428,26 +429,31 @@ export function TaskInspector({
                   <Calendar
                     className={cn(
                       "h-3.5 w-3.5",
-                      isOverdue
+                      schedule?.isOverdue
                         ? "text-rose-500"
-                        : isDueToday
+                        : schedule?.isDueToday
                         ? "text-[var(--app-accent-text)]"
-                        : isDueTomorrow
+                        : schedule?.isDueTomorrow
                         ? "text-amber-400"
                         : undefined
                     )}
                   />
                   <span>
-                    {task.dueDate
-                      ? isOverdue
-                        ? getOverdueLabel(task.dueDate)
-                        : isDueToday
-                        ? "Today"
-                        : isDueTomorrow
-                        ? "Tomorrow"
-                        : formatShortDate(task.dueDate)
-                      : "Set date"}
-                    {task.dueTime ? ` ${task.dueTime}` : ""}
+                    {schedule ? (
+                      <span className="inline-flex items-center gap-1">
+                        <span>{schedule.dateLabel}</span>
+                        {schedule.timeLabel && (
+                          <span className="opacity-80 font-mono app-meta">{schedule.timeLabel}</span>
+                        )}
+                        {schedule.durationBadge && (
+                          <span className="ml-0.5 rounded px-1 py-0.2 bg-[var(--app-accent)]/20 text-[var(--app-accent-text)] font-mono app-meta font-semibold">
+                            {schedule.durationBadge}
+                          </span>
+                        )}
+                      </span>
+                    ) : (
+                      "Set date"
+                    )}
                   </span>
                 </button>
               </PopoverTrigger>

@@ -35,7 +35,7 @@ import {
   Check,
 } from "lucide-react";
 import { Task } from "@/hooks/use-workspace";
-import { formatShortDate, getTodayISO, addDays } from "@/lib/date-utils";
+import { formatShortDate, getTodayISO, addDays, formatTaskSchedule } from "@/lib/date-utils";
 import { useWorkspaceContext } from "@/context/workspace-context";
 import { cn } from "@/lib/utils";
 
@@ -118,6 +118,7 @@ function TaskCard({
   }, [task.dueDate, task.completed, today]);
 
   const tomorrow = useMemo(() => addDays(today, 1), [today]);
+  const schedule = useMemo(() => formatTaskSchedule(task), [task]);
 
   // Priority and completion card styling
   const priorityCardStyles = useMemo(() => {
@@ -287,29 +288,30 @@ function TaskCard({
               </span>
             )}
 
-            {/* Due Date */}
-            {task.dueDate && (
+            {/* Due Date & Schedule */}
+            {schedule && (
               <div
                 className={cn(
                   "inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium tabular-nums app-meta shrink-0",
-                  isOverdue
+                  schedule.isOverdue
                     ? "bg-rose-500/15 text-rose-400 border border-rose-500/30 font-bold"
-                    : task.dueDate === today
+                    : schedule.isDueToday
                     ? "bg-[var(--app-accent)]/15 text-[var(--app-accent-text)] font-bold border border-[var(--app-accent)]/30"
-                    : task.dueDate === tomorrow
+                    : schedule.isDueTomorrow
                     ? "bg-amber-500/15 text-amber-400 font-bold border border-amber-500/30"
                     : "bg-[var(--app-panel-alt)] text-[var(--app-muted)] border border-[var(--app-border)]/60"
                 )}
               >
                 <Calendar className="h-2.5 w-2.5 shrink-0" />
                 <time className="whitespace-nowrap">
-                  {task.dueDate === today
-                    ? "Today"
-                    : task.dueDate === tomorrow
-                    ? "Tomorrow"
-                    : formatShortDate(task.dueDate)}
-                  {task.dueTime && ` · ${task.dueTime}`}
+                  {schedule.dateLabel}
+                  {schedule.timeLabel && ` · ${schedule.timeLabel}`}
                 </time>
+                {schedule.durationBadge && (
+                  <span className="ml-0.5 rounded px-1 py-0.2 bg-[var(--app-accent)]/20 text-[var(--app-accent-text)] font-mono app-meta font-semibold">
+                    {schedule.durationBadge}
+                  </span>
+                )}
               </div>
             )}
 

@@ -16,6 +16,7 @@ export interface CalendarEvent {
   listColor?: string;
   subtaskCount?: number;
   subtasksCompleted?: number;
+  durationMinutes?: number;
 }
 
 export type EventColor =

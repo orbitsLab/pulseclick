@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Plus, Check, Calendar, CheckCircle2 } from "lucide-react";
 import { Task } from "@/hooks/use-workspace";
-import { getTodayISO } from "@/lib/date-utils";
+import { getTodayISO, formatTaskSchedule } from "@/lib/date-utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface EisenhowerMatrixViewProps {
@@ -188,12 +188,21 @@ export function EisenhowerMatrixView({
                       </span>
                     </div>
 
-                    {task.dueDate && (
-                      <span className="app-meta text-[var(--app-muted)] flex items-center gap-1 flex-shrink-0">
-                        <Calendar className="h-2.5 w-2.5" />
-                        {task.dueDate}
-                      </span>
-                    )}
+                    {(() => {
+                      const schedule = formatTaskSchedule(task);
+                      if (!schedule) return null;
+                      return (
+                        <span className="app-meta text-[var(--app-muted)] flex items-center gap-1 flex-shrink-0">
+                          <Calendar className="h-2.5 w-2.5" />
+                          <span>{schedule.dateLabel}</span>
+                          {schedule.durationBadge && (
+                            <span className="ml-0.5 rounded px-1 py-0.2 bg-[var(--app-accent)]/20 text-[var(--app-accent-text)] font-mono text-[9px] font-semibold">
+                              {schedule.durationBadge}
+                            </span>
+                          )}
+                        </span>
+                      );
+                    })()}
                   </div>
                 );
               })

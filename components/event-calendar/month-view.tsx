@@ -2,6 +2,7 @@
 
 import {
   addDays,
+  differenceInCalendarDays,
   eachDayOfInterval,
   endOfMonth,
   endOfWeek,
@@ -14,6 +15,7 @@ import {
 } from "date-fns";
 import type React from "react";
 import { useEffect, useMemo, useState } from "react";
+import { cn } from "@/lib/utils";
 
 import {
   type CalendarEvent,
@@ -169,6 +171,15 @@ export function MonthView({
                         const isHidden = isMounted && index >= visibleLimit;
 
                         if (!isFirstDay) {
+                          const totalDays = Math.max(
+                            1,
+                            differenceInCalendarDays(eventEnd, eventStart) + 1,
+                          );
+                          const dayNumber = Math.max(
+                            1,
+                            differenceInCalendarDays(day, eventStart) + 1,
+                          );
+
                           return (
                             <div
                               aria-hidden={isHidden ? "true" : undefined}
@@ -183,16 +194,22 @@ export function MonthView({
                                 onToggleComplete={onEventToggleComplete}
                                 view="month"
                               >
-                                <div aria-hidden={true} className="invisible">
-                                  {!event.allDay && (
-                                    <span>
-                                      {format(
-                                        new Date(event.start),
-                                        "h:mm",
-                                      )}{" "}
-                                    </span>
-                                  )}
-                                  {event.title}
+                                <div className="flex items-center gap-1 w-full min-w-0">
+                                  <span className="text-[var(--app-muted)] app-meta font-mono shrink-0 select-none">
+                                    ↳
+                                  </span>
+                                  <span
+                                    className={cn(
+                                      "truncate min-w-0 font-medium",
+                                      event.completed &&
+                                        "line-through text-[var(--app-muted)]",
+                                    )}
+                                  >
+                                    {event.title}
+                                  </span>
+                                  <span className="ml-auto app-meta font-mono text-[var(--app-muted)] shrink-0 select-none">
+                                    {dayNumber}/{totalDays}
+                                  </span>
                                 </div>
                               </EventItem>
                             </div>

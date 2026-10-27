@@ -10,8 +10,6 @@ import {
   Tag as TagIcon,
   Bell,
   Plus,
-  Mic,
-  MicOff,
   Wand2,
   Repeat,
 } from "lucide-react";
@@ -91,9 +89,7 @@ export function QuickAddModal({
   const [recurrence, setRecurrence] = useState<string>("NONE");
   const [reminder, setReminder] = useState<string>("NONE");
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
-  const [isListening, setIsListening] = useState(false);
   const manual = useRef<Set<string>>(new Set());
-  const recognitionRef = useRef<any>(null);
 
   const parsed = useMemo(() => parseTaskInput(title), [title]);
 
@@ -118,29 +114,6 @@ export function QuickAddModal({
         return next;
       });
     }
-  }
-
-  function toggleVoiceInput() {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) return;
-    if (isListening && recognitionRef.current) {
-      recognitionRef.current.stop();
-      return;
-    }
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = "en-US";
-    recognition.onresult = (event: any) => {
-      const transcript = event.results?.[0]?.[0]?.transcript || "";
-      if (transcript) handleTitleChange(transcript);
-    };
-    recognition.onend = () => setIsListening(false);
-    recognition.onerror = () => setIsListening(false);
-    recognitionRef.current = recognition;
-    setIsListening(true);
-    recognition.start();
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -230,15 +203,6 @@ export function QuickAddModal({
                 placeholder="What would you like to accomplish?"
                 className="flex-1 bg-transparent app-title font-semibold text-white placeholder-[var(--app-muted)] focus:outline-none"
               />
-              <button
-                type="button"
-                onClick={toggleVoiceInput}
-                aria-label={isListening ? "Stop dictation" : "Dictate a task"}
-                title={isListening ? "Stop dictation" : "Dictate a task"}
-                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-colors ${ isListening ? "bg-rose-500/20 text-rose-400" : "text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)] hover:text-white" }`}
-              >
-                {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-              </button>
             </div>
 
             {/* Natural language preview */}

@@ -73,3 +73,93 @@ export function getWeekDays(mondayIso: string) {
   }
   return days;
 }
+
+export interface TaskScheduleData {
+  dueDate?: string | null;
+  dueTime?: string | null;
+  startDate?: string | null;
+  startTime?: string | null;
+  endDate?: string | null;
+  endTime?: string | null;
+  durationMinutes?: number | null;
+  completed?: boolean;
+}
+
+export interface TaskScheduleFormat {
+  dateLabel: string;
+  timeLabel?: string;
+  durationBadge?: string;
+  isOverdue: boolean;
+  isDueToday: boolean;
+  isDueTomorrow: boolean;
+  isMultiDay: boolean;
+}
+
+export function formatDurationMinutes(minutes: number): string {
+  if (minutes >= 1440 && minutes % 1440 === 0) {
+    return `${minutes / 1440}d`;
+  }
+  if (minutes >= 60) {
+    const hours = Math.round((minutes / 60) * 10) / 10;
+    return `${hours}h`;
+  }
+  return `${minutes}m`;
+}
+
+export function formatTaskSchedule(task: TaskScheduleData): TaskScheduleFormat | null {
+  const startIso = task.startDate || task.dueDate;
+  if (!startIso) return null;
+
+  const today = getTodayISO();
+  const tomorrow = addDays(today, 1);
+  const endIso = task.endDate;
+
+  const isMultiDay = Boolean(endIso && endIso !== startIso);
+
+  const formatSingle = (iso: string) => {
+    if (iso === today) return "Today";
+    if (iso === tomorrow) return "Tomorrow";
+    return formatShortDate(iso);
+  };
+
+  let dateLabel = "";
+  let durationBadge: string | undefined;
+
+  if (isMultiDay && endIso) {
+    const startDt = parseISODate(startIso);
+    const endDt = parseISODate(endIso);
+    const days = Math.round((endDt.getTime() - startDt.getTime()) / 86400000) + 1;
+    dateLabel = `${formatSingle(startIso)} – ${formatSingle(endIso)}`;
+    durationBadge = `${Math.max(1, days)}d`;
+  } else {
+    dateLabel = formatSingle(startIso);
+    if (task.durationMinutes && task.durationMinutes > 0) {
+      durationBadge = formatDurationMinutes(task.durationMinutes);
+    }
+  }
+
+  const startTime = task.startTime || task.dueTime;
+  const endTime = task.endTime;
+  let timeLabel: string | undefined;
+
+  if (startTime && endTime) {
+    timeLabel = `${startTime} – ${endTime}`;
+  } else if (startTime) {
+    timeLabel = `@${startTime}`;
+  }
+
+  const effectiveEnd = endIso || task.dueDate || startIso;
+  const isOverdue = Boolean(effectiveEnd && effectiveEnd < today && !task.completed);
+  const isDueToday = Boolean((startIso === today || endIso === today) && !task.completed);
+  const isDueTomorrow = Boolean(startIso === tomorrow && !task.completed);
+
+  return {
+    dateLabel,
+    timeLabel,
+    durationBadge,
+    isOverdue,
+    isDueToday,
+    isDueTomorrow,
+    isMultiDay,
+  };
+}

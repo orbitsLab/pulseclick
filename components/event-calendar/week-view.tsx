@@ -285,20 +285,17 @@ export function WeekView({
                         event={event}
                         isFirstDay={isFirstDay}
                         isLastDay={isLastDay}
-                        key={`spanning-${event.id}`}
+                        key={`spanning-${event.id}-${day.toISOString().slice(0, 10)}`}
                         onClick={(e) => handleEventClick(event, e)}
                         onToggleComplete={onEventToggleComplete}
                         view="month"
                       >
-                        {/* Show title if it's the first day of the event or the first visible day in the week */}
-                        <div
-                          aria-hidden={!shouldShowTitle}
-                          className={cn(
-                            "truncate",
-                            !shouldShowTitle && "invisible",
+                        {/* Show title on first day, and continuation indicator on subsequent days */}
+                        <div className="truncate flex items-center gap-1 w-full min-w-0">
+                          {!shouldShowTitle && (
+                            <span className="text-[var(--app-muted)] app-meta font-mono shrink-0 select-none">↳</span>
                           )}
-                        >
-                          {event.title}
+                          <span className="truncate">{event.title}</span>
                         </div>
                       </EventItem>
                     );

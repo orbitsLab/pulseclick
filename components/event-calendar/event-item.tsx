@@ -2,7 +2,7 @@
 
 import type { DraggableAttributes } from "@dnd-kit/core";
 import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
-import { differenceInMinutes, format, getMinutes } from "date-fns";
+import { differenceInCalendarDays, differenceInMinutes, format, getMinutes } from "date-fns";
 import { Check } from "lucide-react";
 import React, { useMemo } from "react";
 
@@ -230,6 +230,11 @@ export function EventItem({
             <span className={cn("truncate min-w-0 font-medium", event.completed && "line-through text-[var(--app-muted)]")}>
               {event.title}
             </span>
+            {isFirstDay && !isLastDay && (
+              <span className="ml-auto text-[10px] font-mono text-[var(--app-muted)] shrink-0 select-none">
+                {Math.max(1, differenceInCalendarDays(displayEnd, displayStart) + 1)}d
+              </span>
+            )}
           </div>
         )}
       </EventWrapper>
@@ -268,6 +273,11 @@ export function EventItem({
             <span className={cn("truncate min-w-0 font-medium", event.completed && "line-through text-[var(--app-muted)]")}>
               {event.title}
             </span>
+            {isFirstDay && !isLastDay && (
+              <span className="ml-auto text-[10px] font-mono text-[var(--app-muted)] shrink-0 select-none">
+                {Math.max(1, differenceInCalendarDays(displayEnd, displayStart) + 1)}d
+              </span>
+            )}
             {showTime && (
               <span className="opacity-75 font-mono app-meta shrink-0 ml-auto">
                 {formatTimeWithOptionalMinutes(displayStart)}

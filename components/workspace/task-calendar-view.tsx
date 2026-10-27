@@ -92,6 +92,7 @@ export function TaskCalendarView({
           listColor: t.list?.color,
           subtaskCount: t.subtasks?.length || 0,
           subtasksCompleted: t.subtasks?.filter((s) => s.completed).length || 0,
+          durationMinutes: t.durationMinutes || undefined,
         };
       });
   }, [tasks]);

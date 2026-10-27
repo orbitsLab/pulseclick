@@ -8,8 +8,6 @@ import {
   Folder,
   Tag as TagIcon,
   X,
-  Mic,
-  MicOff,
   Repeat,
   Wand2,
   ChevronDown,
@@ -85,11 +83,9 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
   const [listId, setListId] = useState<string | null>(currentListId);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [recurrence, setRecurrence] = useState<string>("NONE");
-  const [isListening, setIsListening] = useState(false);
 
   // Fields the user set by hand always win over the natural language parse.
   const manual = useRef<Set<string>>(new Set());
-  const recognitionRef = useRef<any>(null);
 
   // Popover toggles
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -147,31 +143,6 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
         return next;
       });
     }
-  }
-
-  function toggleVoiceInput() {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) return;
-
-    if (isListening && recognitionRef.current) {
-      recognitionRef.current.stop();
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = "en-US";
-    recognition.onresult = (event: any) => {
-      const transcript = event.results?.[0]?.[0]?.transcript || "";
-      if (transcript) handleTitleChange(transcript);
-    };
-    recognition.onend = () => setIsListening(false);
-    recognition.onerror = () => setIsListening(false);
-    recognitionRef.current = recognition;
-    setIsListening(true);
-    recognition.start();
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -264,13 +235,25 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
           />
         </div>
 
-        {/* Right-side Controls: Voice, Date, and Menu Dropdown */}
+        {/* Right-side Controls: Date and Menu Dropdown */}
         <div className="flex items-center gap-1.5 shrink-0 ml-2">
           {/* Active Date Label Pill if set */}
           {dueDate && (
-            <span className="flex items-center gap-1 rounded-md bg-[var(--app-accent)]/15 px-2 py-0.5 app-meta font-medium text-[var(--app-accent-text)]">
+            <span className="flex items-center gap-1.5 rounded-md bg-[var(--app-accent)]/15 px-2 py-0.5 app-meta font-medium text-[var(--app-accent-text)]">
               <span>
-                {dueDate === today ? "Today" : dueDate === tomorrow ? "Tomorrow" : formatShortDate(dueDate)}
+                {endDate && endDate !== dueDate ? (
+                  <>
+                    {formatShortDate(dueDate)} – {formatShortDate(endDate)}
+                    <span className="ml-1 opacity-75 font-mono">
+                      · {Math.round((parseISODate(endDate).getTime() - parseISODate(dueDate).getTime()) / 86400000) + 1}d
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    {dueDate === today ? "Today" : dueDate === tomorrow ? "Tomorrow" : formatShortDate(dueDate)}
+                    {dueTime && <span className="ml-1 opacity-75 font-mono">@{dueTime}</span>}
+                  </>
+                )}
               </span>
               <button
                 type="button"
@@ -288,22 +271,6 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
               </button>
             </span>
           )}
-
-          {/* Voice Input */}
-          <button
-            type="button"
-            onClick={toggleVoiceInput}
-            title={isListening ? "Stop dictation" : "Dictate a task"}
-            aria-label={isListening ? "Stop dictation" : "Dictate a task"}
-            className={cn(
-              "flex h-7 w-7 items-center justify-center rounded-lg transition-colors cursor-pointer",
-              isListening
-                ? "bg-rose-500/15 text-rose-500"
-                : "text-[var(--app-muted)] hover:bg-[var(--app-panel)] hover:text-[var(--app-text)]"
-            )}
-          >
-            {isListening ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
-          </button>
 
           {/* Calendar Trigger */}
           <div className="relative" ref={datePickerContainerRef}>

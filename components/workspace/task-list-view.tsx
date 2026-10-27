@@ -21,10 +21,11 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { Task } from "@/hooks/use-workspace";
-import { getTodayISO, addDays, formatShortDate } from "@/lib/date-utils";
+import { getTodayISO, addDays, formatShortDate, formatTaskSchedule } from "@/lib/date-utils";
 import { WorkspaceContext } from "@/context/workspace-context";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 export function TaskListSkeleton({ count = 5 }: { count?: number }) {
   return (
@@ -168,6 +169,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
 
     const isOverdue = task.dueDate && task.dueDate < today && !task.completed;
     const isDueToday = task.dueDate === today && !task.completed;
+    const schedule = formatTaskSchedule(task);
 
     return (
       <div
@@ -260,17 +262,27 @@ export function TaskListView(props: TaskListViewProps = {}) {
                 </span>
               )}
 
-              {task.dueDate && (
+              {schedule && (
                 <span
-                  className={`inline-flex items-center gap-0.5 rounded px-1.5 py-0.2 font-medium ${ isOverdue ? "bg-rose-500/15 text-rose-500 font-bold" : isDueToday ? "bg-[var(--app-accent)]/15 text-[var(--app-accent-text)] font-bold" : "bg-[var(--app-panel-alt)] text-[var(--app-text)] dark:bg-[var(--app-panel-alt)] dark:text-[var(--app-muted)]" }`}
+                  className={cn(
+                    "inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium transition-colors app-meta",
+                    schedule.isOverdue
+                      ? "bg-rose-500/15 text-rose-500 font-bold"
+                      : schedule.isDueToday
+                      ? "bg-[var(--app-accent)]/15 text-[var(--app-accent-text)] font-semibold"
+                      : "bg-[var(--app-panel-alt)] text-[var(--app-text)] dark:text-[var(--app-muted)]"
+                  )}
                 >
-                  <Calendar className="h-2.5 w-2.5" />
-                  {task.dueDate === today
-                    ? "Today"
-                    : task.dueDate === tomorrow
-                    ? "Tomorrow"
-                    : formatShortDate(task.dueDate)}
-                  {task.dueTime && ` ${task.dueTime}`}
+                  <Calendar className="h-3 w-3 shrink-0" />
+                  <span>{schedule.dateLabel}</span>
+                  {schedule.timeLabel && (
+                    <span className="opacity-80 font-mono app-meta">{schedule.timeLabel}</span>
+                  )}
+                  {schedule.durationBadge && (
+                    <span className="ml-0.5 rounded px-1 py-0.2 bg-[var(--app-accent)]/20 text-[var(--app-accent-text)] font-mono app-meta font-semibold">
+                      {schedule.durationBadge}
+                    </span>
+                  )}
                 </span>
               )}
 
