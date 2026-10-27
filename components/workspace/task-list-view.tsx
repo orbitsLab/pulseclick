@@ -18,6 +18,7 @@ import {
   ChevronRight,
   Layers,
   Sunrise,
+  AlertCircle,
 } from "lucide-react";
 import { Task } from "@/hooks/use-workspace";
 import { getTodayISO, addDays, formatShortDate } from "@/lib/date-utils";
@@ -89,8 +90,15 @@ export function TaskListView(props: TaskListViewProps = {}) {
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<"default" | "date" | "priority" | "title">("default");
   const [groupBy, setGroupBy] = useState<"date" | "priority" | "list" | "none">("date");
-  const [showCompleted, setShowCompleted] = useState<boolean>(false);
+  const isCompletedView = viewName === "Completed" || context?.activeView === "completed";
+  const [showCompleted, setShowCompleted] = useState<boolean>(() => isCompletedView);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
+
+  React.useEffect(() => {
+    if (isCompletedView) {
+      setShowCompleted(true);
+    }
+  }, [isCompletedView]);
 
   // Sorting
   const sortedTasks = [...tasks].sort((a, b) => {
@@ -471,6 +479,23 @@ export function TaskListView(props: TaskListViewProps = {}) {
       <div className="flex-1 space-y-4 overflow-y-auto pr-1 pb-16">
         {isInitialLoading ? (
           <TaskListSkeleton count={5} />
+        ) : context?.isErrorTasks ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center text-rose-500">
+            <AlertCircle className="h-8 w-8 text-rose-500 mb-2 opacity-90" />
+            <h2 className="app-heading font-semibold text-rose-500">
+              Failed to load tasks
+            </h2>
+            <p className="app-label text-[var(--app-muted)] mt-1 max-w-sm">
+              {context.tasksError?.message || "There was an issue connecting to the database."}
+            </p>
+            <button
+              type="button"
+              onClick={() => context.refetchTasks?.()}
+              className="mt-4 px-3.5 py-1.5 rounded-lg bg-[var(--app-accent-strong)] text-white text-xs font-semibold hover:opacity-90 transition-opacity cursor-pointer shadow-xs"
+            >
+              Retry
+            </button>
+          </div>
         ) : tasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center text-[var(--app-muted)]">
             <h2 className="flex items-center gap-2 app-heading font-semibold text-[var(--app-text)]">

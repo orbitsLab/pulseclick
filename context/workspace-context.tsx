@@ -74,10 +74,16 @@ export interface WorkspaceContextType {
   isLoadingTasks: boolean;
   isInitialLoadingTasks: boolean;
   hasLoadedTasksOnce: boolean;
+  isErrorTasks?: boolean;
+  tasksError?: Error | null;
+  refetchTasks?: () => Promise<any>;
   lists: TaskList[];
   isLoadingLists: boolean;
   isInitialLoadingLists: boolean;
   hasLoadedListsOnce: boolean;
+  isErrorLists?: boolean;
+  listsError?: Error | null;
+  refetchLists?: () => Promise<any>;
   inboxCount: number;
   todayCount: number;
   tomorrowCount: number;
@@ -462,10 +468,16 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     isLoadingTasks: workspace.isLoadingTasks,
     isInitialLoadingTasks,
     hasLoadedTasksOnce,
+    isErrorTasks: workspace.isErrorTasks,
+    tasksError: workspace.tasksError,
+    refetchTasks: workspace.refetchTasks,
     lists: workspace.lists,
     isLoadingLists: workspace.isLoadingLists,
     isInitialLoadingLists,
     hasLoadedListsOnce,
+    isErrorLists: workspace.isErrorLists,
+    listsError: workspace.listsError,
+    refetchLists: workspace.refetchLists,
     inboxCount: workspace.inboxCount,
     todayCount: workspace.todayCount,
     tomorrowCount: workspace.tomorrowCount,
