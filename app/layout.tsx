@@ -1,8 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { onest, instrumentSerif, geistMono } from "./fonts";
 import "./globals.css";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { Toaster } from "@/components/ui/toast";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+  themeColor: "#0f172a",
+};
 
 export const metadata: Metadata = {
   title: "PulseFlow — Tasks, Schedule, Habits & Focus",

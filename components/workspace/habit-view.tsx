@@ -1181,7 +1181,7 @@ function HabitRow({
   return (
     <div className="group relative flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[var(--app-border)]/80 bg-[var(--app-panel)] p-3.5 transition-all hover:border-[var(--app-border)] hover:shadow-xs">
       {/* Left: Icon, Title, Goal details & Streak */}
-      <div className="flex items-center gap-3 min-w-[240px] flex-1">
+      <div className="flex items-center gap-3 min-w-[200px] sm:min-w-[240px] flex-1">
         <div
           className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl font-bold text-white shadow-xs"
           style={{ backgroundColor: habit.color || "#14b8a6" }}
@@ -1196,7 +1196,7 @@ function HabitRow({
             </h4>
 
             {isSkippedToday && (
-              <span className="rounded-md bg-amber-500/15 text-amber-500 text-[10px] font-bold px-1.5 py-0.2">
+              <span className="rounded-md bg-amber-500/15 text-amber-500 app-meta font-bold px-1.5 py-0.2">
                 Skipped Today
               </span>
             )}
@@ -1243,7 +1243,7 @@ function HabitRow({
       </div>
 
       {/* Middle/Right: Numeric Goal Progress OR 7-Day Week Check-ins */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end overflow-x-auto">
         {isNumeric ? (
           <div className="flex items-center gap-2">
             {/* Numeric Progress Capsule */}
@@ -1304,7 +1304,7 @@ function HabitRow({
 
               return (
                 <div key={day.iso} className="flex flex-col items-center gap-1">
-                  <span className="app-overline font-semibold text-[var(--app-muted)] text-[10px]">
+                  <span className="app-overline font-semibold text-[var(--app-muted)] app-meta">
                     {day.shortName[0]}
                   </span>
                   <button

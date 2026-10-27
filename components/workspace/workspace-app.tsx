@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react";
 import { ModuleRail } from "./module-rail";
+import { MobileBottomNav } from "./mobile-bottom-nav";
 import { WorkspaceSidebar } from "./sidebar";
 import { TaskInputBar } from "./task-input-bar";
 import { TaskListView } from "./task-list-view";
@@ -193,10 +194,10 @@ function WorkspaceContainer({
         )}
 
         {/* Middle Main Workspace */}
-        <main className="flex-1 flex flex-col h-full overflow-hidden bg-[var(--app-panel)] p-4 sm:p-6">
+        <main className="flex-1 flex flex-col h-full overflow-hidden bg-[var(--app-panel)] p-3.5 sm:p-6 pb-20 md:pb-6 min-w-0">
           {/* View Header */}
-          <div className="flex items-center justify-between pb-3 mb-3 border-b border-[var(--app-border)]/80">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between pb-3 mb-3 border-b border-[var(--app-border)]/80 gap-2 shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
               {activeModule === "tasks" && (
                 <button
                   type="button"
@@ -218,7 +219,7 @@ function WorkspaceContainer({
                 </button>
               )}
 
-              <h1 className="app-display text-[var(--app-text)] capitalize">
+              <h1 className="text-lg sm:text-2xl md:app-display font-semibold text-[var(--app-text)] capitalize truncate">
                 {activeModule === "matrix"
                   ? "Eisenhower Matrix"
                   : activeModule === "pomodoro"
@@ -240,7 +241,7 @@ function WorkspaceContainer({
                   : currentListName}
               </h1>
               {activeModule === "tasks" && (
-                <span className="rounded-full bg-[var(--app-panel-alt)] px-2 py-0.5 app-label font-semibold text-[var(--app-muted)]">
+                <span className="rounded-full bg-[var(--app-panel-alt)] px-2 py-0.5 app-meta font-bold text-[var(--app-muted)] shrink-0">
                   {tasks.filter((t) => !t.completed).length}
                 </span>
               )}
@@ -436,6 +437,17 @@ function WorkspaceContainer({
           />
         )}
       </div>
+
+      {/* Mobile Bottom Navigation Bar (Visible on mobile screens) */}
+      <MobileBottomNav
+        activeModule={activeModule}
+        onSelectModule={selectModule}
+        isDark={isDark}
+        onToggleTheme={onToggleTheme}
+        onOpenThemePicker={() => setIsThemePickerOpen(true)}
+        user={user}
+        onLogout={onLogout}
+      />
 
       {/* Quick Add Modal */}
       <QuickAddModal

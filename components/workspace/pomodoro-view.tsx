@@ -129,29 +129,32 @@ export function PomodoroView({ tasks, stats, onLogPomodoro }: PomodoroViewProps)
   const strokeDashoffset = 565 - (565 * progressPercent) / 100;
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-between rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-6 shadow-sm transition-colors max-w-2xl mx-auto w-full">
+    <div className="flex-1 flex flex-col items-center justify-between rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4 sm:p-6 shadow-sm transition-colors max-w-2xl mx-auto w-full overflow-y-auto">
       {/* Mode Switcher Tabs */}
-      <div className="flex items-center gap-2 rounded-xl bg-[var(--app-panel-alt)] p-1">
+      <div className="flex items-center gap-1 sm:gap-2 rounded-xl bg-[var(--app-panel-alt)] p-1 w-full max-w-sm sm:max-w-none justify-center">
         <button
           type="button"
           onClick={() => switchMode("focus")}
-          className={`rounded-lg px-4 py-1.5 app-label font-semibold transition-all ${ mode === "focus" ? "bg-[var(--app-accent-strong)] text-white shadow-md shadow-[var(--app-accent)]/25" : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)] dark:hover:text-white" }`}
+          className={`rounded-lg px-2.5 sm:px-4 py-1.5 app-label font-semibold transition-all flex-1 sm:flex-initial text-center ${ mode === "focus" ? "bg-[var(--app-accent-strong)] text-white shadow-md shadow-[var(--app-accent)]/25" : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)] dark:hover:text-white" }`}
         >
-          Pomodoro (25m)
+          <span className="hidden sm:inline">Pomodoro (25m)</span>
+          <span className="sm:hidden">Focus 25m</span>
         </button>
         <button
           type="button"
           onClick={() => switchMode("shortBreak")}
-          className={`rounded-lg px-4 py-1.5 app-label font-semibold transition-all ${ mode === "shortBreak" ? "bg-[var(--app-accent-strong)] text-white shadow-md shadow-[var(--app-accent)]/25" : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)] dark:hover:text-white" }`}
+          className={`rounded-lg px-2.5 sm:px-4 py-1.5 app-label font-semibold transition-all flex-1 sm:flex-initial text-center ${ mode === "shortBreak" ? "bg-[var(--app-accent-strong)] text-white shadow-md shadow-[var(--app-accent)]/25" : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)] dark:hover:text-white" }`}
         >
-          Short Break (5m)
+          <span className="hidden sm:inline">Short Break (5m)</span>
+          <span className="sm:hidden">Short 5m</span>
         </button>
         <button
           type="button"
           onClick={() => switchMode("longBreak")}
-          className={`rounded-lg px-4 py-1.5 app-label font-semibold transition-all ${ mode === "longBreak" ? "bg-[var(--app-accent-strong)] text-white shadow-md shadow-[var(--app-accent)]/25" : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)] dark:hover:text-white" }`}
+          className={`rounded-lg px-2.5 sm:px-4 py-1.5 app-label font-semibold transition-all flex-1 sm:flex-initial text-center ${ mode === "longBreak" ? "bg-[var(--app-accent-strong)] text-white shadow-md shadow-[var(--app-accent)]/25" : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)] dark:hover:text-white" }`}
         >
-          Long Break (15m)
+          <span className="hidden sm:inline">Long Break (15m)</span>
+          <span className="sm:hidden">Long 15m</span>
         </button>
       </div>
 

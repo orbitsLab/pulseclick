@@ -147,7 +147,7 @@ export function CommandPalette({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 pt-20 p-4 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 pt-6 sm:pt-20 p-3 sm:p-4 backdrop-blur-xs">
       <div className="w-full max-w-xl overflow-hidden rounded-2xl border border-[var(--app-border)] bg-[var(--app-rail)] text-[var(--app-text)] shadow-2xl animate-in fade-in zoom-in-95 duration-150">
         {/* Search header */}
         <div className="flex items-center gap-3 border-b border-[var(--app-border)] px-4 py-3">

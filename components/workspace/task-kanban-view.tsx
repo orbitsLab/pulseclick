@@ -626,6 +626,7 @@ export function TaskKanbanView({
 }: TaskKanbanViewProps) {
   const context = useWorkspaceContext();
   const today = getTodayISO();
+  const [activeMobileColumn, setActiveMobileColumn] = useState<string>("TODO");
 
   // Initialize and synchronize columns from live tasks
   const [columns, setColumns] = useState<Record<string, Task[]>>(() =>
@@ -681,6 +682,37 @@ export function TaskKanbanView({
 
   return (
     <div className="flex-1 h-full overflow-hidden flex flex-col">
+      {/* Mobile Column Switcher Segmented Control (< md) */}
+      <div className="flex md:hidden items-center rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] p-1 mb-2.5 shrink-0">
+        {(
+          [
+            { id: "TODO", label: "To Do", dotColor: "bg-slate-400" },
+            { id: "IN_PROGRESS", label: "In Progress", dotColor: "bg-amber-400" },
+            { id: "DONE", label: "Done", dotColor: "bg-emerald-400" },
+          ] as const
+        ).map((col) => {
+          const count = columns[col.id]?.length || 0;
+          const isActive = activeMobileColumn === col.id;
+          return (
+            <button
+              key={col.id}
+              type="button"
+              onClick={() => setActiveMobileColumn(col.id)}
+              className={cn(
+                "flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 app-label font-medium transition-colors cursor-pointer",
+                isActive
+                  ? "bg-[var(--app-panel)] text-[var(--app-text)] font-semibold shadow-xs border border-[var(--app-border)]/60"
+                  : "text-[var(--app-muted)] hover:text-[var(--app-text)]"
+              )}
+            >
+              <span className={cn("h-2 w-2 rounded-full", col.dotColor)} />
+              <span>{col.label}</span>
+              <span className="app-meta text-[var(--app-muted)] font-mono">({count})</span>
+            </button>
+          );
+        })}
+      </div>
+
       <Kanban
         value={columns}
         onValueChange={setColumns}
@@ -689,21 +721,31 @@ export function TaskKanbanView({
         className="flex-1 h-full overflow-hidden flex flex-col"
       >
         <KanbanBoard className="grid h-full auto-rows-fr grid-cols-1 md:grid-cols-3 gap-4 overflow-y-auto md:overflow-hidden pb-4 min-h-0">
-          {Object.entries(columns).map(([columnValue, colTasks]) => (
-            <TaskColumn
-              key={columnValue}
-              value={columnValue}
-              tasks={colTasks}
-              isLoading={isInitialLoading}
-              selectedTaskId={selectedTaskId}
-              today={today}
-              onSelectTask={onSelectTask}
-              onQuickAdd={onQuickAdd}
-              onToggleComplete={handleToggleComplete}
-              onMoveStatus={handleMoveStatus}
-              onToggleSubtask={handleToggleSubtask}
-            />
-          ))}
+          {Object.entries(columns).map(([columnValue, colTasks]) => {
+            const isHiddenOnMobile = columnValue !== activeMobileColumn;
+            return (
+              <div
+                key={columnValue}
+                className={cn(
+                  "h-full min-h-0",
+                  isHiddenOnMobile ? "hidden md:flex flex-col" : "flex flex-col"
+                )}
+              >
+                <TaskColumn
+                  value={columnValue}
+                  tasks={colTasks}
+                  isLoading={isInitialLoading}
+                  selectedTaskId={selectedTaskId}
+                  today={today}
+                  onSelectTask={onSelectTask}
+                  onQuickAdd={onQuickAdd}
+                  onToggleComplete={handleToggleComplete}
+                  onMoveStatus={handleMoveStatus}
+                  onToggleSubtask={handleToggleSubtask}
+                />
+              </div>
+            );
+          })}
         </KanbanBoard>
 
         <KanbanOverlay>

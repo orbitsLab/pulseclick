@@ -305,7 +305,13 @@ export function TaskInspector({
 
   return (
     <>
-      <aside className="flex flex-col h-full w-80 md:w-96 border-l border-[var(--app-border)] bg-[var(--app-panel)] shadow-xl z-20 flex-shrink-0 animate-in slide-in-from-right duration-200 relative">
+      {/* Mobile/Tablet Backdrop (< lg) */}
+      <div
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 lg:hidden animate-in fade-in duration-150"
+        onClick={onClose}
+      />
+
+      <aside className="fixed inset-y-0 right-0 z-50 w-full sm:w-[420px] max-w-full lg:relative lg:inset-auto lg:z-20 lg:w-80 xl:w-96 flex flex-col h-full border-l border-[var(--app-border)] bg-[var(--app-panel)] shadow-2xl lg:shadow-xl flex-shrink-0 animate-in slide-in-from-right duration-200">
         {/* Top Header Bar */}
         <div className="flex items-center justify-between border-b border-[var(--app-border)]/80 px-3.5 py-2.5">
           <div className="flex items-center gap-2">

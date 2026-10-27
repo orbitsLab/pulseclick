@@ -245,41 +245,40 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
   const calStartOffset = (calFirstDay.getDay() + 6) % 7;
   const miniCalLabel = miniCalDate.toLocaleDateString("en-US", { month: "short", year: "numeric" });
 
-  return (
-    <aside
-      style={{ width: isSidebarOpen ? `${sidebarWidth}px` : 0 }}
-      className={cn(
-        "relative flex flex-col h-full border-r border-[var(--app-border)] bg-[var(--app-panel-alt)] select-none flex-shrink-0 overflow-hidden",
-        isResizing ? "transition-none select-none" : "transition-[width] duration-200 ease-out",
-        !isSidebarOpen && "border-r-0"
-      )}
-    >
-      <div style={{ width: `${sidebarWidth}px` }} className="flex flex-col h-full min-w-0">
-        {/* Search Input & Collapse Button */}
-        <div className="p-3 border-b border-[var(--app-border)]/80 flex items-center gap-2">
-          <div className="relative flex-1 min-w-0">
-            <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-[var(--app-muted)]" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Search tasks..."
-              className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] py-1.5 pl-8 pr-3 app-label text-[var(--app-text)] placeholder-[var(--app-muted)] focus:border-[var(--app-accent)] focus:outline-none"
-            />
-          </div>
+  const handleItemSelect = (action: () => void) => {
+    action();
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      onToggleCollapse();
+    }
+  };
 
-          <button
-            type="button"
-            onClick={onToggleCollapse}
-            title="Collapse sidebar (Ctrl+B)"
-            aria-label="Collapse sidebar"
-            className="p-1.5 rounded-lg text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel)] border border-transparent hover:border-[var(--app-border)] transition-colors cursor-pointer shrink-0"
-          >
-            <PanelLeftClose className="h-4 w-4" />
-          </button>
+  const renderSidebarInner = (isMobile = false) => (
+    <div className="flex flex-col h-full min-w-0">
+      {/* Search Input & Collapse Button */}
+      <div className="p-3 border-b border-[var(--app-border)]/80 flex items-center gap-2">
+        <div className="relative flex-1 min-w-0">
+          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-[var(--app-muted)]" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Search tasks..."
+            className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] py-1.5 pl-8 pr-3 app-label text-[var(--app-text)] placeholder-[var(--app-muted)] focus:border-[var(--app-accent)] focus:outline-none"
+          />
         </div>
 
-        <div className="p-2 space-y-4 flex-1 overflow-y-auto">
+        <button
+          type="button"
+          onClick={onToggleCollapse}
+          title={isMobile ? "Close sidebar" : "Collapse sidebar (Ctrl+B)"}
+          aria-label={isMobile ? "Close sidebar" : "Collapse sidebar"}
+          className="p-1.5 rounded-lg text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel)] border border-transparent hover:border-[var(--app-border)] transition-colors cursor-pointer shrink-0"
+        >
+          {isMobile ? <X className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+        </button>
+      </div>
+
+      <div className="p-2 space-y-4 flex-1 overflow-y-auto">
         {/* Smart Lists */}
         <div className="space-y-0.5">
           {smartLists.map((item) => {
@@ -288,7 +287,7 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => onSelectView(item.id, null, null)}
+                onClick={() => handleItemSelect(() => onSelectView(item.id, null, null))}
                 className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 app-label font-medium transition-colors ${ isSelected ? "bg-[var(--app-accent)]/10 text-[var(--app-accent-text)] dark:bg-[var(--app-accent)]/15 font-bold" : "text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/60 dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]/60" }`}
               >
                 <div className="flex items-center gap-2.5">
@@ -343,7 +342,7 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                   <button
                     key={filter.id}
                     type="button"
-                    onClick={() => onSelectFilter?.(isSelected ? null : filter.id)}
+                    onClick={() => handleItemSelect(() => onSelectFilter?.(isSelected ? null : filter.id))}
                     className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 app-label font-medium transition-colors ${ isSelected ? "bg-[var(--app-accent)]/10 text-[var(--app-accent-text)] font-bold" : "text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/60 dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]/60" }`}
                   >
                     <span
@@ -390,7 +389,7 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                   return (
                     <div
                       key={list.id}
-                      onClick={() => onSelectView("list", list.id, null)}
+                      onClick={() => handleItemSelect(() => onSelectView("list", list.id, null))}
                       className={`group flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 app-label font-medium transition-colors cursor-pointer ${ isSelected ? "bg-[var(--app-accent)]/10 text-[var(--app-accent-text)] dark:bg-[var(--app-accent)]/15 font-bold" : "text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/60 dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]/60" }`}
                     >
                       <div className="flex items-center gap-2.5 truncate flex-1 min-w-0">
@@ -474,7 +473,7 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                   return (
                     <div
                       key={tag.id}
-                      onClick={() => onSelectView("tag", null, tag.name)}
+                      onClick={() => handleItemSelect(() => onSelectView("tag", null, tag.name))}
                       className={`group flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 app-label font-medium transition-colors cursor-pointer ${ isSelected ? "bg-indigo-500/15 text-indigo-400 font-bold" : "text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/60 dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]/60" }`}
                     >
                       <div className="flex items-center gap-2 truncate flex-1 min-w-0">
@@ -559,7 +558,7 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                     <button
                       key={dayNum}
                       type="button"
-                      onClick={() => onSelectDate?.(iso)}
+                      onClick={() => handleItemSelect(() => onSelectDate?.(iso))}
                       className={`flex h-6 w-6 items-center justify-center rounded-md font-semibold transition-all ${ isToday ? "bg-[var(--app-accent-strong)] text-white font-bold shadow-xs" : "text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)] dark:hover:text-white" }`}
                     >
                       {dayNum}
@@ -572,6 +571,59 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      {/* 1. Mobile Drawer Overlay (< md) */}
+      <div
+        className={cn(
+          "fixed inset-0 z-50 md:hidden flex transition-all duration-200",
+          isSidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        )}
+      >
+        <div
+          className={cn(
+            "fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-200",
+            isSidebarOpen ? "opacity-100" : "opacity-0"
+          )}
+          onClick={onToggleCollapse}
+        />
+        <aside
+          className={cn(
+            "relative z-10 flex flex-col h-full w-[280px] max-w-[85vw] bg-[var(--app-panel-alt)] shadow-2xl transition-transform duration-200 ease-out border-r border-[var(--app-border)] select-none",
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          )}
+        >
+          {renderSidebarInner(true)}
+        </aside>
+      </div>
+
+      {/* 2. Desktop Inline Resizable Sidebar (>= md) */}
+      <aside
+        style={{ width: isSidebarOpen ? `${sidebarWidth}px` : 0 }}
+        className={cn(
+          "hidden md:flex relative flex-col h-full border-r border-[var(--app-border)] bg-[var(--app-panel-alt)] select-none flex-shrink-0 overflow-hidden",
+          isResizing ? "transition-none select-none" : "transition-[width] duration-200 ease-out",
+          !isSidebarOpen && "border-r-0"
+        )}
+      >
+        <div style={{ width: `${sidebarWidth}px` }} className="flex flex-col h-full min-w-0">
+          {renderSidebarInner(false)}
+        </div>
+
+        {/* Draggable Resize Handle */}
+        {isSidebarOpen && (
+          <div
+            onMouseDown={handleMouseDown}
+            onDoubleClick={() => onWidthChange(260)}
+            title="Drag to resize, double-click to reset width"
+            className="absolute top-0 right-0 w-1.5 h-full cursor-col-resize hover:bg-[var(--app-accent)]/50 active:bg-[var(--app-accent)] transition-colors z-20 group"
+          >
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-full bg-[var(--app-border)] group-hover:bg-[var(--app-accent)] transition-colors opacity-0 group-hover:opacity-100" />
+          </div>
+        )}
+      </aside>
 
       {/* New List Modal */}
       {showAddList && (
@@ -736,17 +788,6 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
           }
         }}
       />
-      {/* Draggable Resize Handle */}
-      {isSidebarOpen && (
-        <div
-          onMouseDown={handleMouseDown}
-          onDoubleClick={() => onWidthChange(260)}
-          title="Drag to resize, double-click to reset width"
-          className="absolute top-0 right-0 w-1.5 h-full cursor-col-resize hover:bg-[var(--app-accent)]/50 active:bg-[var(--app-accent)] transition-colors z-20 group"
-        >
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-full bg-[var(--app-border)] group-hover:bg-[var(--app-accent)] transition-colors opacity-0 group-hover:opacity-100" />
-        </div>
-      )}
-    </aside>
+    </>
   );
 }

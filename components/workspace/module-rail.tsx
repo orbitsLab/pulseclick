@@ -61,7 +61,7 @@ export function ModuleRail({
   ];
 
   return (
-    <aside className="flex flex-col items-center justify-between border-r border-[var(--app-border)] bg-[var(--app-rail)] py-4 px-2 text-[var(--app-muted)] select-none z-30 w-16 flex-shrink-0">
+    <aside className="hidden md:flex flex-col items-center justify-between border-r border-[var(--app-border)] bg-[var(--app-rail)] py-4 px-2 text-[var(--app-muted)] select-none z-30 w-16 flex-shrink-0">
       {/* Brand icon / User avatar */}
       <div className="flex flex-col items-center gap-4">
         <div
