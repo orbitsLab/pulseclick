@@ -669,9 +669,8 @@ export function useWorkspace(filters: {
         const reconciled = prevTasks.map((t) => (t.id === context.tempId ? data.task : t));
         queryClient.setQueryData(tasksQueryKey, reconciled);
       }
-      queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["workspace-lists"] });
-      queryClient.invalidateQueries({ queryKey: ["workspace-tags"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-lists"], refetchType: "none" });
+      queryClient.invalidateQueries({ queryKey: ["workspace-tags"], refetchType: "none" });
     },
   });
 

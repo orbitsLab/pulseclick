@@ -84,7 +84,6 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
   const [priority, setPriority] = useState<number>(0);
   const [listId, setListId] = useState<string | null>(currentListId);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [recurrence, setRecurrence] = useState<string>("NONE");
   const [isListening, setIsListening] = useState(false);
 
@@ -177,53 +176,71 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!title.trim() || isSubmitting) return;
+    if (!title.trim()) return;
 
     const result = parseTaskInput(title);
     const cleanTitle = result.title || title.trim();
 
-    setIsSubmitting(true);
-    try {
-      let durationMinutes = result.durationMinutes ?? undefined;
-      if (dueDate && endDate && endDate !== dueDate) {
-        const start = parseISODate(dueDate);
-        const end = parseISODate(endDate);
-        if (start && end) {
-          const diff = Math.round((end.getTime() - start.getTime()) / 86400000) + 1;
-          durationMinutes = diff * 24 * 60;
-        }
+    // Snapshot form values for recovery if mutation fails
+    const savedTitle = title;
+    const savedDueDate = dueDate;
+    const savedEndDate = endDate;
+    const savedDueTime = dueTime;
+    const savedEndTime = endTime;
+    const savedPriority = priority;
+    const savedTagIds = [...selectedTagIds];
+    const savedRecurrence = recurrence;
+
+    let durationMinutes = result.durationMinutes ?? undefined;
+    if (dueDate && endDate && endDate !== dueDate) {
+      const start = parseISODate(dueDate);
+      const end = parseISODate(endDate);
+      if (start && end) {
+        const diff = Math.round((end.getTime() - start.getTime()) / 86400000) + 1;
+        durationMinutes = diff * 24 * 60;
       }
-
-      await onAddTask({
-        title: cleanTitle,
-        listId: listId || currentListId,
-        dueDate: endDate || dueDate,
-        startDate: dueDate,
-        endDate: endDate || null,
-        dueTime,
-        endTime: endTime || null,
-        priority,
-        tags: selectedTagIds,
-        recurrence: recurrence !== "NONE" ? recurrence : undefined,
-        recurrenceInterval: result.recurrenceInterval ?? 1,
-        recurrenceWeekdays: result.recurrenceWeekdays ?? null,
-        durationMinutes,
-      });
-
-      setTitle("");
-      setDueDate(getDefaultDueDate(context?.activeView));
-      setEndDate(null);
-      setDueTime(null);
-      setEndTime(null);
-      setPriority(0);
-      setSelectedTagIds([]);
-      setRecurrence("NONE");
-      manual.current.clear();
-      setShowDatePicker(false);
-      setIsDropdownOpen(false);
-    } finally {
-      setIsSubmitting(false);
     }
+
+    const payload = {
+      title: cleanTitle,
+      listId: listId || currentListId,
+      dueDate: endDate || dueDate,
+      startDate: dueDate,
+      endDate: endDate || null,
+      dueTime,
+      endTime: endTime || null,
+      priority,
+      tags: selectedTagIds,
+      recurrence: recurrence !== "NONE" ? recurrence : undefined,
+      recurrenceInterval: result.recurrenceInterval ?? 1,
+      recurrenceWeekdays: result.recurrenceWeekdays ?? null,
+      durationMinutes,
+    };
+
+    // Synchronously clear inputs immediately so the user can instantly type the next task
+    setTitle("");
+    setDueDate(getDefaultDueDate(context?.activeView));
+    setEndDate(null);
+    setDueTime(null);
+    setEndTime(null);
+    setPriority(0);
+    setSelectedTagIds([]);
+    setRecurrence("NONE");
+    manual.current.clear();
+    setShowDatePicker(false);
+    setIsDropdownOpen(false);
+
+    // Non-blocking background sync with error rollback
+    Promise.resolve(onAddTask(payload)).catch(() => {
+      setTitle(savedTitle);
+      setDueDate(savedDueDate);
+      setEndDate(savedEndDate);
+      setDueTime(savedDueTime);
+      setEndTime(savedEndTime);
+      setPriority(savedPriority);
+      setSelectedTagIds(savedTagIds);
+      setRecurrence(savedRecurrence);
+    });
   }
 
   const targetList = lists.find((l) => l.id === (listId || currentListId));

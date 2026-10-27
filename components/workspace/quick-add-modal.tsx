@@ -143,7 +143,7 @@ export function QuickAddModal({
     recognition.start();
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim()) return;
 
@@ -159,7 +159,7 @@ export function QuickAddModal({
       }
     }
 
-    await onAddTask({
+    const payload = {
       title: result.title || title.trim(),
       description: description.trim() || undefined,
       listId: listId === "inbox" ? null : listId,
@@ -175,8 +175,9 @@ export function QuickAddModal({
       reminder,
       tags: selectedTagIds,
       durationMinutes,
-    });
+    };
 
+    // Close modal and reset fields immediately for instant responsive feel
     setTitle("");
     setDescription("");
     setDueDate(defaultDueDate);
@@ -185,6 +186,9 @@ export function QuickAddModal({
     setEndTime("");
     manual.current.clear();
     onClose();
+
+    // Trigger optimistic background sync
+    Promise.resolve(onAddTask(payload)).catch(() => {});
   }
 
   function toggleTag(tagId: string) {
