@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { getSessionUser } from "@/lib/auth";
+import { getSessionAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getTodayISO, addDays } from "@/lib/date-utils";
 
 export async function GET(req: Request) {
   try {
-    const user = await getSessionUser();
+    const user = await getSessionAuth();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -24,6 +24,7 @@ export async function GET(req: Request) {
     const [habits, sections] = await Promise.all([
       prisma.habit.findMany({
         where: whereClause,
+        relationLoadStrategy: "join",
         orderBy: [{ order: "asc" }, { createdAt: "desc" }],
         include: {
           section: true,
@@ -124,7 +125,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const user = await getSessionUser();
+    const user = await getSessionAuth();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

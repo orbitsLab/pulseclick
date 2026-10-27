@@ -287,6 +287,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
 
   // TanStack Query Hook integration
   const workspace = useWorkspace({
+    activeModule,
     view:
       activeModule === "timeline" || activeModule === "calendar"
         ? activeModule

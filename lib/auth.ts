@@ -41,6 +41,22 @@ export async function verifySession(token: string): Promise<SessionPayload | nul
   }
 }
 
+export async function getSessionAuth(): Promise<{ id: string; email: string } | null> {
+  try {
+    await connection();
+    const cookieStore = await cookies();
+    const token = cookieStore.get(COOKIE_NAME)?.value;
+    if (!token) return null;
+
+    const session = await verifySession(token);
+    if (!session || !session.userId) return null;
+
+    return { id: session.userId, email: session.email };
+  } catch {
+    return null;
+  }
+}
+
 export async function getSessionUser() {
   try {
     // With Cache Components enabled the session must only be resolved for a real

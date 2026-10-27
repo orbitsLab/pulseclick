@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSessionUser } from "@/lib/auth";
+import { getSessionAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getTodayISO, addDays } from "@/lib/date-utils";
 
@@ -13,7 +13,7 @@ function iso(d: Date) {
 
 export async function GET(req: Request) {
   try {
-    const user = await getSessionUser();
+    const user = await getSessionAuth();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { searchParams } = new URL(req.url);

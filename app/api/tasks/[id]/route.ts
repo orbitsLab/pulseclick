@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSessionUser } from "@/lib/auth";
+import { getSessionAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getTodayISO } from "@/lib/date-utils";
 import { computeNextOccurrence } from "@/lib/recurrence";
@@ -9,12 +9,13 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await getSessionUser();
+    const user = await getSessionAuth();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { id } = await params;
     const task = await prisma.task.findFirst({
       where: { id, userId: user.id },
+      relationLoadStrategy: "join",
       include: {
         list: true,
         subtasks: { orderBy: { order: "asc" } },
@@ -34,7 +35,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await getSessionUser();
+    const user = await getSessionAuth();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { id } = await params;
@@ -207,7 +208,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await getSessionUser();
+    const user = await getSessionAuth();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { id } = await params;

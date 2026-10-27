@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { getSessionUser } from "@/lib/auth";
+import { getSessionAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getTodayISO, addDays } from "@/lib/date-utils";
 import { parseFilterQuery, buildFilterWhere } from "@/lib/filters";
 
 export async function GET(req: Request) {
   try {
-    const user = await getSessionUser();
+    const user = await getSessionAuth();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -76,6 +76,7 @@ export async function GET(req: Request) {
 
     const tasks = await prisma.task.findMany({
       where,
+      relationLoadStrategy: "join",
       orderBy: [
         { isPinned: "desc" },
         { priority: "desc" },
@@ -112,7 +113,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const user = await getSessionUser();
+    const user = await getSessionAuth();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -225,6 +226,7 @@ export async function POST(req: Request) {
 
     const created = await prisma.task.findUnique({
       where: { id: task.id },
+      relationLoadStrategy: "join",
       include: {
         list: true,
         subtasks: true,

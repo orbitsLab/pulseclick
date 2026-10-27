@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { getSessionUser } from "@/lib/auth";
+import { getSessionAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getTheme, DEFAULT_THEME_ID } from "@/lib/themes";
 
 export async function GET() {
   try {
-    const user = await getSessionUser();
+    const user = await getSessionAuth();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const settings = await prisma.user.findUnique({
@@ -34,7 +34,7 @@ export async function GET() {
 
 export async function PATCH(req: Request) {
   try {
-    const user = await getSessionUser();
+    const user = await getSessionAuth();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();

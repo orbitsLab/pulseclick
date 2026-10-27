@@ -278,6 +278,7 @@ export interface HabitAnalyticsData {
 }
 
 export function useWorkspace(filters: {
+  activeModule?: string;
   view: string;
   listId?: string | null;
   tag?: string | null;
@@ -317,6 +318,7 @@ export function useWorkspace(filters: {
       return (data.tasks || []) as Task[];
     },
     placeholderData: keepPreviousData,
+    staleTime: 10_000,
   });
 
   // 2. Task Lists Query
@@ -335,6 +337,7 @@ export function useWorkspace(filters: {
       };
     },
     placeholderData: keepPreviousData,
+    staleTime: 30_000,
   });
 
   // 3. Tags Query
@@ -347,6 +350,7 @@ export function useWorkspace(filters: {
       return (data.tags || []) as Tag[];
     },
     placeholderData: keepPreviousData,
+    staleTime: 30_000,
   });
 
   // 4. Pomodoro Stats Query
@@ -358,6 +362,8 @@ export function useWorkspace(filters: {
       const data = await res.json();
       return data as PomodoroStats;
     },
+    enabled: filters.activeModule === "pomodoro",
+    staleTime: 60_000,
   });
 
   // 5. Habits Query
@@ -371,6 +377,8 @@ export function useWorkspace(filters: {
       return (data.habits || []) as Habit[];
     },
     placeholderData: keepPreviousData,
+    enabled: filters.activeModule === "habits",
+    staleTime: 60_000,
   });
 
   // 5b. Habit Sections Query
@@ -383,6 +391,8 @@ export function useWorkspace(filters: {
       return (data.sections || []) as HabitSection[];
     },
     placeholderData: keepPreviousData,
+    enabled: filters.activeModule === "habits",
+    staleTime: 60_000,
   });
 
   // 5c. Habit Analytics Query (Heatmap, Insights, Achievements)
@@ -395,6 +405,8 @@ export function useWorkspace(filters: {
       return (await res.json()) as HabitAnalyticsData;
     },
     placeholderData: keepPreviousData,
+    enabled: filters.activeModule === "habits",
+    staleTime: 60_000,
   });
 
   // 6. Smart Filters Query
@@ -406,6 +418,7 @@ export function useWorkspace(filters: {
       const data = await res.json();
       return (data.filters || []) as any[];
     },
+    staleTime: 60_000,
   });
 
   // 7. Countdowns Query
@@ -417,6 +430,8 @@ export function useWorkspace(filters: {
       const data = await res.json();
       return (data.countdowns || []) as Countdown[];
     },
+    enabled: filters.activeModule === "countdown",
+    staleTime: 60_000,
   });
 
   // 8. Statistics Query
@@ -428,6 +443,8 @@ export function useWorkspace(filters: {
       if (!res.ok) return null;
       return (await res.json()) as StatisticsData;
     },
+    enabled: filters.activeModule === "statistics",
+    staleTime: 60_000,
   });
 
   // 9. Settings Query
@@ -438,6 +455,7 @@ export function useWorkspace(filters: {
       if (!res.ok) return null;
       return (await res.json()) as UserSettings;
     },
+    staleTime: 120_000,
   });
 
   // 10. Reminders Query (for the selected task)
