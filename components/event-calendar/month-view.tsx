@@ -125,14 +125,16 @@ export function MonthView({
               const allEvents = getAllEventsForDay(events, day);
 
               const isReferenceCell = weekIndex === 0 && dayIndex === 0;
-              const visibleCount = isMounted
+              const rawVisibleCount = isMounted
                 ? getVisibleEventCount(allDayEvents.length)
                 : undefined;
-              const hasMore =
-                visibleCount !== undefined &&
-                allDayEvents.length > visibleCount;
+              const visibleLimit =
+                typeof rawVisibleCount === "number" && rawVisibleCount > 0
+                  ? rawVisibleCount
+                  : 3;
+              const hasMore = allDayEvents.length > visibleLimit;
               const remainingCount = hasMore
-                ? allDayEvents.length - visibleCount
+                ? allDayEvents.length - visibleLimit
                 : 0;
 
               return (
@@ -164,10 +166,7 @@ export function MonthView({
                         const isFirstDay = isSameDay(day, eventStart);
                         const isLastDay = isSameDay(day, eventEnd);
 
-                        const isHidden =
-                          isMounted && visibleCount && index >= visibleCount;
-
-                        if (!visibleCount) return null;
+                        const isHidden = isMounted && index >= visibleLimit;
 
                         if (!isFirstDay) {
                           return (

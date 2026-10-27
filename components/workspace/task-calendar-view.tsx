@@ -22,9 +22,10 @@ export function TaskCalendarView({
   onAddTaskForDate,
 }: TaskCalendarViewProps) {
   const context = useWorkspaceContext();
-  const tasks = propTasks || context.tasks || [];
+  const tasks = propTasks || context.allActiveTasks || context.tasks || [];
   const lists = context.lists || [];
   const activeListId = context.activeListId;
+  const [showCompleted, setShowCompleted] = React.useState(true);
 
   // Convert real tasks to calendar events
   const taskEvents = useMemo<CalendarEvent[]>(() => {
@@ -53,7 +54,7 @@ export function TaskCalendarView({
         } else if (t.durationMinutes && t.durationMinutes > 0 && !allDay) {
           end = addMinutes(start, t.durationMinutes);
         } else if (allDay) {
-          end = addDays(start, 1);
+          end = new Date(`${endDateStr}T23:59:59`);
         } else {
           end = addHours(start, 1);
         }
@@ -94,6 +95,10 @@ export function TaskCalendarView({
         };
       });
   }, [tasks]);
+
+  const visibleEvents = useMemo(() => {
+    return showCompleted ? taskEvents : taskEvents.filter((e) => !e.completed);
+  }, [taskEvents, showCompleted]);
 
   // Event handlers
   const handleEventAdd = async (event: CalendarEvent) => {
@@ -202,8 +207,10 @@ export function TaskCalendarView({
         </div>
       )}
       <EventCalendar
-        events={taskEvents}
+        events={visibleEvents}
         lists={lists}
+        showCompleted={showCompleted}
+        onToggleShowCompleted={() => setShowCompleted((prev) => !prev)}
         onEventAdd={handleEventAdd}
         onEventDelete={handleEventDelete}
         onEventUpdate={handleEventUpdate}

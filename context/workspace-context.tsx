@@ -71,6 +71,7 @@ export interface WorkspaceContextType {
   refetchAll: () => Promise<void>;
 
   // Domain Queries & States
+  allActiveTasks: Task[];
   tasks: Task[];
   isLoadingTasks: boolean;
   isInitialLoadingTasks: boolean;
@@ -414,7 +415,9 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     let result = workspace.allActiveTasks;
 
     // 1. Module / View Filter
-    if (activeView === "today") {
+    if (activeModule === "calendar" || activeModule === "timeline") {
+      // Calendar and timeline show all scheduled tasks across dates
+    } else if (activeView === "today") {
       result = result.filter((t) => t.dueDate && t.dueDate <= today);
     } else if (activeView === "tomorrow") {
       result = result.filter((t) => t.dueDate === tomorrow);
@@ -425,7 +428,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     } else if (activeView === "completed") {
       result = result.filter((t) => t.completed);
     }
-    // "all", "calendar", "timeline" take all active tasks
+    // "all" takes all active tasks
 
     // 2. Custom List Filter
     if (activeListId && activeListId !== "inbox" && activeListId !== "all") {
@@ -469,6 +472,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
 
     return result;
   }, [
+    activeModule,
     activeView,
     activeListId,
     activeTag,
@@ -601,6 +605,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     refetchAll,
 
     // Data from useWorkspace
+    allActiveTasks: workspace.allActiveTasks,
     tasks: derivedTasks,
     isLoadingTasks: workspace.isLoadingTasks,
     isInitialLoadingTasks,

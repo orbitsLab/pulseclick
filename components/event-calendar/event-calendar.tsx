@@ -61,6 +61,8 @@ export interface EventCalendarProps {
   lists?: Array<{ id: string; name: string; color?: string }>;
   className?: string;
   initialView?: CalendarView;
+  showCompleted?: boolean;
+  onToggleShowCompleted?: () => void;
 }
 
 export function EventCalendar({
@@ -73,6 +75,8 @@ export function EventCalendar({
   lists = [],
   className,
   initialView = "month",
+  showCompleted = true,
+  onToggleShowCompleted,
 }: EventCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<CalendarView>(initialView);
@@ -405,6 +409,30 @@ export function EventCalendar({
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
+
+            {/* Completed Tasks Toggle */}
+            {onToggleShowCompleted && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onToggleShowCompleted}
+                className={cn(
+                  "gap-1.5 border-[var(--app-border)] app-label font-medium cursor-pointer transition-colors",
+                  showCompleted
+                    ? "bg-[var(--app-accent)]/10 border-[var(--app-accent)]/40 text-[var(--app-accent-text)]"
+                    : "bg-[var(--app-panel-alt)] text-[var(--app-muted)] hover:text-[var(--app-text)]"
+                )}
+                title={showCompleted ? "Hide completed tasks" : "Show completed tasks"}
+              >
+                <RiCalendarCheckLine
+                  className={cn(
+                    "h-4 w-4",
+                    showCompleted ? "text-[var(--app-accent-text)]" : "text-[var(--app-muted)]"
+                  )}
+                />
+                <span className="hidden sm:inline">Completed</span>
+              </Button>
+            )}
 
             {/* List Filter Dropdown */}
             {lists.length > 0 && (
