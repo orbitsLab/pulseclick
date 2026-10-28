@@ -338,7 +338,9 @@ export function TaskInspector({
                   )}
                   title={
                     task.completed
-                      ? "Mark incomplete (Right-click for options)"
+                      ? task.kanbanStatus === "WONT_DO"
+                        ? "Won't Do (Right-click for options)"
+                        : "Completed (Right-click for options)"
                       : "Mark complete (Right-click for options)"
                   }
                 >
@@ -352,7 +354,7 @@ export function TaskInspector({
                 </button>
               </ContextMenuTrigger>
 
-              <ContextMenuContent className="w-52 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] shadow-xl p-1.5 z-50">
+              <ContextMenuContent className="w-52 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] shadow-xl p-1.5 z-50 rounded-xl">
                 <ContextMenuItem
                   onClick={() => {
                     const nextCompleted = task.completed && task.kanbanStatus !== "WONT_DO" ? false : true;
@@ -362,9 +364,12 @@ export function TaskInspector({
                       kanbanStatus: nextCompleted ? "DONE" : "TODO",
                     });
                   }}
-                  className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-md text-xs hover:bg-[var(--app-panel-alt)]"
+                  className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-lg text-xs hover:bg-[var(--app-panel-alt)]"
                 >
-                  <span>Completed</span>
+                  <span className="flex items-center gap-2">
+                    <Check className="h-3.5 w-3.5 text-emerald-500 stroke-[2.5]" />
+                    Completed
+                  </span>
                   {task.completed && task.kanbanStatus !== "WONT_DO" && (
                     <Check className="h-3.5 w-3.5 text-emerald-500" />
                   )}
@@ -379,13 +384,34 @@ export function TaskInspector({
                       kanbanStatus: nextWonDo ? "WONT_DO" : "TODO",
                     });
                   }}
-                  className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-md text-xs hover:bg-[var(--app-panel-alt)]"
+                  className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-lg text-xs hover:bg-[var(--app-panel-alt)]"
                 >
-                  <span>Won&apos;t Do</span>
+                  <span className="flex items-center gap-2">
+                    <X className="h-3.5 w-3.5 text-rose-500 stroke-[2.5]" />
+                    Won&apos;t Do
+                  </span>
                   {task.completed && task.kanbanStatus === "WONT_DO" && (
                     <Check className="h-3.5 w-3.5 text-rose-500" />
                   )}
                 </ContextMenuItem>
+
+                {task.completed && (
+                  <>
+                    <ContextMenuSeparator className="my-1 bg-[var(--app-border)]" />
+                    <ContextMenuItem
+                      onClick={() => {
+                        onUpdateTask({
+                          taskId: task.id,
+                          completed: false,
+                          kanbanStatus: "TODO",
+                        });
+                      }}
+                      className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-lg text-xs text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]"
+                    >
+                      <span>Mark Incomplete</span>
+                    </ContextMenuItem>
+                  </>
+                )}
 
                 <ContextMenuSeparator className="my-1.5 bg-[var(--app-border)]" />
 
@@ -409,6 +435,13 @@ export function TaskInspector({
                 </div>
               </ContextMenuContent>
             </ContextMenu>
+
+            {task.completed && task.kanbanStatus === "WONT_DO" && (
+              <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 app-meta font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25">
+                <X className="h-3 w-3 stroke-[2.5]" />
+                Won&apos;t Do
+              </span>
+            )}
 
             {/* Vertical Divider */}
             <span className="h-3.5 w-px bg-[var(--app-border)]/80" />

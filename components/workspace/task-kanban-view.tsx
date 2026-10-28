@@ -33,6 +33,7 @@ import {
   ChevronDown,
   ChevronUp,
   Check,
+  X,
 } from "lucide-react";
 import { Task } from "@/hooks/use-workspace";
 import { formatShortDate, getTodayISO, addDays, formatTaskSchedule } from "@/lib/date-utils";
@@ -156,33 +157,55 @@ function TaskCard({
     >
       <CardContent className="flex flex-col gap-2 p-0">
         {/* Top Header: Checkbox + Title + Priority Badge */}
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex items-start gap-2 flex-1 min-w-0">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleComplete?.(!task.completed);
-              }}
-              className="text-[var(--app-muted)] hover:text-emerald-500 transition-colors mt-0.5 shrink-0 cursor-pointer"
-              title={task.completed ? "Mark incomplete" : "Mark complete"}
-            >
-              {task.completed ? (
-                <CheckCircle2 className="h-4 w-4 text-emerald-500 fill-emerald-500/10" />
-              ) : (
-                <Circle className="h-4 w-4" />
-              )}
-            </button>
-            <span
-              className={cn(
-                "line-clamp-2 app-heading font-semibold text-[var(--app-text)] flex-1",
-                task.completed &&
-                  "line-through opacity-60 text-[var(--app-muted)]"
-              )}
-            >
-              {task.title}
-            </span>
-          </div>
+        {(() => {
+          const isWontDo = Boolean(task.completed && task.kanbanStatus === "WONT_DO");
+          return (
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-start gap-2 flex-1 min-w-0">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleComplete?.(!task.completed);
+                  }}
+                  className="text-[var(--app-muted)] hover:text-emerald-500 transition-colors mt-0.5 shrink-0 cursor-pointer"
+                  title={
+                    task.completed
+                      ? isWontDo
+                        ? "Won't Do (Click to mark incomplete)"
+                        : "Completed (Click to mark incomplete)"
+                      : "Mark complete"
+                  }
+                >
+                  {task.completed ? (
+                    isWontDo ? (
+                      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-rose-500/15 text-rose-500 border border-rose-500/30">
+                        <X className="h-2.5 w-2.5 stroke-[3]" />
+                      </span>
+                    ) : (
+                      <CheckCircle2 className="h-4 w-4 text-emerald-500 fill-emerald-500/10" />
+                    )
+                  ) : (
+                    <Circle className="h-4 w-4" />
+                  )}
+                </button>
+                <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                  <span
+                    className={cn(
+                      "line-clamp-2 app-heading font-semibold text-[var(--app-text)] flex-1",
+                      task.completed &&
+                        "line-through opacity-60 text-[var(--app-muted)]"
+                    )}
+                  >
+                    {task.title}
+                  </span>
+                  {isWontDo && (
+                    <span className="inline-flex shrink-0 items-center gap-0.5 rounded px-1.5 py-0.2 app-meta font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25">
+                      Won&apos;t Do
+                    </span>
+                  )}
+                </div>
+              </div>
 
           {/* Priority Badge */}
           {task.priority === 3 && (
@@ -210,6 +233,8 @@ function TaskCard({
             </Badge>
           )}
         </div>
+          );
+        })()}
 
         {/* Task Description */}
         {task.description && (

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { CalendarSubscription, TaskList } from "@/hooks/use-workspace";
 import { LIST_BACKGROUNDS, THEMES, getTheme } from "@/lib/themes";
+import { notify } from "@/components/ui/toast";
 
 export interface SettingsViewProps {
   subscriptions: CalendarSubscription[];
@@ -303,20 +304,31 @@ export function SettingsView({
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {LIST_BACKGROUNDS.map((bg) => {
-                    const active = (list as any).background === bg.id;
+                    const active = ((list as any).background || "none") === bg.id;
                     return (
                       <button
                         key={bg.id}
                         type="button"
                         title={bg.name}
                         aria-label={`${bg.name} background for ${list.name}`}
-                        onClick={() => onUpdateList({ id: list.id, background: bg.id })}
+                        onClick={async () => {
+                          try {
+                            await onUpdateList({ id: list.id, background: bg.id });
+                            notify.success("Backdrop updated", `${bg.name} set for ${list.name}`);
+                          } catch (err: any) {
+                            notify.error("Failed to update backdrop", err?.message || "Please try again.");
+                          }
+                        }}
                         style={{ background: bg.css }}
-                        className={`h-7 w-9 rounded-md border transition-all ${ active ? "border-[var(--app-accent)] ring-2 ring-[var(--app-accent)]/40" : "border-[var(--app-border)] hover:border-[var(--app-border)] dark:border-[var(--app-border)]" }`}
+                        className={`h-7 w-9 rounded-md border transition-all cursor-pointer ${
+                          active
+                            ? "border-[var(--app-accent)] ring-2 ring-[var(--app-accent)]/50 scale-105 shadow-xs"
+                            : "border-[var(--app-border)] hover:scale-105 hover:border-[var(--app-accent)]/50"
+                        }`}
                       >
                         {active && (
-                          <span className="flex h-full items-center justify-center">
-                            <Check className="h-3 w-3 text-[var(--app-accent-text)]" />
+                          <span className="flex h-full items-center justify-center bg-black/15 rounded-sm">
+                            <Check className="h-3.5 w-3.5 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] stroke-[3]" />
                           </span>
                         )}
                       </button>

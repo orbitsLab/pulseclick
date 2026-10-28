@@ -22,7 +22,14 @@ import { FilterPanel } from "./filter-panel";
 import { ThemePicker } from "./theme-picker";
 import { SyncIndicator } from "./sync-indicator";
 import { WorkspaceProvider, useWorkspaceContext } from "@/context/workspace-context";
-import { applyTheme, DEFAULT_THEME_ID } from "@/lib/themes";
+import { applyTheme, DEFAULT_THEME_ID, getListBackground, LIST_BACKGROUNDS } from "@/lib/themes";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { notify } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import {
   ListTodo,
@@ -31,6 +38,9 @@ import {
   Plus,
   PanelLeftClose,
   PanelLeftOpen,
+  Palette,
+  Check,
+  Folder,
 } from "lucide-react";
 
 interface WorkspaceAppProps {
@@ -66,6 +76,7 @@ function WorkspaceContainer({
     setSelectedTaskId,
     selectedTask,
     currentListName,
+    currentList,
     calView,
     setCalView,
     calDate,
@@ -198,106 +209,338 @@ function WorkspaceContainer({
         )}
 
         {/* Middle Main Workspace */}
-        <main className="flex-1 flex flex-col h-full overflow-hidden bg-[var(--app-panel)] p-3.5 sm:p-6 pb-20 md:pb-6 min-w-0">
-          {/* View Header */}
-          <div className="flex items-center justify-between pb-3 mb-3 border-b border-[var(--app-border)]/80 gap-2 shrink-0">
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-              {activeModule === "tasks" && (
-                <button
-                  type="button"
-                  onClick={toggleSidebar}
-                  title={isSidebarOpen ? "Collapse sidebar (Ctrl+B)" : "Expand sidebar (Ctrl+B)"}
-                  aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
-                  className={cn(
-                    "p-1.5 rounded-lg border transition-all cursor-pointer shrink-0 flex items-center justify-center",
-                    isSidebarOpen
-                      ? "border-[var(--app-border)] bg-[var(--app-panel-alt)] text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/80"
-                      : "border-[var(--app-accent)]/40 bg-[var(--app-accent)]/10 text-[var(--app-accent-text)] hover:bg-[var(--app-accent)]/20 shadow-xs"
-                  )}
+        {(() => {
+          const activeListBackground = currentList?.background ? getListBackground(currentList.background) : null;
+          const isCustom = Boolean(
+            activeModule === "tasks" && currentList && activeListBackground && activeListBackground.id !== "none"
+          );
+
+          return (
+            <main className="relative flex-1 flex flex-col h-full overflow-hidden bg-[var(--app-panel)] p-3.5 sm:p-6 pb-20 md:pb-6 min-w-0">
+              {/* Ambient atmospheric canvas glow when a list background is active */}
+              {isCustom && currentList && activeListBackground && (
+                <div
+                  className="pointer-events-none absolute inset-x-0 top-0 h-72 opacity-25 dark:opacity-15 blur-3xl z-0"
+                  style={{ background: activeListBackground.css }}
+                />
+              )}
+
+              {/* View Header: Custom List Hero Banner vs Standard Header */}
+              {isCustom && currentList && activeListBackground ? (
+                <div
+                  className="relative overflow-hidden rounded-2xl border border-[var(--app-border)]/80 p-3.5 sm:p-4 mb-3.5 shadow-sm shrink-0 transition-all z-10"
+                  style={{ background: activeListBackground.css }}
                 >
-                  {isSidebarOpen ? (
-                    <PanelLeftClose className="h-4 w-4" />
-                  ) : (
-                    <PanelLeftOpen className="h-4 w-4" />
-                  )}
-                </button>
-              )}
+                  {/* Adaptive glass overlay ensuring high-contrast legible text across themes */}
+                  <div className="absolute inset-0 bg-white/50 dark:bg-black/60 backdrop-blur-[2px] pointer-events-none" />
 
-              <h1 className="text-lg sm:text-2xl md:app-display font-semibold text-[var(--app-text)] capitalize truncate">
-                {activeModule === "matrix"
-                  ? "Eisenhower Matrix"
-                  : activeModule === "pomodoro"
-                  ? "Pomodoro Focus Timer"
-                  : activeModule === "calendar"
-                  ? "Calendar Schedule"
-                  : activeModule === "timeline"
-                  ? "Timeline"
-                  : activeModule === "countdown"
-                  ? "Countdowns"
-                  : activeModule === "statistics"
-                  ? "Statistics"
-                  : activeModule === "settings"
-                  ? "Settings"
-                  : activeModule === "habits"
-                  ? "Habit Tracker"
-                  : activeFilterId
-                  ? filters.find((f: any) => f.id === activeFilterId)?.name || currentListName
-                  : currentListName}
-              </h1>
-              {activeModule === "tasks" && (
-                <span className="rounded-full bg-[var(--app-panel-alt)] px-2 py-0.5 app-meta font-bold text-[var(--app-muted)] shrink-0">
-                  {tasks.filter((t) => !t.completed).length}
-                </span>
-              )}
-            </div>
+                  <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5">
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                      <button
+                        type="button"
+                        onClick={toggleSidebar}
+                        title={isSidebarOpen ? "Collapse sidebar (Ctrl+B)" : "Expand sidebar (Ctrl+B)"}
+                        aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+                        className={cn(
+                          "p-1.5 rounded-lg border transition-all cursor-pointer shrink-0 flex items-center justify-center bg-[var(--app-panel)]/80 backdrop-blur",
+                          isSidebarOpen
+                            ? "border-[var(--app-border)] text-[var(--app-muted)] hover:text-[var(--app-text)]"
+                            : "border-[var(--app-accent)]/50 text-[var(--app-accent-text)] bg-[var(--app-accent)]/15"
+                        )}
+                      >
+                        {isSidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
+                      </button>
 
-            {/* Right Header: Sync Indicator, Cmd+K Command Palette Trigger & Layout switcher buttons */}
-            <div className="flex items-center gap-2">
-              <SyncIndicator />
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span
+                          className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl shadow-xs"
+                          style={{
+                            backgroundColor: currentList.color || "var(--app-accent)",
+                            color: "#ffffff",
+                          }}
+                        >
+                          <Folder className="h-4 w-4" />
+                        </span>
 
-              <button
-                type="button"
-                onClick={() => setIsCommandPaletteOpen(true)}
-                className="flex items-center gap-1.5 rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-2.5 py-1 app-label text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] dark:hover:text-[var(--app-text)] transition-colors cursor-pointer"
-                title="Open Command Palette (Cmd+K)"
-              >
-                <Search className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Search / Commands</span>
-                <kbd className="hidden sm:inline-block rounded bg-[var(--app-panel-alt)] px-1 app-meta font-mono">
-                  ⌘K
-                </kbd>
-              </button>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <h1 className="text-lg sm:text-2xl font-bold text-[var(--app-text)] font-sans tracking-tight truncate">
+                              {currentList.name}
+                            </h1>
+                            <span className="rounded-full bg-[var(--app-panel)]/80 backdrop-blur border border-[var(--app-border)] px-2 py-0.5 app-meta font-bold text-[var(--app-muted)] shrink-0">
+                              {tasks.filter((t) => !t.completed).length} open
+                            </span>
+                          </div>
+                          <p className="app-meta text-[var(--app-muted)] flex items-center gap-1.5 mt-0.5">
+                            <span
+                              className="h-1.5 w-1.5 rounded-full"
+                              style={{ backgroundColor: currentList.color || "var(--app-accent)" }}
+                            />
+                            <span>{activeListBackground.name} backdrop</span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
 
-              {activeModule === "tasks" && (
-                <div className="flex items-center rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] p-0.5">
-                  <button
-                    type="button"
-                    onClick={() => setTaskLayout("list")}
-                    title="List View"
-                    className={`rounded-md p-1.5 transition-colors ${
-                      taskLayout === "list"
-                        ? "bg-[var(--app-panel)] text-[var(--app-accent-text)] shadow-xs dark:bg-[var(--app-panel-alt)] dark:text-[var(--app-accent-text)]"
-                        : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)]"
-                    }`}
-                  >
-                    <ListTodo className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setTaskLayout("kanban")}
-                    title="Kanban Board View"
-                    className={`rounded-md p-1.5 transition-colors ${
-                      taskLayout === "kanban"
-                        ? "bg-[var(--app-panel)] text-[var(--app-accent-text)] shadow-xs dark:bg-[var(--app-panel-alt)] dark:text-[var(--app-accent-text)]"
-                        : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)]"
-                    }`}
-                  >
-                    <Columns3 className="h-4 w-4" />
-                  </button>
+                    {/* Right Header Controls inside banner */}
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <SyncIndicator />
+
+                      {/* Backdrop Quick Picker Dropdown */}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            type="button"
+                            title={`Current backdrop: ${activeListBackground.name}. Click to change.`}
+                            className="flex items-center gap-1.5 rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)]/85 backdrop-blur px-2.5 py-1 app-label text-[var(--app-text)] hover:bg-[var(--app-panel)] transition-all cursor-pointer shadow-xs"
+                          >
+                            <Palette className="h-3.5 w-3.5 text-[var(--app-accent-text)]" />
+                            <span className="hidden sm:inline font-medium">{activeListBackground.name}</span>
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          className="w-64 p-3 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] shadow-xl rounded-xl z-50"
+                        >
+                          <div className="flex items-center justify-between pb-2 mb-2 border-b border-[var(--app-border)]">
+                            <span className="app-label font-semibold text-[var(--app-text)]">List Backdrop</span>
+                            <span className="app-meta text-[var(--app-muted)]">20 presets</span>
+                          </div>
+                          <div className="grid grid-cols-4 gap-1.5 max-h-56 overflow-y-auto p-0.5 custom-scrollbar">
+                            {LIST_BACKGROUNDS.map((bg) => {
+                              const active = (currentList.background || "none") === bg.id;
+                              return (
+                                <button
+                                  key={bg.id}
+                                  type="button"
+                                  title={bg.name}
+                                  onClick={async () => {
+                                    try {
+                                      await updateList({ id: currentList.id, background: bg.id });
+                                      notify.success("Backdrop updated", `${bg.name} set for ${currentList.name}`);
+                                    } catch (err: any) {
+                                      notify.error("Failed to update backdrop", err?.message || "Please try again.");
+                                    }
+                                  }}
+                                  style={{ background: bg.css }}
+                                  className={cn(
+                                    "h-8 rounded-lg border transition-all cursor-pointer relative",
+                                    active
+                                      ? "border-[var(--app-accent)] ring-2 ring-[var(--app-accent)]/50 scale-105"
+                                      : "border-[var(--app-border)] hover:scale-105 hover:border-[var(--app-accent)]/50"
+                                  )}
+                                >
+                                  {active && (
+                                    <span className="flex h-full items-center justify-center bg-black/25 rounded-md">
+                                      <Check className="h-3.5 w-3.5 text-white stroke-[3] drop-shadow-xs" />
+                                    </span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
+                      <button
+                        type="button"
+                        onClick={() => setIsCommandPaletteOpen(true)}
+                        className="flex items-center gap-1.5 rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)]/85 backdrop-blur px-2.5 py-1 app-label text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel)] transition-colors cursor-pointer shadow-xs"
+                        title="Open Command Palette (Cmd+K)"
+                      >
+                        <Search className="h-3.5 w-3.5" />
+                        <span className="hidden sm:inline">Search</span>
+                        <kbd className="hidden sm:inline-block rounded bg-[var(--app-panel-alt)] px-1 app-meta font-mono">
+                          ⌘K
+                        </kbd>
+                      </button>
+
+                      <div className="flex items-center rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)]/85 backdrop-blur p-0.5 shadow-xs">
+                        <button
+                          type="button"
+                          onClick={() => setTaskLayout("list")}
+                          title="List View"
+                          className={`rounded-md p-1.5 transition-colors cursor-pointer ${
+                            taskLayout === "list"
+                              ? "bg-[var(--app-panel)] text-[var(--app-accent-text)] shadow-xs"
+                              : "text-[var(--app-muted)] hover:text-[var(--app-text)]"
+                          }`}
+                        >
+                          <ListTodo className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setTaskLayout("kanban")}
+                          title="Kanban Board View"
+                          className={`rounded-md p-1.5 transition-colors cursor-pointer ${
+                            taskLayout === "kanban"
+                              ? "bg-[var(--app-panel)] text-[var(--app-accent-text)] shadow-xs"
+                              : "text-[var(--app-muted)] hover:text-[var(--app-text)]"
+                          }`}
+                        >
+                          <Columns3 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between pb-3 mb-3 border-b border-[var(--app-border)]/80 gap-2 shrink-0">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                    {activeModule === "tasks" && (
+                      <button
+                        type="button"
+                        onClick={toggleSidebar}
+                        title={isSidebarOpen ? "Collapse sidebar (Ctrl+B)" : "Expand sidebar (Ctrl+B)"}
+                        aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+                        className={cn(
+                          "p-1.5 rounded-lg border transition-all cursor-pointer shrink-0 flex items-center justify-center",
+                          isSidebarOpen
+                            ? "border-[var(--app-border)] bg-[var(--app-panel-alt)] text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/80"
+                            : "border-[var(--app-accent)]/40 bg-[var(--app-accent)]/10 text-[var(--app-accent-text)] hover:bg-[var(--app-accent)]/20 shadow-xs"
+                        )}
+                      >
+                        {isSidebarOpen ? (
+                          <PanelLeftClose className="h-4 w-4" />
+                        ) : (
+                          <PanelLeftOpen className="h-4 w-4" />
+                        )}
+                      </button>
+                    )}
+
+                    <h1 className="text-lg sm:text-2xl md:app-display font-semibold text-[var(--app-text)] capitalize truncate">
+                      {activeModule === "matrix"
+                        ? "Eisenhower Matrix"
+                        : activeModule === "pomodoro"
+                        ? "Pomodoro Focus Timer"
+                        : activeModule === "calendar"
+                        ? "Calendar Schedule"
+                        : activeModule === "timeline"
+                        ? "Timeline"
+                        : activeModule === "countdown"
+                        ? "Countdowns"
+                        : activeModule === "statistics"
+                        ? "Statistics"
+                        : activeModule === "settings"
+                        ? "Settings"
+                        : activeModule === "habits"
+                        ? "Habit Tracker"
+                        : activeFilterId
+                        ? filters.find((f: any) => f.id === activeFilterId)?.name || currentListName
+                        : currentListName}
+                    </h1>
+                    {activeModule === "tasks" && (
+                      <span className="rounded-full bg-[var(--app-panel-alt)] px-2 py-0.5 app-meta font-bold text-[var(--app-muted)] shrink-0">
+                        {tasks.filter((t) => !t.completed).length}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Right Header: Sync Indicator, Backdrop Quick Picker, Cmd+K & Layout switcher */}
+                  <div className="flex items-center gap-2">
+                    <SyncIndicator />
+
+                    {activeModule === "tasks" && currentList && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            type="button"
+                            title="Customize list backdrop"
+                            className="flex items-center gap-1.5 rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-2.5 py-1 app-label text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/80 transition-colors cursor-pointer"
+                          >
+                            <Palette className="h-3.5 w-3.5 text-[var(--app-accent-text)]" />
+                            <span className="hidden sm:inline">Backdrop</span>
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          className="w-64 p-3 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] shadow-xl rounded-xl z-50"
+                        >
+                          <div className="flex items-center justify-between pb-2 mb-2 border-b border-[var(--app-border)]">
+                            <span className="app-label font-semibold text-[var(--app-text)]">List Backdrop</span>
+                            <span className="app-meta text-[var(--app-muted)]">20 presets</span>
+                          </div>
+                          <div className="grid grid-cols-4 gap-1.5 max-h-56 overflow-y-auto p-0.5 custom-scrollbar">
+                            {LIST_BACKGROUNDS.map((bg) => {
+                              const active = (currentList.background || "none") === bg.id;
+                              return (
+                                <button
+                                  key={bg.id}
+                                  type="button"
+                                  title={bg.name}
+                                  onClick={async () => {
+                                    try {
+                                      await updateList({ id: currentList.id, background: bg.id });
+                                      notify.success("Backdrop updated", `${bg.name} set for ${currentList.name}`);
+                                    } catch (err: any) {
+                                      notify.error("Failed to update backdrop", err?.message || "Please try again.");
+                                    }
+                                  }}
+                                  style={{ background: bg.css }}
+                                  className={cn(
+                                    "h-8 rounded-lg border transition-all cursor-pointer relative",
+                                    active
+                                      ? "border-[var(--app-accent)] ring-2 ring-[var(--app-accent)]/50 scale-105"
+                                      : "border-[var(--app-border)] hover:scale-105 hover:border-[var(--app-accent)]/50"
+                                  )}
+                                >
+                                  {active && (
+                                    <span className="flex h-full items-center justify-center bg-black/25 rounded-md">
+                                      <Check className="h-3.5 w-3.5 text-white stroke-[3] drop-shadow-xs" />
+                                    </span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => setIsCommandPaletteOpen(true)}
+                      className="flex items-center gap-1.5 rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-2.5 py-1 app-label text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] dark:hover:text-[var(--app-text)] transition-colors cursor-pointer"
+                      title="Open Command Palette (Cmd+K)"
+                    >
+                      <Search className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline">Search / Commands</span>
+                      <kbd className="hidden sm:inline-block rounded bg-[var(--app-panel-alt)] px-1 app-meta font-mono">
+                        ⌘K
+                      </kbd>
+                    </button>
+
+                    {activeModule === "tasks" && (
+                      <div className="flex items-center rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] p-0.5">
+                        <button
+                          type="button"
+                          onClick={() => setTaskLayout("list")}
+                          title="List View"
+                          className={`rounded-md p-1.5 transition-colors ${
+                            taskLayout === "list"
+                              ? "bg-[var(--app-panel)] text-[var(--app-accent-text)] shadow-xs dark:bg-[var(--app-panel-alt)] dark:text-[var(--app-accent-text)]"
+                              : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)]"
+                          }`}
+                        >
+                          <ListTodo className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setTaskLayout("kanban")}
+                          title="Kanban Board View"
+                          className={`rounded-md p-1.5 transition-colors ${
+                            taskLayout === "kanban"
+                              ? "bg-[var(--app-panel)] text-[var(--app-accent-text)] shadow-xs dark:bg-[var(--app-panel-alt)] dark:text-[var(--app-accent-text)]"
+                              : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)]"
+                          }`}
+                        >
+                          <Columns3 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
-            </div>
-          </div>
 
           {/* Content Rendering based on Module */}
           {activeModule === "tasks" && (
@@ -422,6 +665,8 @@ function WorkspaceContainer({
             />
           )}
         </main>
+      );
+    })()}
 
         {/* 3. Right Pane Task Detail Inspector */}
         {selectedTask && (

@@ -3,7 +3,7 @@
 import type { DraggableAttributes } from "@dnd-kit/core";
 import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { differenceInCalendarDays, differenceInMinutes, format, getMinutes } from "date-fns";
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 import React, { useMemo } from "react";
 
 import {
@@ -23,14 +23,16 @@ const formatTimeWithOptionalMinutes = (date: Date) => {
 
 interface EventCheckboxProps {
   completed?: boolean;
+  kanbanStatus?: string;
   priority?: number;
   title: string;
   onToggle?: (e: React.MouseEvent) => void;
   size?: "sm" | "md";
 }
 
-function EventCheckbox({ completed, priority, title, onToggle, size = "sm" }: EventCheckboxProps) {
+function EventCheckbox({ completed, kanbanStatus, priority, title, onToggle, size = "sm" }: EventCheckboxProps) {
   const isCompleted = Boolean(completed);
+  const isWontDo = isCompleted && kanbanStatus === "WONT_DO";
   const sizeClasses = size === "sm" ? "h-3.5 w-3.5 rounded-[4px]" : "h-4 w-4 rounded-md";
   const iconSize = size === "sm" ? "h-2.5 w-2.5" : "h-3 w-3";
 
@@ -50,7 +52,9 @@ function EventCheckbox({ completed, priority, title, onToggle, size = "sm" }: Ev
         "flex shrink-0 items-center justify-center border transition-all active:scale-90 cursor-pointer focus-visible:outline-none focus-visible:ring-1.5 focus-visible:ring-[var(--app-accent)]",
         sizeClasses,
         isCompleted
-          ? "border-emerald-500 bg-emerald-500 text-white shadow-xs"
+          ? isWontDo
+            ? "border-rose-500 bg-rose-500 text-white shadow-xs"
+            : "border-emerald-500 bg-emerald-500 text-white shadow-xs"
           : priority === 3
           ? "border-rose-500 bg-rose-500/15 hover:bg-rose-500/30 text-rose-500"
           : priority === 2
@@ -60,7 +64,13 @@ function EventCheckbox({ completed, priority, title, onToggle, size = "sm" }: Ev
           : "border-[var(--app-border)] bg-[var(--app-panel)]/80 hover:border-[var(--app-accent)] text-[var(--app-muted)]"
       )}
     >
-      {isCompleted && <Check className={cn(iconSize, "stroke-[3]")} />}
+      {isCompleted && (
+        isWontDo ? (
+          <X className={cn(iconSize, "stroke-[3]")} />
+        ) : (
+          <Check className={cn(iconSize, "stroke-[3]")} />
+        )
+      )}
     </button>
   );
 }
@@ -217,6 +227,7 @@ export function EventItem({
           <div className="flex items-center gap-1.5 w-full min-w-0">
             <EventCheckbox
               completed={event.completed}
+              kanbanStatus={event.kanbanStatus}
               priority={event.priority}
               title={event.title}
               size="sm"
@@ -265,6 +276,7 @@ export function EventItem({
           <div className="flex items-center gap-1.5 w-full min-w-0">
             <EventCheckbox
               completed={event.completed}
+              kanbanStatus={event.kanbanStatus}
               priority={event.priority}
               title={event.title}
               size="sm"
@@ -289,6 +301,7 @@ export function EventItem({
             <div className="flex items-center gap-1.5 w-full min-w-0 font-medium">
               <EventCheckbox
                 completed={event.completed}
+                kanbanStatus={event.kanbanStatus}
                 priority={event.priority}
                 title={event.title}
                 size="sm"
@@ -338,6 +351,7 @@ export function EventItem({
         <div className="flex items-center gap-2.5 font-medium app-heading truncate min-w-0">
           <EventCheckbox
             completed={event.completed}
+            kanbanStatus={event.kanbanStatus}
             priority={event.priority}
             title={event.title}
             size="md"

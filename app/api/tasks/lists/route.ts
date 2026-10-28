@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();
-    const { name, color, icon } = body;
+    const { name, color, icon, background } = body;
 
     if (!name || !name.trim()) {
       return NextResponse.json({ error: "List name is required" }, { status: 400 });
@@ -51,6 +51,7 @@ export async function POST(req: Request) {
         name: name.trim(),
         color: color || "#14b8a6",
         icon: icon || "Folder",
+        background: background || "none",
         order: nextOrder,
       },
     });

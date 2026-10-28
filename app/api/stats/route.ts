@@ -95,7 +95,12 @@ export async function GET(req: Request) {
           select: { id: true, createdAt: true, priority: true, listId: true },
         }),
         prisma.task.findMany({
-          where: { userId: user.id, completedAt: { gte: start }, isTrash: false },
+          where: {
+            userId: user.id,
+            completedAt: { gte: start },
+            isTrash: false,
+            kanbanStatus: { not: "WONT_DO" },
+          },
           select: { id: true, completedAt: true, priority: true, listId: true },
         }),
         prisma.task.count({

@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { Plus, Check, Calendar, CheckCircle2 } from "lucide-react";
+import { Plus, Check, X, Calendar, CheckCircle2 } from "lucide-react";
 import { Task } from "@/hooks/use-workspace";
 import { getTodayISO, formatTaskSchedule } from "@/lib/date-utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 interface EisenhowerMatrixViewProps {
   tasks: Task[];
@@ -174,19 +175,44 @@ export function EisenhowerMatrixView({
                     className={`flex items-center justify-between gap-2 rounded-xl border p-2.5 cursor-pointer transition-all ${ isSelected ? "border-[var(--app-accent)] bg-[var(--app-accent)]/10 ring-1 ring-[var(--app-accent)]" : "border-[var(--app-border)] bg-[var(--app-panel)] dark:border-[var(--app-border)] dark:bg-[var(--app-bg)]/80 hover:border-[var(--app-border)]" }`}
                   >
                     <div className="flex items-center gap-2 min-w-0 flex-1">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onToggleComplete(task.id, !task.completed);
-                        }}
-                        className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border border-[var(--app-border)] hover:border-[var(--app-accent)]"
-                      >
-                        {task.completed && <Check className="h-3 w-3 text-[var(--app-accent-text)]" />}
-                      </button>
-                      <span className="app-heading font-semibold text-[var(--app-text)] truncate">
-                        {task.title}
-                      </span>
+                      {(() => {
+                        const isWontDo = Boolean(task.completed && task.kanbanStatus === "WONT_DO");
+                        return (
+                          <>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onToggleComplete(task.id, !task.completed);
+                              }}
+                              title={isWontDo ? "Won't Do" : task.completed ? "Completed" : "Mark complete"}
+                              className={cn(
+                                "flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border transition-colors",
+                                task.completed
+                                  ? isWontDo
+                                    ? "border-rose-500 bg-rose-500 text-white"
+                                    : "border-[var(--app-accent)] bg-[var(--app-accent)] text-white"
+                                  : "border-[var(--app-border)] hover:border-[var(--app-accent)]"
+                              )}
+                            >
+                              {task.completed && (
+                                isWontDo ? <X className="h-3 w-3 stroke-[3]" /> : <Check className="h-3 w-3 stroke-[3]" />
+                              )}
+                            </button>
+                            <span className={cn(
+                              "app-heading font-semibold truncate",
+                              task.completed ? "line-through text-[var(--app-muted)]" : "text-[var(--app-text)]"
+                            )}>
+                              {task.title}
+                            </span>
+                            {isWontDo && (
+                              <span className="inline-flex shrink-0 items-center gap-0.5 rounded px-1.5 py-0.2 app-meta font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25">
+                                Won&apos;t Do
+                              </span>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
 
                     {(() => {

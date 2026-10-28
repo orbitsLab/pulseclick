@@ -32,6 +32,7 @@ export interface TimelineTask {
   /** 0 none, 1 low, 2 medium, 3 high */
   priority: number;
   completed: boolean;
+  kanbanStatus?: string;
   list?: { id: string; name: string; color?: string | null } | null;
 }
 
@@ -509,6 +510,11 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
                   >
                     {task.title}
                   </button>
+                  {task.completed && task.kanbanStatus === "WONT_DO" && (
+                    <span className="inline-flex shrink-0 items-center rounded px-1 py-0.2 text-[10px] font-bold bg-rose-500/15 text-rose-500 border border-rose-500/25">
+                      Won&apos;t Do
+                    </span>
+                  )}
                 </div>
               ))}
             </div>

@@ -95,6 +95,7 @@ export function TaskCalendarView({
           allDay,
           color,
           completed: t.completed,
+          kanbanStatus: t.kanbanStatus,
           priority: t.priority,
           listId: t.listId,
           listName: t.list?.name,

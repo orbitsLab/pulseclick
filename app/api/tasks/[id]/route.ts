@@ -69,13 +69,12 @@ export async function PATCH(
     if (body.kanbanStatus !== undefined) {
       updateData.kanbanStatus = body.kanbanStatus;
       if (body.completed === undefined) {
-        if (body.kanbanStatus === "DONE") {
+        if (body.kanbanStatus === "DONE" || body.kanbanStatus === "WONT_DO") {
           updateData.completed = true;
-          updateData.completedAt = new Date();
+          updateData.completedAt = existing.completedAt || new Date();
         } else if (
           body.kanbanStatus === "TODO" ||
-          body.kanbanStatus === "IN_PROGRESS" ||
-          body.kanbanStatus === "WONT_DO"
+          body.kanbanStatus === "IN_PROGRESS"
         ) {
           updateData.completed = false;
           updateData.completedAt = null;
@@ -126,13 +125,19 @@ export async function PATCH(
           // The recurrence ended: close the task for good.
           updateData.completed = true;
           updateData.completedAt = new Date();
-          updateData.kanbanStatus = "DONE";
+          updateData.kanbanStatus = body.kanbanStatus || "DONE";
         }
       } else {
         updateData.completed = nextCompleted;
-        updateData.completedAt = nextCompleted ? new Date() : null;
+        updateData.completedAt = nextCompleted ? (existing.completedAt || new Date()) : null;
         if (nextCompleted) {
-          updateData.kanbanStatus = "DONE";
+          if (body.kanbanStatus !== undefined) {
+            updateData.kanbanStatus = body.kanbanStatus;
+          } else if (existing.kanbanStatus === "WONT_DO") {
+            updateData.kanbanStatus = "WONT_DO";
+          } else {
+            updateData.kanbanStatus = "DONE";
+          }
         } else if (body.kanbanStatus === undefined) {
           updateData.kanbanStatus = "TODO";
         }

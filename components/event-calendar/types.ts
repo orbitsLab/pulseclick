@@ -10,6 +10,7 @@ export interface CalendarEvent {
   color?: EventColor;
   location?: string;
   completed?: boolean;
+  kanbanStatus?: string;
   priority?: number;
   listId?: string | null;
   listName?: string;

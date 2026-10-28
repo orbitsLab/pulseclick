@@ -28,6 +28,7 @@ export interface TaskList {
   name: string;
   color: string;
   icon?: string | null;
+  background?: string | null;
   order: number;
   _count?: { tasks: number };
 }
@@ -716,23 +717,31 @@ export function useWorkspace(filters: {
 
         let nextCompleted = t.completed;
         let nextCompletedAt = t.completedAt;
+        let nextKanbanStatus = updates.kanbanStatus ?? t.kanbanStatus;
+
         if (updates.kanbanStatus !== undefined && updates.completed === undefined) {
-          if (updates.kanbanStatus === "DONE") {
+          if (updates.kanbanStatus === "DONE" || updates.kanbanStatus === "WONT_DO") {
             nextCompleted = true;
-            nextCompletedAt = new Date().toISOString();
+            nextCompletedAt = t.completedAt || new Date().toISOString();
           } else if (
             updates.kanbanStatus === "TODO" ||
-            updates.kanbanStatus === "IN_PROGRESS" ||
-            updates.kanbanStatus === "WONT_DO"
+            updates.kanbanStatus === "IN_PROGRESS"
           ) {
             nextCompleted = false;
             nextCompletedAt = null;
+          }
+        } else if (updates.completed !== undefined && updates.kanbanStatus === undefined) {
+          if (updates.completed) {
+            nextKanbanStatus = t.kanbanStatus === "WONT_DO" ? "WONT_DO" : "DONE";
+          } else {
+            nextKanbanStatus = "TODO";
           }
         }
 
         return {
           ...t,
           ...updates,
+          kanbanStatus: nextKanbanStatus,
           completed: updates.completed !== undefined ? updates.completed : nextCompleted,
           completedAt:
             updates.completed !== undefined
@@ -869,7 +878,16 @@ export function useWorkspace(filters: {
 
   // Update List
   const updateListMutation = useMutation({
-    mutationFn: async ({ id, ...updates }: { id: string; name?: string; color?: string; icon?: string }) => {
+    mutationFn: async ({
+      id,
+      ...updates
+    }: {
+      id: string;
+      name?: string;
+      color?: string;
+      icon?: string;
+      background?: string;
+    }) => {
       const res = await fetch(`/api/tasks/lists/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -878,10 +896,33 @@ export function useWorkspace(filters: {
       if (!res.ok) throw new Error("Failed to update list");
       return res.json();
     },
-    onError: (err: any) => {
+    onMutate: async ({ id, ...updates }) => {
+      await queryClient.cancelQueries({ queryKey: ["workspace-lists"] });
+      const prevData = queryClient.getQueryData<any>(["workspace-lists"]);
+
+      if (Array.isArray(prevData)) {
+        queryClient.setQueryData<TaskList[]>(
+          ["workspace-lists"],
+          prevData.map((l) => (l.id === id ? { ...l, ...updates } : l))
+        );
+      } else if (prevData && Array.isArray(prevData.lists)) {
+        queryClient.setQueryData(
+          ["workspace-lists"],
+          {
+            ...prevData,
+            lists: prevData.lists.map((l: TaskList) => (l.id === id ? { ...l, ...updates } : l)),
+          }
+        );
+      }
+      return { prevData };
+    },
+    onError: (err: any, _vars, context) => {
+      if (context?.prevData) {
+        queryClient.setQueryData(["workspace-lists"], context.prevData);
+      }
       notify.error("Failed to update list", err?.message || "Could not update list.");
     },
-    onSuccess: () => {
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["workspace-lists"] });
       queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
     },
@@ -898,13 +939,23 @@ export function useWorkspace(filters: {
       await queryClient.cancelQueries({ queryKey: ["workspace-lists"] });
       await queryClient.cancelQueries({ queryKey: tasksQueryKey });
 
-      const prevLists = queryClient.getQueryData<TaskList[]>(["workspace-lists"]) || [];
+      const prevData = queryClient.getQueryData<any>(["workspace-lists"]);
 
       // Optimistically remove list
-      queryClient.setQueryData<TaskList[]>(
-        ["workspace-lists"],
-        prevLists.filter((l) => l.id !== id)
-      );
+      if (Array.isArray(prevData)) {
+        queryClient.setQueryData<TaskList[]>(
+          ["workspace-lists"],
+          prevData.filter((l) => l.id !== id)
+        );
+      } else if (prevData && Array.isArray(prevData.lists)) {
+        queryClient.setQueryData(
+          ["workspace-lists"],
+          {
+            ...prevData,
+            lists: prevData.lists.filter((l: TaskList) => l.id !== id),
+          }
+        );
+      }
 
       // Tasks in deleted list move to Inbox (listId = null)
       queryClient.setQueriesData<Task[]>(
@@ -915,18 +966,18 @@ export function useWorkspace(filters: {
         }
       );
 
-      return { prevLists };
+      return { prevData };
     },
     onError: (err: any, _id, context) => {
-      if (context?.prevLists) {
-        queryClient.setQueryData(["workspace-lists"], context.prevLists);
+      if (context?.prevData) {
+        queryClient.setQueryData(["workspace-lists"], context.prevData);
       }
       queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
       notify.error("Failed to delete list", err?.message || "Could not delete list.");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["workspace-lists"] });
-      queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
+      queryClient.invalidateQueries({ queryKey: tasksQueryKey });
     },
   });
 

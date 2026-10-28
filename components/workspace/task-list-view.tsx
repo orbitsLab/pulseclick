@@ -26,6 +26,13 @@ import { WorkspaceContext } from "@/context/workspace-context";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+} from "@/components/ui/context-menu";
 
 export function TaskListSkeleton({ count = 5 }: { count?: number }) {
   return (
@@ -171,6 +178,8 @@ export function TaskListView(props: TaskListViewProps = {}) {
     const isDueToday = task.dueDate === today && !task.completed;
     const schedule = formatTaskSchedule(task);
 
+    const isWontDo = Boolean(task.completed && task.kanbanStatus === "WONT_DO");
+
     return (
       <div
         key={task.id}
@@ -193,17 +202,111 @@ export function TaskListView(props: TaskListViewProps = {}) {
             )}
           </button>
 
-          {/* Complete toggle checkbox */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleComplete(task.id, !task.completed);
-            }}
-            className={`flex h-4.5 w-4.5 flex-shrink-0 items-center justify-center rounded-md border transition-all active:scale-90 ${ task.completed ? "border-[var(--app-accent)] bg-[var(--app-accent-strong)] text-white shadow-xs shadow-[var(--app-accent)]/30" : task.priority === 3 ? "border-rose-500 hover:bg-rose-500/20" : task.priority === 2 ? "border-amber-500 hover:bg-amber-500/20" : task.priority === 1 ? "border-blue-400 hover:bg-blue-500/20" : "border-[var(--app-border)] hover:border-[var(--app-accent)] dark:hover:border-[var(--app-accent)]" }`}
-          >
-            {task.completed && <Check className="h-3 w-3 stroke-[3]" />}
-          </button>
+          {/* Complete toggle checkbox with Context Menu for Won't Do */}
+          <ContextMenu>
+            <ContextMenuTrigger className="inline-flex items-center justify-center">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleComplete(task.id, !task.completed);
+                }}
+                title={
+                  task.completed
+                    ? isWontDo
+                      ? "Won't Do (Right-click for options)"
+                      : "Completed (Right-click for options)"
+                    : "Mark complete (Right-click for options)"
+                }
+                className={cn(
+                  "flex h-4.5 w-4.5 flex-shrink-0 items-center justify-center rounded-md border transition-all active:scale-90 cursor-pointer",
+                  task.completed
+                    ? isWontDo
+                      ? "border-rose-500 bg-rose-500 text-white shadow-xs"
+                      : "border-[var(--app-accent)] bg-[var(--app-accent-strong)] text-white shadow-xs shadow-[var(--app-accent)]/30"
+                    : task.priority === 3
+                    ? "border-rose-500 hover:bg-rose-500/20"
+                    : task.priority === 2
+                    ? "border-amber-500 hover:bg-amber-500/20"
+                    : task.priority === 1
+                    ? "border-blue-400 hover:bg-blue-500/20"
+                    : "border-[var(--app-border)] hover:border-[var(--app-accent)] dark:hover:border-[var(--app-accent)]"
+                )}
+              >
+                {task.completed && (
+                  isWontDo ? (
+                    <X className="h-3 w-3 stroke-[3]" />
+                  ) : (
+                    <Check className="h-3 w-3 stroke-[3]" />
+                  )
+                )}
+              </button>
+            </ContextMenuTrigger>
+
+            <ContextMenuContent
+              onClick={(e) => e.stopPropagation()}
+              className="w-48 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] shadow-xl p-1.5 z-50 rounded-xl"
+            >
+              <ContextMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const nextCompleted = task.completed && !isWontDo ? false : true;
+                  onUpdateTask?.({
+                    taskId: task.id,
+                    completed: nextCompleted,
+                    kanbanStatus: nextCompleted ? "DONE" : "TODO",
+                  });
+                }}
+                className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-lg text-xs hover:bg-[var(--app-panel-alt)]"
+              >
+                <span className="flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-emerald-500 stroke-[2.5]" />
+                  Completed
+                </span>
+                {task.completed && !isWontDo && (
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                )}
+              </ContextMenuItem>
+
+              <ContextMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const nextWonDo = isWontDo ? false : true;
+                  onUpdateTask?.({
+                    taskId: task.id,
+                    completed: nextWonDo,
+                    kanbanStatus: nextWonDo ? "WONT_DO" : "TODO",
+                  });
+                }}
+                className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-lg text-xs hover:bg-[var(--app-panel-alt)]"
+              >
+                <span className="flex items-center gap-2">
+                  <X className="h-3.5 w-3.5 text-rose-500 stroke-[2.5]" />
+                  Won&apos;t Do
+                </span>
+                {isWontDo && <Check className="h-3.5 w-3.5 text-rose-500" />}
+              </ContextMenuItem>
+
+              {task.completed && (
+                <>
+                  <ContextMenuSeparator className="my-1 bg-[var(--app-border)]" />
+                  <ContextMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onUpdateTask?.({
+                        taskId: task.id,
+                        completed: false,
+                        kanbanStatus: "TODO",
+                      });
+                    }}
+                    className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-lg text-xs text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]"
+                  >
+                    <span>Mark Incomplete</span>
+                  </ContextMenuItem>
+                </>
+              )}
+            </ContextMenuContent>
+          </ContextMenu>
 
           {/* Quick inline Priority Flag */}
           <button
@@ -222,6 +325,13 @@ export function TaskListView(props: TaskListViewProps = {}) {
               >
                 {task.title}
               </span>
+
+              {isWontDo && (
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.2 app-meta font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25">
+                  <X className="h-3 w-3 stroke-[2.5]" />
+                  Won&apos;t Do
+                </span>
+              )}
 
               {!task.completed && (
                 <button
@@ -523,28 +633,31 @@ export function TaskListView(props: TaskListViewProps = {}) {
             {renderGroupedTasks()}
 
             {/* Completed Tasks section with toggle */}
-            {completedTasks.length > 0 && (
-              <div className="space-y-1.5 pt-4 border-t border-[var(--app-border)]/60">
-                <button
-                  type="button"
-                  onClick={() => setShowCompleted(!showCompleted)}
-                  className="flex items-center gap-1.5 app-overline font-semibold text-[var(--app-muted)] hover:text-[var(--app-text)] transition-colors cursor-pointer"
-                >
-                  {showCompleted ? (
-                    <ChevronDown className="h-3.5 w-3.5" />
-                  ) : (
-                    <ChevronRight className="h-3.5 w-3.5" />
+            {completedTasks.length > 0 && (() => {
+              const wontDoCount = completedTasks.filter((t) => t.kanbanStatus === "WONT_DO").length;
+              return (
+                <div className="space-y-1.5 pt-4 border-t border-[var(--app-border)]/60">
+                  <button
+                    type="button"
+                    onClick={() => setShowCompleted(!showCompleted)}
+                    className="flex items-center gap-1.5 app-overline font-semibold text-[var(--app-muted)] hover:text-[var(--app-text)] transition-colors cursor-pointer"
+                  >
+                    {showCompleted ? (
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    ) : (
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    )}
+                    <span>{wontDoCount > 0 ? "Completed & Won't Do" : "Completed"}</span>
+                    <span className="rounded-full bg-[var(--app-panel-alt)] px-1.5 py-0.2 app-meta text-[var(--app-muted)]">
+                      {completedTasks.length}
+                    </span>
+                  </button>
+                  {showCompleted && (
+                    <div className="space-y-1.5 pt-1">{completedTasks.map(renderTaskItem)}</div>
                   )}
-                  <span>Completed & Won&apos;t Do</span>
-                  <span className="rounded-full bg-[var(--app-panel-alt)] px-1.5 py-0.2 app-meta text-[var(--app-muted)]">
-                    {completedTasks.length}
-                  </span>
-                </button>
-                {showCompleted && (
-                  <div className="space-y-1.5 pt-1">{completedTasks.map(renderTaskItem)}</div>
-                )}
-              </div>
-            )}
+                </div>
+              );
+            })()}
           </>
         )}
       </div>

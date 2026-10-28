@@ -45,6 +45,7 @@ export interface WorkspaceContextType {
   setSelectedTaskId: (id: string | null) => void;
   selectedTask: Task | null;
   currentListName: string;
+  currentList?: TaskList | null;
 
   // Calendar State
   calView?: "month" | "week" | "day" | "agenda" | "year";
@@ -138,8 +139,8 @@ export interface WorkspaceContextType {
     action: "complete" | "delete" | "priority" | "dueDate" | "moveList";
     value?: any;
   }) => Promise<any>;
-  addList: (params: { name: string; color: string; icon?: string }) => Promise<any>;
-  updateList: (params: { id: string; name?: string; color?: string; icon?: string }) => Promise<any>;
+  addList: (params: { name: string; color: string; icon?: string; background?: string }) => Promise<any>;
+  updateList: (params: { id: string; name?: string; color?: string; icon?: string; background?: string }) => Promise<any>;
   deleteList: (id: string) => Promise<any>;
   addTag: (params: { name: string; color?: string }) => Promise<any>;
   deleteTag: (id: string) => Promise<any>;
@@ -603,6 +604,14 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     }
   }, [activeListId, activeTag, activeView, workspace.lists]);
 
+  // Current active list object
+  const currentList = useMemo(() => {
+    if (activeListId) {
+      return workspace.lists.find((item) => item.id === activeListId) || null;
+    }
+    return null;
+  }, [activeListId, workspace.lists]);
+
   // Selected Task
   const selectedTask = useMemo(
     () => (activeView === "trash" ? workspace.trashTasks : workspace.allActiveTasks).find((t) => t.id === selectedTaskId) || null,
@@ -775,6 +784,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     setSelectedTaskId,
     selectedTask,
     currentListName,
+    currentList,
     calView,
     setCalView,
     calDate,
