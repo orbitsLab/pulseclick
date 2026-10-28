@@ -61,6 +61,10 @@ export interface EventCalendarProps {
   lists?: Array<{ id: string; name: string; color?: string }>;
   className?: string;
   initialView?: CalendarView;
+  view?: CalendarView;
+  onViewChange?: (view: CalendarView) => void;
+  currentDate?: Date;
+  onDateChange?: (date: Date) => void;
   showCompleted?: boolean;
   onToggleShowCompleted?: () => void;
 }
@@ -75,11 +79,27 @@ export function EventCalendar({
   lists = [],
   className,
   initialView = "month",
+  view: propView,
+  onViewChange,
+  currentDate: propCurrentDate,
+  onDateChange,
   showCompleted = true,
   onToggleShowCompleted,
 }: EventCalendarProps) {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [view, setView] = useState<CalendarView>(initialView);
+  const [internalCurrentDate, setInternalCurrentDate] = useState(new Date());
+  const currentDate = propCurrentDate ?? internalCurrentDate;
+  const setCurrentDate = (d: Date | ((prev: Date) => Date)) => {
+    const next = typeof d === "function" ? d(currentDate) : d;
+    setInternalCurrentDate(next);
+    onDateChange?.(next);
+  };
+
+  const [internalView, setInternalView] = useState<CalendarView>(initialView);
+  const view = propView ?? internalView;
+  const setView = (v: CalendarView) => {
+    setInternalView(v);
+    onViewChange?.(v);
+  };
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [selectedListId, setSelectedListId] = useState<string>("all");

@@ -345,7 +345,7 @@ export function CountdownView({
   const isEditing = editingId !== null;
 
   return (
-    <div className="flex w-full flex-col gap-6">
+    <div className="flex-1 min-h-0 overflow-y-auto pr-1 sm:pr-2 pb-12 flex w-full flex-col gap-6">
       {/* Header strip */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">

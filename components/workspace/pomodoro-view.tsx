@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   Play,
   Pause,
@@ -39,11 +40,27 @@ const MODE_DURATIONS: Record<PomoMode, number> = {
 };
 
 export function PomodoroView({ tasks, stats, onLogPomodoro }: PomodoroViewProps) {
-  const [mode, setMode] = useState<PomoMode>("focus");
-  const [timeLeft, setTimeLeft] = useState<number>(MODE_DURATIONS.focus);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const modeParam = searchParams.get("mode") as PomoMode | null;
+  const initialMode = modeParam && MODE_DURATIONS[modeParam] ? modeParam : "focus";
+
+  const [mode, setMode] = useState<PomoMode>(initialMode);
+  const [timeLeft, setTimeLeft] = useState<number>(MODE_DURATIONS[initialMode]);
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string>("");
   const [ambientSound, setAmbientSound] = useState<AmbientType>("off");
+
+  useEffect(() => {
+    if (modeParam && MODE_DURATIONS[modeParam] && modeParam !== mode) {
+      setMode(modeParam);
+      setTimeLeft(MODE_DURATIONS[modeParam]);
+      setIsRunning(false);
+      stopAmbientSound();
+    }
+  }, [modeParam]);
 
   const activeTasks = tasks.filter((t) => !t.completed);
 
@@ -105,6 +122,9 @@ export function PomodoroView({ tasks, stats, onLogPomodoro }: PomodoroViewProps)
     stopAmbientSound();
     setMode(newMode);
     setTimeLeft(MODE_DURATIONS[newMode]);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("mode", newMode);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }
 
   function toggleRunning() {

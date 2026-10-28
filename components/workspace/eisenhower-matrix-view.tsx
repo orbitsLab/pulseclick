@@ -108,12 +108,13 @@ export function EisenhowerMatrixView({
   }
 
   return (
-    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 pb-4">
-      {quadrants.map((quad) => (
-        <div
-          key={quad.id}
-          className={`flex flex-col rounded-2xl border-2 p-3.5 sm:p-4 transition-all ${quad.color} dark:bg-[var(--app-rail)]/60 min-h-[300px]`}
-        >
+    <div className="flex-1 min-h-0 overflow-y-auto pr-1 sm:pr-2 pb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4">
+        {quadrants.map((quad) => (
+          <div
+            key={quad.id}
+            className={`flex flex-col rounded-2xl border-2 p-3.5 sm:p-4 transition-all ${quad.color} dark:bg-[var(--app-rail)]/60 min-h-[300px]`}
+          >
           {/* Header */}
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-current/20">
             <div>
@@ -210,6 +211,7 @@ export function EisenhowerMatrixView({
           </div>
         </div>
       ))}
+      </div>
     </div>
   );
 }

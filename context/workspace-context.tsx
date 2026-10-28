@@ -1,6 +1,8 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { format } from "date-fns";
 import { useIsFetching, useQueryClient } from "@tanstack/react-query";
 import { WorkspaceModule } from "@/components/workspace/module-rail";
 import { getTodayISO, addDays } from "@/lib/date-utils";
@@ -43,6 +45,12 @@ export interface WorkspaceContextType {
   setSelectedTaskId: (id: string | null) => void;
   selectedTask: Task | null;
   currentListName: string;
+
+  // Calendar State
+  calView?: "month" | "week" | "day" | "agenda" | "year";
+  setCalView?: (view: "month" | "week" | "day" | "agenda" | "year") => void;
+  calDate?: Date;
+  setCalDate?: (date: Date) => void;
 
   // Sidebar State
   isSidebarOpen: boolean;
@@ -206,21 +214,101 @@ export interface WorkspaceContextType {
 
 export const WorkspaceContext = createContext<WorkspaceContextType | null>(null);
 
+function getModuleFromPath(pathname: string | null): WorkspaceModule {
+  if (!pathname) return "tasks";
+  if (pathname.startsWith("/calendar")) return "calendar";
+  if (pathname.startsWith("/matrix")) return "matrix";
+  if (pathname.startsWith("/habits")) return "habits";
+  if (pathname.startsWith("/analytics") || pathname.startsWith("/statistics")) return "statistics";
+  if (pathname.startsWith("/pomodoro")) return "pomodoro";
+  if (pathname.startsWith("/timeline")) return "timeline";
+  if (pathname.startsWith("/countdown")) return "countdown";
+  if (pathname.startsWith("/settings")) return "settings";
+  return "tasks";
+}
+
+function getPathFromModule(mod: WorkspaceModule): string {
+  switch (mod) {
+    case "calendar":
+      return "/calendar";
+    case "matrix":
+      return "/matrix";
+    case "habits":
+      return "/habits";
+    case "statistics":
+      return "/analytics";
+    case "pomodoro":
+      return "/pomodoro";
+    case "timeline":
+      return "/timeline";
+    case "countdown":
+      return "/countdowns";
+    case "settings":
+      return "/settings";
+    case "tasks":
+    default:
+      return "/tasks";
+  }
+}
+
 export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
   const fetchingCount = useIsFetching();
   const isBackgroundFetching = fetchingCount > 0;
 
-  // Navigation State
-  const [activeModule, setActiveModule] = useState<WorkspaceModule>("tasks");
-  const [activeView, setActiveView] = useState<string>("today");
-  const [activeListId, setActiveListId] = useState<string | null>(null);
-  const [activeTag, setActiveTag] = useState<string | null>(null);
-  const [activeFilterId, setActiveFilterId] = useState<string | null>(null);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Navigation State derived from URL
+  const activeModule: WorkspaceModule = useMemo(() => getModuleFromPath(pathname), [pathname]);
+
+  const activeView = useMemo(() => {
+    if (activeModule !== "tasks") return "today";
+    return searchParams.get("view") || "today";
+  }, [activeModule, searchParams]);
+
+  const activeListId = useMemo(() => {
+    return searchParams.get("listId") || null;
+  }, [searchParams]);
+
+  const activeTag = useMemo(() => {
+    return searchParams.get("tag") || null;
+  }, [searchParams]);
+
+  const activeFilterId = useMemo(() => {
+    return searchParams.get("filterId") || null;
+  }, [searchParams]);
+
+  const taskLayout: "list" | "kanban" = useMemo(() => {
+    return searchParams.get("layout") === "kanban" ? "kanban" : "list";
+  }, [searchParams]);
+
+  const selectedTaskId = useMemo(() => {
+    return searchParams.get("taskId") || null;
+  }, [searchParams]);
+
+  const statsRange: "week" | "month" | "quarter" | "year" = useMemo(() => {
+    const r = searchParams.get("range");
+    if (r === "week" || r === "month" || r === "quarter" || r === "year") return r;
+    return "month";
+  }, [searchParams]);
+
+  const calView: "month" | "week" | "day" | "agenda" | "year" = useMemo(() => {
+    const v = searchParams.get("view");
+    if (v === "month" || v === "week" || v === "day" || v === "agenda" || v === "year") return v;
+    return "month";
+  }, [searchParams]);
+
+  const calDate: Date = useMemo(() => {
+    const d = searchParams.get("date");
+    if (d && !isNaN(Date.parse(d))) {
+      return new Date(d);
+    }
+    return new Date();
+  }, [searchParams]);
+
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [statsRange, setStatsRange] = useState<"week" | "month" | "quarter" | "year">("month");
-  const [taskLayout, setTaskLayout] = useState<"list" | "kanban">("list");
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   // Expandable Sidebar State
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
@@ -533,27 +621,134 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Helper navigation methods
-  const selectView = (view: string, listId?: string | null, tag?: string | null) => {
-    setActiveView(view);
-    setActiveListId(listId || null);
-    setActiveTag(tag || null);
-    setActiveFilterId(null);
-    setSelectedTaskId(null);
-  };
+  // Helper navigation methods with Next.js router integration
+  const selectModule = useCallback(
+    (mod: WorkspaceModule) => {
+      const targetPath = getPathFromModule(mod);
+      if (targetPath !== pathname) {
+        router.push(targetPath);
+      }
+    },
+    [pathname, router]
+  );
 
-  const selectFilter = (filterId: string) => {
-    setActiveFilterId(filterId);
-    setActiveListId(null);
-    setActiveTag(null);
-    setActiveModule("tasks");
-    setSelectedTaskId(null);
-  };
+  const setActiveModule = useCallback(
+    (mod: WorkspaceModule) => {
+      selectModule(mod);
+    },
+    [selectModule]
+  );
 
-  const selectModule = (mod: WorkspaceModule) => {
-    setActiveModule(mod);
-    setSelectedTaskId(null);
-  };
+  const selectView = useCallback(
+    (view: string, listId?: string | null, tag?: string | null) => {
+      const params = new URLSearchParams();
+      if (view) params.set("view", view);
+      if (listId) params.set("listId", listId);
+      if (tag) params.set("tag", tag);
+      if (searchParams.get("layout") === "kanban") params.set("layout", "kanban");
+      const qs = params.toString() ? `?${params.toString()}` : "";
+      router.push(`/tasks${qs}`);
+    },
+    [searchParams, router]
+  );
+
+  const setActiveView = useCallback(
+    (view: string) => {
+      selectView(view, activeListId, activeTag);
+    },
+    [selectView, activeListId, activeTag]
+  );
+
+  const setActiveListId = useCallback(
+    (listId: string | null) => {
+      selectView(activeView, listId, activeTag);
+    },
+    [selectView, activeView, activeTag]
+  );
+
+  const setActiveTag = useCallback(
+    (tag: string | null) => {
+      selectView(activeView, activeListId, tag);
+    },
+    [selectView, activeView, activeListId]
+  );
+
+  const selectFilter = useCallback(
+    (filterId: string) => {
+      const params = new URLSearchParams();
+      params.set("filterId", filterId);
+      if (searchParams.get("layout") === "kanban") params.set("layout", "kanban");
+      router.push(`/tasks?${params.toString()}`);
+    },
+    [searchParams, router]
+  );
+
+  const setActiveFilterId = useCallback(
+    (filterId: string | null) => {
+      if (filterId) {
+        selectFilter(filterId);
+      } else {
+        selectView("today", null, null);
+      }
+    },
+    [selectFilter, selectView]
+  );
+
+  const setTaskLayout = useCallback(
+    (layout: "list" | "kanban") => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (layout === "kanban") {
+        params.set("layout", "kanban");
+      } else {
+        params.delete("layout");
+      }
+      const qs = params.toString() ? `?${params.toString()}` : "";
+      router.replace(`${pathname || "/tasks"}${qs}`, { scroll: false });
+    },
+    [pathname, searchParams, router]
+  );
+
+  const setSelectedTaskId = useCallback(
+    (id: string | null) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (id) {
+        params.set("taskId", id);
+      } else {
+        params.delete("taskId");
+      }
+      const qs = params.toString() ? `?${params.toString()}` : "";
+      router.replace(`${pathname || "/tasks"}${qs}`, { scroll: false });
+    },
+    [pathname, searchParams, router]
+  );
+
+  const setStatsRange = useCallback(
+    (range: "week" | "month" | "quarter" | "year") => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("range", range);
+      router.replace(`${pathname || "/analytics"}?${params.toString()}`, { scroll: false });
+    },
+    [pathname, searchParams, router]
+  );
+
+  const setCalView = useCallback(
+    (v: "month" | "week" | "day" | "agenda" | "year") => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("view", v);
+      router.replace(`${pathname || "/calendar"}?${params.toString()}`, { scroll: false });
+    },
+    [pathname, searchParams, router]
+  );
+
+  const setCalDate = useCallback(
+    (date: Date) => {
+      const params = new URLSearchParams(searchParams.toString());
+      const iso = format(date, "yyyy-MM-dd");
+      params.set("date", iso);
+      router.replace(`${pathname || "/calendar"}?${params.toString()}`, { scroll: false });
+    },
+    [pathname, searchParams, router]
+  );
 
   const refetchAll = async () => {
     await queryClient.invalidateQueries();
@@ -580,6 +775,10 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     setSelectedTaskId,
     selectedTask,
     currentListName,
+    calView,
+    setCalView,
+    calDate,
+    setCalDate,
 
     // Sidebar State
     isSidebarOpen,

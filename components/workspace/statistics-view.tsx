@@ -407,7 +407,7 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
   const axisTick = { fill: theme.muted, fontSize: 11 };
 
   return (
-    <div className="space-y-4">
+    <div className="flex-1 min-h-0 overflow-y-auto pr-1 sm:pr-2 space-y-4 pb-12">
       {/* Header + range switcher */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>

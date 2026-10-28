@@ -99,8 +99,8 @@ export function MonthView({
   }, []);
 
   return (
-    <div className="contents" data-slot="month-view">
-      <div className="grid grid-cols-7 border-border/70 border-b">
+    <div className="flex flex-col flex-1 min-h-0 overflow-y-auto" data-slot="month-view">
+      <div className="sticky top-0 z-20 bg-[var(--app-panel)] grid grid-cols-7 border-border/70 border-b">
         {weekdays.map((day) => (
           <div
             className="py-2 text-center text-muted-foreground/70 text-sm"
@@ -110,7 +110,7 @@ export function MonthView({
           </div>
         ))}
       </div>
-      <div className="grid flex-1 auto-rows-fr">
+      <div className="grid flex-1 auto-rows-fr min-h-[480px]">
         {weeks.map((week, weekIndex) => (
           <div
             className="grid grid-cols-7 [&:last-child>*]:border-b-0"

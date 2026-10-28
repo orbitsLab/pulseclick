@@ -17,7 +17,7 @@ import {
   startOfWeek,
 } from "date-fns";
 import type React from "react";
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect } from "react";
 
 import {
   type CalendarEvent,
@@ -224,6 +224,17 @@ export function WeekView({
     "week",
   );
 
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const currentHour = new Date().getHours();
+      const targetHour = Math.max(0, Math.min(23, currentHour > 0 ? currentHour - 1 : 8));
+      const cellHeight = WeekCellsHeight || 64;
+      scrollContainerRef.current.scrollTop = targetHour * cellHeight;
+    }
+  }, []);
+
   return (
     <div className="flex h-full flex-col" data-slot="week-view">
       <div className="sticky top-0 z-30 grid grid-cols-8 border-border/70 border-b bg-background/80 backdrop-blur-md">
@@ -307,7 +318,7 @@ export function WeekView({
         </div>
       )}
 
-      <div className="grid flex-1 grid-cols-8 overflow-hidden">
+      <div ref={scrollContainerRef} className="grid flex-1 grid-cols-8 overflow-y-auto">
         <div className="grid auto-cols-fr border-border/70 border-r">
           {hours.map((hour, index) => (
             <div

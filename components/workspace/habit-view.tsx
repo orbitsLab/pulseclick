@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useContext, useMemo } from "react";
+import React, { useState, useContext, useMemo, useEffect } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   Flame,
   Plus,
@@ -144,10 +145,59 @@ export function HabitView(props: HabitViewProps = {}) {
   const habitAnalyticsHabitId = context?.habitAnalyticsHabitId ?? "all";
   const setHabitAnalyticsHabitId = context?.setHabitAnalyticsHabitId ?? (() => {});
 
-  // View state
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const tabParam = searchParams.get("tab");
+  const statusParam = searchParams.get("status");
+
+  // View state synced with query parameters
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
-  const [activeTab, setActiveTab] = useState<"ACTIVE" | "ARCHIVED">("ACTIVE");
-  const [viewMode, setViewMode] = useState<"ROUTINES" | "HEATMAP" | "ANALYTICS" | "ACHIEVEMENTS" | "JOURNAL">("ROUTINES");
+  const [activeTab, setActiveTab] = useState<"ACTIVE" | "ARCHIVED">(() =>
+    statusParam === "archived" ? "ARCHIVED" : "ACTIVE"
+  );
+  const [viewMode, setViewMode] = useState<"ROUTINES" | "HEATMAP" | "ANALYTICS" | "ACHIEVEMENTS" | "JOURNAL">(() => {
+    if (tabParam === "heatmap") return "HEATMAP";
+    if (tabParam === "analytics") return "ANALYTICS";
+    if (tabParam === "achievements") return "ACHIEVEMENTS";
+    if (tabParam === "journal") return "JOURNAL";
+    return "ROUTINES";
+  });
+
+  useEffect(() => {
+    if (tabParam) {
+      const upper = tabParam.toUpperCase();
+      if (["ROUTINES", "HEATMAP", "ANALYTICS", "ACHIEVEMENTS", "JOURNAL"].includes(upper)) {
+        setViewMode(upper as any);
+      }
+    }
+  }, [tabParam]);
+
+  useEffect(() => {
+    if (statusParam) {
+      const upper = statusParam.toUpperCase();
+      if (upper === "ACTIVE" || upper === "ARCHIVED") {
+        setActiveTab(upper as any);
+        setHabitStatus(upper as any);
+      }
+    }
+  }, [statusParam, setHabitStatus]);
+
+  const handleViewModeChange = (mode: "ROUTINES" | "HEATMAP" | "ANALYTICS" | "ACHIEVEMENTS" | "JOURNAL") => {
+    setViewMode(mode);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", mode.toLowerCase());
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const handleTabChange = (tab: "ACTIVE" | "ARCHIVED") => {
+    setActiveTab(tab);
+    setHabitStatus(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("status", tab.toLowerCase());
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   // Encouragement toast state
   const [toastData, setToastData] = useState<{
@@ -188,12 +238,6 @@ export function HabitView(props: HabitViewProps = {}) {
 
   // New section form
   const [newSectionName, setNewSectionName] = useState("");
-
-  // Switch between ACTIVE and ARCHIVED tabs
-  const handleTabChange = (tab: "ACTIVE" | "ARCHIVED") => {
-    setActiveTab(tab);
-    setHabitStatus(tab);
-  };
 
   const toggleSectionCollapse = (secId: string) => {
     setCollapsedSections((prev) => ({
@@ -360,7 +404,7 @@ export function HabitView(props: HabitViewProps = {}) {
             <div className="flex items-center rounded-xl bg-[var(--app-panel-alt)] p-0.5 border border-[var(--app-border)]">
               <button
                 type="button"
-                onClick={() => setViewMode("ROUTINES")}
+                onClick={() => handleViewModeChange("ROUTINES")}
                 className={`flex items-center gap-1.5 px-3 py-1 rounded-lg app-label font-medium transition-all ${
                   viewMode === "ROUTINES"
                     ? "bg-[var(--app-accent-strong)] text-white shadow-xs"
@@ -372,7 +416,7 @@ export function HabitView(props: HabitViewProps = {}) {
               </button>
               <button
                 type="button"
-                onClick={() => setViewMode("HEATMAP")}
+                onClick={() => handleViewModeChange("HEATMAP")}
                 className={`flex items-center gap-1.5 px-3 py-1 rounded-lg app-label font-medium transition-all ${
                   viewMode === "HEATMAP"
                     ? "bg-[var(--app-accent-strong)] text-white shadow-xs"
@@ -384,7 +428,7 @@ export function HabitView(props: HabitViewProps = {}) {
               </button>
               <button
                 type="button"
-                onClick={() => setViewMode("ANALYTICS")}
+                onClick={() => handleViewModeChange("ANALYTICS")}
                 className={`flex items-center gap-1.5 px-3 py-1 rounded-lg app-label font-medium transition-all ${
                   viewMode === "ANALYTICS"
                     ? "bg-[var(--app-accent-strong)] text-white shadow-xs"
@@ -396,7 +440,7 @@ export function HabitView(props: HabitViewProps = {}) {
               </button>
               <button
                 type="button"
-                onClick={() => setViewMode("ACHIEVEMENTS")}
+                onClick={() => handleViewModeChange("ACHIEVEMENTS")}
                 className={`flex items-center gap-1.5 px-3 py-1 rounded-lg app-label font-medium transition-all ${
                   viewMode === "ACHIEVEMENTS"
                     ? "bg-[var(--app-accent-strong)] text-white shadow-xs"
@@ -408,7 +452,7 @@ export function HabitView(props: HabitViewProps = {}) {
               </button>
               <button
                 type="button"
-                onClick={() => setViewMode("JOURNAL")}
+                onClick={() => handleViewModeChange("JOURNAL")}
                 className={`flex items-center gap-1.5 px-3 py-1 rounded-lg app-label font-medium transition-all ${
                   viewMode === "JOURNAL"
                     ? "bg-[var(--app-accent-strong)] text-white shadow-xs"

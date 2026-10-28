@@ -5,6 +5,7 @@ import { addDays, addHours, addMinutes, differenceInMinutes, format } from "date
 import {
   type CalendarEvent,
   type EventColor,
+  type CalendarView,
   EventCalendar,
 } from "@/components/event-calendar";
 import { Task } from "@/hooks/use-workspace";
@@ -14,12 +15,20 @@ interface TaskCalendarViewProps {
   tasks?: Task[];
   onSelectTask?: (taskId: string) => void;
   onAddTaskForDate?: (dateIso: string) => void;
+  calView?: CalendarView;
+  onCalViewChange?: (view: CalendarView) => void;
+  currentDate?: Date;
+  onDateChange?: (date: Date) => void;
 }
 
 export function TaskCalendarView({
   tasks: propTasks,
   onSelectTask,
   onAddTaskForDate,
+  calView,
+  onCalViewChange,
+  currentDate,
+  onDateChange,
 }: TaskCalendarViewProps) {
   const context = useWorkspaceContext();
   const tasks = propTasks || context.allActiveTasks || context.tasks || [];
@@ -210,6 +219,10 @@ export function TaskCalendarView({
       <EventCalendar
         events={visibleEvents}
         lists={lists}
+        view={calView}
+        onViewChange={onCalViewChange}
+        currentDate={currentDate}
+        onDateChange={onDateChange}
         showCompleted={showCompleted}
         onToggleShowCompleted={() => setShowCompleted((prev) => !prev)}
         onEventAdd={handleEventAdd}

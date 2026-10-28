@@ -66,6 +66,10 @@ function WorkspaceContainer({
     setSelectedTaskId,
     selectedTask,
     currentListName,
+    calView,
+    setCalView,
+    calDate,
+    setCalDate,
     selectView,
     selectFilter,
     selectModule,
@@ -329,6 +333,10 @@ function WorkspaceContainer({
           {activeModule === "calendar" && (
             <TaskCalendarView
               tasks={tasks}
+              calView={calView}
+              onCalViewChange={setCalView}
+              currentDate={calDate}
+              onDateChange={setCalDate}
               onSelectTask={(id) => setSelectedTaskId(id)}
               onAddTaskForDate={(dueDate) =>
                 addTask({

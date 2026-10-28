@@ -44,7 +44,7 @@ export function AgendaView({
   );
 
   return (
-    <div className="border-border/70 border-t px-4">
+    <div className="flex-1 min-h-0 overflow-y-auto border-border/70 border-t px-4 pb-12">
       {!hasEvents ? (
         <div className="flex min-h-[70svh] flex-col items-center justify-center py-16 text-center">
           <RiCalendarEventLine

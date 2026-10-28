@@ -12,7 +12,7 @@ import {
   startOfDay,
 } from "date-fns";
 import type React from "react";
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect } from "react";
 
 import {
   type CalendarEvent,
@@ -196,6 +196,17 @@ export function DayView({
     "day",
   );
 
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const currentHour = new Date().getHours();
+      const targetHour = Math.max(0, Math.min(23, currentHour > 0 ? currentHour - 1 : 8));
+      const cellHeight = WeekCellsHeight || 64;
+      scrollContainerRef.current.scrollTop = targetHour * cellHeight;
+    }
+  }, []);
+
   return (
     <div className="contents" data-slot="day-view">
       {showAllDaySection && (
@@ -233,7 +244,7 @@ export function DayView({
         </div>
       )}
 
-      <div className="grid flex-1 grid-cols-[3rem_1fr] overflow-hidden border-border/70 border-t sm:grid-cols-[4rem_1fr]">
+      <div ref={scrollContainerRef} className="grid flex-1 grid-cols-[3rem_1fr] overflow-y-auto border-border/70 border-t sm:grid-cols-[4rem_1fr]">
         <div>
           {hours.map((hour, index) => (
             <div
