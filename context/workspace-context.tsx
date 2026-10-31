@@ -10,6 +10,7 @@ import {
   useWorkspace,
   Task,
   TaskList,
+  TaskGroup,
   Tag,
   Habit,
   HabitSection,
@@ -31,6 +32,8 @@ export interface WorkspaceContextType {
   setActiveView: (view: string) => void;
   activeListId: string | null;
   setActiveListId: (id: string | null) => void;
+  activeGroupId: string | null;
+  setActiveGroupId: (id: string | null) => void;
   activeTag: string | null;
   setActiveTag: (tag: string | null) => void;
   activeFilterId: string | null;
@@ -46,6 +49,12 @@ export interface WorkspaceContextType {
   selectedTask: Task | null;
   currentListName: string;
   currentList?: TaskList | null;
+  currentGroup?: TaskGroup | null;
+  taskGroups: TaskGroup[];
+  isLoadingTaskGroups?: boolean;
+  addTaskGroup?: (group: { listId: string; name: string; color?: string }) => Promise<any>;
+  updateTaskGroup?: (group: { id: string; name?: string; color?: string; order?: number; collapsed?: boolean }) => Promise<any>;
+  deleteTaskGroup?: (id: string) => Promise<any>;
 
   // Calendar State
   calView?: "month" | "week" | "day" | "agenda" | "year";
@@ -61,7 +70,7 @@ export interface WorkspaceContextType {
   setSidebarWidth: (width: number) => void;
 
   // View Navigation Helpers
-  selectView: (view: string, listId?: string | null, tag?: string | null) => void;
+  selectView: (view: string, listId?: string | null, tag?: string | null, groupId?: string | null) => void;
   selectFilter: (filterId: string) => void;
   selectModule: (mod: WorkspaceModule) => void;
 
@@ -271,6 +280,10 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
 
   const activeListId = useMemo(() => {
     return searchParams.get("listId") || null;
+  }, [searchParams]);
+
+  const activeGroupId = useMemo(() => {
+    return searchParams.get("groupId") || null;
   }, [searchParams]);
 
   const activeTag = useMemo(() => {
@@ -519,9 +532,14 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     }
     // "all" takes all active tasks
 
-    // 2. Custom List Filter
+    // 2. Custom List / Group Filter
     if (activeListId && activeListId !== "inbox" && activeListId !== "all") {
       result = result.filter((t) => t.listId === activeListId);
+      if (activeGroupId) {
+        result = result.filter((t) => t.groupId === activeGroupId);
+      }
+    } else if (activeGroupId) {
+      result = result.filter((t) => t.groupId === activeGroupId);
     }
 
     // 3. Tag Filter
@@ -564,12 +582,14 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     activeModule,
     activeView,
     activeListId,
+    activeGroupId,
     activeTag,
     searchQuery,
     activeFilterId,
     workspace.allActiveTasks,
     workspace.trashTasks,
     workspace.filters,
+    workspace.lists,
     today,
     tomorrow,
     next7Days,
@@ -579,7 +599,16 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const currentListName = useMemo(() => {
     if (activeListId) {
       const l = workspace.lists.find((item) => item.id === activeListId);
+      if (activeGroupId) {
+        const g = workspace.taskGroups.find((item) => item.id === activeGroupId);
+        if (g && l) return `${l.name} › ${g.name}`;
+        if (g) return g.name;
+      }
       return l ? l.name : "List";
+    }
+    if (activeGroupId) {
+      const g = workspace.taskGroups.find((item) => item.id === activeGroupId);
+      return g ? g.name : "Group";
     }
     if (activeTag) {
       return `#${activeTag}`;
@@ -602,7 +631,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       default:
         return "Tasks";
     }
-  }, [activeListId, activeTag, activeView, workspace.lists]);
+  }, [activeListId, activeGroupId, activeTag, activeView, workspace.lists, workspace.taskGroups]);
 
   // Current active list object
   const currentList = useMemo(() => {
@@ -611,6 +640,14 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     }
     return null;
   }, [activeListId, workspace.lists]);
+
+  // Current active group object
+  const currentGroup = useMemo(() => {
+    if (activeGroupId) {
+      return workspace.taskGroups.find((item) => item.id === activeGroupId) || null;
+    }
+    return null;
+  }, [activeGroupId, workspace.taskGroups]);
 
   // Selected Task
   const selectedTask = useMemo(
@@ -649,11 +686,12 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   );
 
   const selectView = useCallback(
-    (view: string, listId?: string | null, tag?: string | null) => {
+    (view: string, listId?: string | null, tag?: string | null, groupId?: string | null) => {
       const params = new URLSearchParams();
       if (view) params.set("view", view);
       if (listId) params.set("listId", listId);
       if (tag) params.set("tag", tag);
+      if (groupId) params.set("groupId", groupId);
       if (searchParams.get("layout") === "kanban") params.set("layout", "kanban");
       const qs = params.toString() ? `?${params.toString()}` : "";
       router.push(`/tasks${qs}`);
@@ -663,16 +701,28 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
 
   const setActiveView = useCallback(
     (view: string) => {
-      selectView(view, activeListId, activeTag);
+      selectView(view, activeListId, activeTag, activeGroupId);
     },
-    [selectView, activeListId, activeTag]
+    [selectView, activeListId, activeTag, activeGroupId]
   );
 
   const setActiveListId = useCallback(
     (listId: string | null) => {
-      selectView(activeView, listId, activeTag);
+      selectView(activeView, listId, activeTag, activeGroupId);
     },
-    [selectView, activeView, activeTag]
+    [selectView, activeView, activeTag, activeGroupId]
+  );
+
+  const setActiveGroupId = useCallback(
+    (groupId: string | null) => {
+      if (!groupId) {
+        selectView(activeView, activeListId, null, null);
+        return;
+      }
+      const parentListId = workspace.taskGroups.find((g) => g.id === groupId)?.listId;
+      selectView("list", parentListId || activeListId, null, groupId);
+    },
+    [selectView, activeView, activeListId, workspace.taskGroups]
   );
 
   const setActiveTag = useCallback(
@@ -770,6 +820,8 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     setActiveView,
     activeListId,
     setActiveListId,
+    activeGroupId,
+    setActiveGroupId,
     activeTag,
     setActiveTag,
     activeFilterId,
@@ -785,6 +837,9 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     selectedTask,
     currentListName,
     currentList,
+    currentGroup,
+    taskGroups: workspace.taskGroups,
+    isLoadingTaskGroups: workspace.isLoadingTaskGroups,
     calView,
     setCalView,
     calDate,
@@ -872,6 +927,9 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     addList: workspace.addList,
     updateList: workspace.updateList,
     deleteList: workspace.deleteList,
+    addTaskGroup: workspace.addTaskGroup,
+    updateTaskGroup: workspace.updateTaskGroup,
+    deleteTaskGroup: workspace.deleteTaskGroup,
     addTag: workspace.addTag,
     deleteTag: workspace.deleteTag,
     logPomodoro: workspace.logPomodoro,

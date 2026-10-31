@@ -23,6 +23,17 @@ export interface TaskTag {
   };
 }
 
+export interface TaskGroup {
+  id: string;
+  listId: string;
+  userId?: string;
+  name: string;
+  color?: string | null;
+  order: number;
+  collapsed: boolean;
+  _count?: { tasks: number };
+}
+
 export interface TaskList {
   id: string;
   name: string;
@@ -30,6 +41,7 @@ export interface TaskList {
   icon?: string | null;
   background?: string | null;
   order: number;
+  groups?: TaskGroup[];
   _count?: { tasks: number };
 }
 
@@ -44,6 +56,8 @@ export interface Task {
   id: string;
   userId: string;
   listId?: string | null;
+  groupId?: string | null;
+  group?: TaskGroup | null;
   title: string;
   description?: string | null;
   completed: boolean;
@@ -344,6 +358,19 @@ export function useWorkspace(filters: {
     staleTime: 30_000,
   });
 
+  // 2b. Task Groups Query (Groups under lists)
+  const taskGroupsQuery = useQuery({
+    queryKey: ["workspace-task-groups"],
+    queryFn: async () => {
+      const res = await fetch("/api/tasks/groups");
+      if (!res.ok) return [];
+      const data = await res.json();
+      return (data.groups || []) as TaskGroup[];
+    },
+    placeholderData: keepPreviousData,
+    staleTime: 30_000,
+  });
+
   // 3. Tags Query
   const tagsQuery = useQuery({
     queryKey: ["workspace-tags"],
@@ -571,6 +598,7 @@ export function useWorkspace(filters: {
       title: string;
       description?: string;
       listId?: string | null;
+      groupId?: string | null;
       dueDate?: string | null;
       dueTime?: string | null;
       priority?: number;
@@ -622,6 +650,8 @@ export function useWorkspace(filters: {
       const tempTask: Task = {
         id: `temp-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
         userId: "current-user",
+        listId: newTask.listId || null,
+        groupId: newTask.groupId || null,
         title: newTask.title,
         description: newTask.description || null,
         completed: false,
@@ -671,6 +701,7 @@ export function useWorkspace(filters: {
         queryClient.setQueryData(tasksQueryKey, reconciled);
       }
       queryClient.invalidateQueries({ queryKey: ["workspace-lists"], refetchType: "none" });
+      queryClient.invalidateQueries({ queryKey: ["workspace-task-groups"], refetchType: "none" });
       queryClient.invalidateQueries({ queryKey: ["workspace-tags"], refetchType: "none" });
     },
   });
@@ -859,7 +890,15 @@ export function useWorkspace(filters: {
 
   // Add List
   const addListMutation = useMutation({
-    mutationFn: async ({ name, color, icon }: { name: string; color: string; icon?: string }) => {
+    mutationFn: async ({
+      name,
+      color,
+      icon,
+    }: {
+      name: string;
+      color: string;
+      icon?: string;
+    }) => {
       const res = await fetch("/api/tasks/lists", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -887,6 +926,7 @@ export function useWorkspace(filters: {
       color?: string;
       icon?: string;
       background?: string;
+      order?: number;
     }) => {
       const res = await fetch(`/api/tasks/lists/${id}`, {
         method: "PATCH",
@@ -977,7 +1017,106 @@ export function useWorkspace(filters: {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["workspace-lists"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-list-groups"] });
       queryClient.invalidateQueries({ queryKey: tasksQueryKey });
+    },
+  });
+
+  // Add Task Group (under a list)
+  const addTaskGroupMutation = useMutation({
+    mutationFn: async ({
+      listId,
+      name,
+      color,
+    }: {
+      listId: string;
+      name: string;
+      color?: string;
+    }) => {
+      const res = await fetch("/api/tasks/groups", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listId, name, color }),
+      });
+      if (!res.ok) throw new Error("Failed to create group");
+      return res.json();
+    },
+    onError: (err: any) => {
+      notify.error("Failed to create group", err?.message || "Could not create group.");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workspace-task-groups"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-lists"] });
+    },
+  });
+
+  // Update Task Group
+  const updateTaskGroupMutation = useMutation({
+    mutationFn: async ({
+      id,
+      ...updates
+    }: {
+      id: string;
+      name?: string;
+      color?: string;
+      order?: number;
+      collapsed?: boolean;
+    }) => {
+      const res = await fetch(`/api/tasks/groups/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+      if (!res.ok) throw new Error("Failed to update group");
+      return res.json();
+    },
+    onMutate: async ({ id, ...updates }) => {
+      await queryClient.cancelQueries({ queryKey: ["workspace-task-groups"] });
+      const prevData = queryClient.getQueryData<TaskGroup[]>(["workspace-task-groups"]);
+      if (Array.isArray(prevData)) {
+        queryClient.setQueryData<TaskGroup[]>(
+          ["workspace-task-groups"],
+          prevData.map((g) => (g.id === id ? { ...g, ...updates } : g))
+        );
+      }
+      return { prevData };
+    },
+    onError: (err: any, _vars, context) => {
+      if (context?.prevData) {
+        queryClient.setQueryData(["workspace-task-groups"], context.prevData);
+      }
+      notify.error("Failed to update group", err?.message || "Could not update group.");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["workspace-task-groups"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-lists"] });
+    },
+  });
+
+  // Delete Task Group
+  const deleteTaskGroupMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/tasks/groups/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete group");
+      return res.json();
+    },
+    onMutate: async (id: string) => {
+      queryClient.setQueriesData<Task[]>(
+        { queryKey: ["workspace-tasks"] },
+        (oldTasks) => {
+          if (!oldTasks || !Array.isArray(oldTasks)) return oldTasks;
+          return oldTasks.map((t) => (t.groupId === id ? { ...t, groupId: null } : t));
+        }
+      );
+    },
+    onError: (err: any) => {
+      notify.error("Failed to delete group", err?.message || "Could not delete group.");
+      queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workspace-task-groups"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-lists"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-tasks"] });
     },
   });
 
@@ -1621,6 +1760,9 @@ export function useWorkspace(filters: {
     isErrorLists: listsQuery.isError,
     listsError: listsQuery.error,
     refetchLists: listsQuery.refetch,
+    taskGroups: taskGroupsQuery.data || [],
+    isLoadingTaskGroups: taskGroupsQuery.isLoading,
+    refetchTaskGroups: taskGroupsQuery.refetch,
     inboxCount: listsQuery.data?.inboxCount || 0,
     todayCount: listsQuery.data?.todayCount || 0,
     tomorrowCount: listsQuery.data?.tomorrowCount || 0,
@@ -1653,6 +1795,9 @@ export function useWorkspace(filters: {
     addList: addListMutation.mutateAsync,
     updateList: updateListMutation.mutateAsync,
     deleteList: deleteListMutation.mutateAsync,
+    addTaskGroup: addTaskGroupMutation.mutateAsync,
+    updateTaskGroup: updateTaskGroupMutation.mutateAsync,
+    deleteTaskGroup: deleteTaskGroupMutation.mutateAsync,
     addTag: addTagMutation.mutateAsync,
     deleteTag: deleteTagMutation.mutateAsync,
     logPomodoro: logPomodoroMutation.mutateAsync,

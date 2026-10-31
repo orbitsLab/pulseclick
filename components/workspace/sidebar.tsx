@@ -11,6 +11,7 @@ import {
   Plus,
   Search,
   Folder,
+  FolderPlus,
   Tag as TagIcon,
   ChevronRight,
   ChevronDown,
@@ -20,9 +21,8 @@ import {
   X,
   Filter,
   PanelLeftClose,
-  PanelLeft,
 } from "lucide-react";
-import { TaskList, Tag } from "@/hooks/use-workspace";
+import { TaskList, Tag, TaskGroup } from "@/hooks/use-workspace";
 import { toISODate, getTodayISO } from "@/lib/date-utils";
 import { WorkspaceContext } from "@/context/workspace-context";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
@@ -69,17 +69,22 @@ function SidebarItemSkeleton({
 interface SidebarProps {
   activeView?: string;
   activeListId?: string | null;
+  activeGroupId?: string | null;
   activeTag?: string | null;
-  onSelectView?: (view: string, listId?: string | null, tag?: string | null) => void;
+  onSelectView?: (view: string, listId?: string | null, tag?: string | null, groupId?: string | null) => void;
   onSelectDate?: (dateIso: string) => void;
   lists?: TaskList[];
+  taskGroups?: TaskGroup[];
   inboxCount?: number;
   tags?: Tag[];
-  onAddList?: (list: { name: string; color: string; icon?: string }) => Promise<any>;
-  onUpdateList?: (list: { id: string; name?: string; color?: string; icon?: string }) => Promise<any>;
-  onDeleteList?: (id: string) => Promise<any>;
-  onAddTag?: (tag: { name: string; color?: string }) => Promise<any>;
-  onDeleteTag?: (id: string) => Promise<any>;
+  onAddList?: (list: { name: string; color: string; icon?: string }) => Promise<unknown>;
+  onUpdateList?: (list: { id: string; name?: string; color?: string; icon?: string }) => Promise<unknown>;
+  onDeleteList?: (id: string) => Promise<unknown>;
+  onAddTaskGroup?: (group: { listId: string; name: string; color?: string }) => Promise<unknown>;
+  onUpdateTaskGroup?: (group: { id: string; name?: string; color?: string; order?: number; collapsed?: boolean }) => Promise<unknown>;
+  onDeleteTaskGroup?: (id: string) => Promise<unknown>;
+  onAddTag?: (tag: { name: string; color?: string }) => Promise<unknown>;
+  onDeleteTag?: (id: string) => Promise<unknown>;
   searchQuery?: string;
   onSearchChange?: (q: string) => void;
   todayCount?: number;
@@ -103,15 +108,21 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
 
   const activeView = props.activeView ?? context?.activeView ?? "today";
   const activeListId = props.activeListId !== undefined ? props.activeListId : (context?.activeListId ?? null);
+  const activeGroupId = props.activeGroupId !== undefined ? props.activeGroupId : (context?.activeGroupId ?? null);
   const activeTag = props.activeTag !== undefined ? props.activeTag : (context?.activeTag ?? null);
   const onSelectView = props.onSelectView ?? context?.selectView ?? (() => {});
   const onSelectDate = props.onSelectDate ?? ((_dateIso) => context?.selectModule("calendar"));
   const lists = props.lists ?? context?.lists ?? [];
+  const taskGroups = props.taskGroups ?? context?.taskGroups ?? [];
+  const allActiveTasks = context?.allActiveTasks ?? [];
   const inboxCount = props.inboxCount ?? context?.inboxCount ?? 0;
   const tags = props.tags ?? context?.tags ?? [];
   const onAddList = props.onAddList ?? context?.addList ?? (async () => {});
   const onUpdateList = props.onUpdateList ?? context?.updateList;
   const onDeleteList = props.onDeleteList ?? context?.deleteList;
+  const onAddTaskGroup = props.onAddTaskGroup ?? context?.addTaskGroup;
+  const onUpdateTaskGroup = props.onUpdateTaskGroup ?? context?.updateTaskGroup;
+  const onDeleteTaskGroup = props.onDeleteTaskGroup ?? context?.deleteTaskGroup;
   const onAddTag = props.onAddTag ?? context?.addTag ?? (async () => {});
   const onDeleteTag = props.onDeleteTag ?? context?.deleteTag;
   const searchQuery = props.searchQuery ?? context?.searchQuery ?? "";
@@ -166,6 +177,29 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
   const [miniCalCollapsed, setMiniCalCollapsed] = useState(false);
   const [miniCalDate, setMiniCalDate] = useState(() => new Date());
 
+  // Expand/collapse groups under a list
+  const [collapsedListIds, setCollapsedListIds] = useState<Record<string, boolean>>({});
+
+  const toggleListCollapse = (listId: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setCollapsedListIds((prev) => ({
+      ...prev,
+      [listId]: !prev[listId],
+    }));
+  };
+
+  // Group modals
+  const [showAddGroup, setShowAddGroup] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
+  const [newGroupColor, setNewGroupColor] = useState("#4772fa");
+  const [newGroupListId, setNewGroupListId] = useState<string>("");
+
+  const [editingGroup, setEditingGroup] = useState<TaskGroup | null>(null);
+  const [editGroupName, setEditGroupName] = useState("");
+  const [editGroupColor, setEditGroupColor] = useState("#4772fa");
+
+  const [groupToDelete, setGroupToDelete] = useState<TaskGroup | null>(null);
+
   // New list dialog
   const [showAddList, setShowAddList] = useState(false);
   const [newListName, setNewListName] = useState("");
@@ -184,6 +218,25 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
   // Delete confirmation modals
   const [tagToDelete, setTagToDelete] = useState<{ id: string; name: string } | null>(null);
   const [listToDelete, setListToDelete] = useState<{ id: string; name: string } | null>(null);
+
+  async function handleCreateGroup(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newGroupName.trim() || !newGroupListId || !onAddTaskGroup) return;
+    await onAddTaskGroup({ listId: newGroupListId, name: newGroupName.trim(), color: newGroupColor });
+    setNewGroupName("");
+    setShowAddGroup(false);
+  }
+
+  async function handleSaveEditGroup(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editingGroup || !editGroupName.trim() || !onUpdateTaskGroup) return;
+    await onUpdateTaskGroup({
+      id: editingGroup.id,
+      name: editGroupName.trim(),
+      color: editGroupColor,
+    });
+    setEditingGroup(null);
+  }
 
   async function handleCreateList(e: React.FormEvent) {
     e.preventDefault();
@@ -368,71 +421,180 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
               {listsCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
               <span className="app-overline font-semibold">Lists</span>
             </button>
-            <button
-              type="button"
-              onClick={() => setShowAddList(true)}
-              title="Add List"
-              className="rounded p-0.5 hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-text)]"
-            >
-              <Plus className="h-3.5 w-3.5" />
-            </button>
+            <div className="flex items-center gap-0.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setNewListName("");
+                  setShowAddList(true);
+                }}
+                title="Add List"
+                className="rounded p-0.5 hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-text)] transition-colors"
+              >
+                <Plus className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
 
           {!listsCollapsed && (
             <div className="space-y-0.5 mt-1">
               {isInitialLoadingLists ? (
                 <SidebarItemSkeleton count={3} dotClass="h-2.5 w-2.5 rounded-full" widths={[80, 104, 68]} />
+              ) : lists.length === 0 ? (
+                <div className="px-2.5 py-1.5 text-xs text-[var(--app-muted)]/70 italic">
+                  No lists yet. Click + to add one.
+                </div>
               ) : (
                 lists.map((list) => {
-                  const isSelected = activeListId === list.id;
+                  const listChildren = taskGroups.filter((g) => g.listId === list.id);
+                  const isListCollapsed = collapsedListIds[list.id] ?? false;
+                  const isListActive = activeListId === list.id && !activeGroupId;
                   const count = list._count?.tasks || 0;
+
                   return (
-                    <div
-                      key={list.id}
-                      onClick={() => handleItemSelect(() => onSelectView("list", list.id, null))}
-                      className={`group flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 app-label font-medium transition-colors cursor-pointer ${ isSelected ? "bg-[var(--app-accent)]/10 text-[var(--app-accent-text)] dark:bg-[var(--app-accent)]/15 font-bold" : "text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/60 dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]/60" }`}
-                    >
-                      <div className="flex items-center gap-2.5 truncate flex-1 min-w-0">
-                        <span
-                          className="h-2.5 w-2.5 rounded-full flex-shrink-0"
-                          style={{ backgroundColor: list.color }}
-                        />
-                        <span className="truncate">{list.name}</span>
-                      </div>
-
-                      <div className="flex items-center gap-1">
-                        {/* Count badge (hidden on group hover if actions exist) */}
-                        {count > 0 && (
-                          <span className="group-hover:hidden rounded-full bg-[var(--app-panel-alt)]/80 px-1.5 py-0.5 app-meta text-[var(--app-text)] font-bold">
-                            {count}
-                          </span>
+                    <div key={list.id} className="space-y-0.5">
+                      {/* List Item Row */}
+                      <div
+                        onClick={() => handleItemSelect(() => onSelectView("list", list.id, null, null))}
+                        className={cn(
+                          "group flex w-full items-center justify-between rounded-lg px-2 py-1.5 app-label font-medium transition-all cursor-pointer select-none",
+                          isListActive
+                            ? "bg-[var(--app-accent)]/10 text-[var(--app-accent-text)] dark:bg-[var(--app-accent)]/15 font-bold"
+                            : "text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/60 dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]/60"
                         )}
+                      >
+                        <div className="flex items-center gap-1.5 truncate flex-1 min-w-0">
+                          {listChildren.length > 0 ? (
+                            <button
+                              type="button"
+                              onClick={(e) => toggleListCollapse(list.id, e)}
+                              className="p-0.5 rounded hover:bg-[var(--app-panel)] text-[var(--app-muted)] hover:text-[var(--app-text)] shrink-0 transition-colors"
+                              title={isListCollapsed ? "Expand groups" : "Collapse groups"}
+                            >
+                              {isListCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                            </button>
+                          ) : (
+                            <span className="w-4 shrink-0" />
+                          )}
+                          <span
+                            className="h-2.5 w-2.5 rounded-full shrink-0"
+                            style={{ backgroundColor: list.color }}
+                          />
+                          <span className="truncate">{list.name}</span>
+                        </div>
 
-                        {/* Action buttons on hover */}
-                        <div className="hidden group-hover:flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditingList(list);
-                              setEditListName(list.name);
-                              setEditListColor(list.color);
-                            }}
-                            title="Edit List"
-                            className="rounded p-0.5 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)]/50"
-                          >
-                            <Pencil className="h-3 w-3" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={(e) => handleDeleteListClick(e, list.id, list.name)}
-                            title="Delete List"
-                            className="rounded p-0.5 text-[var(--app-muted)] hover:text-rose-400 hover:bg-[var(--app-panel-alt)]/50"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </button>
+                        <div className="flex items-center gap-1">
+                          {count > 0 && (
+                            <span className="group-hover:hidden rounded-full bg-[var(--app-panel-alt)]/80 px-1.5 py-0.5 app-meta text-[var(--app-text)] font-bold">
+                              {count}
+                            </span>
+                          )}
+
+                          <div className="hidden group-hover:flex items-center gap-0.5">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setNewGroupListId(list.id);
+                                setNewGroupName("");
+                                setShowAddGroup(true);
+                              }}
+                              title="Add Group in List"
+                              className="rounded p-0.5 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)]/50"
+                            >
+                              <FolderPlus className="h-3 w-3" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingList(list);
+                                setEditListName(list.name);
+                                setEditListColor(list.color);
+                              }}
+                              title="Edit List"
+                              className="rounded p-0.5 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)]/50"
+                            >
+                              <Pencil className="h-3 w-3" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => handleDeleteListClick(e, list.id, list.name)}
+                              title="Delete List"
+                              className="rounded p-0.5 text-[var(--app-muted)] hover:text-rose-400 hover:bg-[var(--app-panel-alt)]/50"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </div>
                         </div>
                       </div>
+
+                      {/* Child Groups Under This List */}
+                      {listChildren.length > 0 && !isListCollapsed && (
+                        <div className="pl-5 space-y-0.5 border-l border-[var(--app-border)]/40 ml-4 my-0.5">
+                          {listChildren.map((group) => {
+                            const isGroupActive = activeListId === list.id && activeGroupId === group.id;
+                            const groupTaskCount = allActiveTasks.filter(
+                              (t) => !t.completed && !t.isTrash && t.listId === list.id && t.groupId === group.id
+                            ).length;
+
+                            return (
+                              <div
+                                key={group.id}
+                                onClick={() => handleItemSelect(() => onSelectView("list", list.id, null, group.id))}
+                                className={cn(
+                                  "group/grp flex w-full items-center justify-between rounded-md px-2 py-1 app-meta font-medium transition-all cursor-pointer select-none",
+                                  isGroupActive
+                                    ? "bg-[var(--app-accent)]/15 text-[var(--app-accent-text)] font-bold"
+                                    : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/50"
+                                )}
+                              >
+                                <div className="flex items-center gap-2 truncate flex-1 min-w-0">
+                                  <span
+                                    className="h-1.5 w-1.5 rounded-full shrink-0"
+                                    style={{ backgroundColor: group.color || list.color }}
+                                  />
+                                  <span className="truncate">{group.name}</span>
+                                </div>
+
+                                <div className="flex items-center gap-1">
+                                  {groupTaskCount > 0 && (
+                                    <span className="group-hover/grp:hidden rounded-full bg-[var(--app-panel-alt)] px-1.5 py-0.2 app-meta text-[var(--app-muted)] font-semibold">
+                                      {groupTaskCount}
+                                    </span>
+                                  )}
+                                  <div className="hidden group-hover/grp:flex items-center gap-0.5">
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setEditingGroup(group);
+                                        setEditGroupName(group.name);
+                                        setEditGroupColor(group.color || list.color);
+                                      }}
+                                      title="Edit Group"
+                                      className="rounded p-0.5 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)]/50"
+                                    >
+                                      <Pencil className="h-2.5 w-2.5" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setGroupToDelete(group);
+                                      }}
+                                      title="Delete Group"
+                                      className="rounded p-0.5 text-[var(--app-muted)] hover:text-rose-400 hover:bg-[var(--app-panel-alt)]/50"
+                                    >
+                                      <Trash2 className="h-2.5 w-2.5" />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   );
                 })
@@ -625,6 +787,119 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
         )}
       </aside>
 
+      {/* New Group Modal */}
+      {showAddGroup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-xs rounded-xl border border-[var(--app-border)] bg-[var(--app-rail)] p-4 text-[var(--app-text)] shadow-xl">
+            <h4 className="app-label font-semibold mb-3 uppercase tracking-wider">New Group</h4>
+            <form onSubmit={handleCreateGroup} className="space-y-3">
+              <div>
+                <label className="block app-meta font-medium text-[var(--app-muted)] mb-1">
+                  List:
+                </label>
+                <select
+                  required
+                  value={newGroupListId}
+                  onChange={(e) => setNewGroupListId(e.target.value)}
+                  className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-1.5 app-label text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)]"
+                >
+                  <option value="" disabled>Select a list...</option>
+                  {lists.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <input
+                type="text"
+                required
+                autoFocus
+                value={newGroupName}
+                onChange={(e) => setNewGroupName(e.target.value)}
+                placeholder="Group name (e.g. Backlog, Sprint 1)"
+                className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+              />
+              <div className="flex items-center gap-2">
+                <span className="app-label text-[var(--app-muted)]">Color:</span>
+                {colorPalette.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setNewGroupColor(c)}
+                    className={`h-5 w-5 rounded-full ${newGroupColor === c ? "ring-2 ring-[var(--app-panel)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
+                    style={{ backgroundColor: c }}
+                  />
+                ))}
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddGroup(false)}
+                  className="rounded px-2.5 py-1 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!newGroupListId || !newGroupName.trim()}
+                  className="rounded bg-[var(--app-accent-strong)] px-3 py-1 app-label font-medium text-white hover:bg-[var(--app-accent-strong)] disabled:opacity-50"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Group Modal */}
+      {editingGroup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-xs rounded-xl border border-[var(--app-border)] bg-[var(--app-rail)] p-4 text-[var(--app-text)] shadow-xl">
+            <h4 className="app-label font-semibold mb-3 uppercase tracking-wider">Edit Group</h4>
+            <form onSubmit={handleSaveEditGroup} className="space-y-3">
+              <input
+                type="text"
+                required
+                autoFocus
+                value={editGroupName}
+                onChange={(e) => setEditGroupName(e.target.value)}
+                placeholder="Group name"
+                className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+              />
+              <div className="flex items-center gap-2">
+                <span className="app-label text-[var(--app-muted)]">Color:</span>
+                {colorPalette.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setEditGroupColor(c)}
+                    className={`h-5 w-5 rounded-full ${editGroupColor === c ? "ring-2 ring-[var(--app-panel)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
+                    style={{ backgroundColor: c }}
+                  />
+                ))}
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingGroup(null)}
+                  className="rounded px-2.5 py-1 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="rounded bg-[var(--app-accent-strong)] px-3 py-1 app-label font-medium text-white hover:bg-[var(--app-accent-strong)]"
+                >
+                  Update
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* New List Modal */}
       {showAddList && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
@@ -718,8 +993,6 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
           </div>
         </div>
       )}
-
-      {/* New Tag Modal */}
       {showAddTag && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
           <div className="w-full max-w-xs rounded-xl border border-[var(--app-border)] bg-[var(--app-rail)] p-4 text-[var(--app-text)] shadow-xl">
@@ -785,6 +1058,24 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
               onSelectView("inbox");
             }
             onDeleteList(target.id);
+          }
+        }}
+      />
+
+      {/* Delete Group Confirmation Dialog */}
+      <DeleteConfirmDialog
+        open={!!groupToDelete}
+        onOpenChange={(open) => !open && setGroupToDelete(null)}
+        title="Delete Group"
+        description={`Are you sure you want to delete group "${groupToDelete?.name}"? All tasks inside this group will be preserved in this list as ungrouped tasks.`}
+        onConfirm={() => {
+          if (groupToDelete && onDeleteTaskGroup) {
+            const target = groupToDelete;
+            setGroupToDelete(null);
+            if (activeGroupId === target.id) {
+              onSelectView("list", target.listId, null, null);
+            }
+            onDeleteTaskGroup(target.id);
           }
         }}
       />

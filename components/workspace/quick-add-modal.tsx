@@ -28,6 +28,7 @@ interface QuickAddModalProps {
     title: string;
     description?: string;
     listId?: string | null;
+    groupId?: string | null;
     dueDate?: string | null;
     dueTime?: string | null;
     priority?: number;
@@ -58,6 +59,7 @@ export function QuickAddModal({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [listId, setListId] = useState<string>("inbox");
+  const [groupId, setGroupId] = useState<string | null>(() => context?.activeGroupId ?? null);
   const [dueDate, setDueDate] = useState<string>(defaultDueDate);
   const [endDate, setEndDate] = useState<string>("");
   const [dueTime, setDueTime] = useState<string>("");
@@ -65,15 +67,27 @@ export function QuickAddModal({
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
   const datePickerRef = useRef<HTMLDivElement>(null);
 
-  // Sync date when opening modal
+  const availableGroups = useMemo(() => {
+    if (!listId || listId === "inbox") return [];
+    return (context?.taskGroups || []).filter((g) => g.listId === listId);
+  }, [listId, context?.taskGroups]);
+
+  // Sync date and default list when opening modal
   useEffect(() => {
     if (isOpen) {
       setDueDate(context?.activeView === "tomorrow" ? tomorrow : today);
       if (context?.activeListId) {
         setListId(context.activeListId);
+        setGroupId(context?.activeGroupId ?? null);
+      } else if (context?.activeGroupId) {
+        const group = (context?.taskGroups || []).find((g) => g.id === context.activeGroupId);
+        if (group) {
+          setListId(group.listId);
+          setGroupId(group.id);
+        }
       }
     }
-  }, [isOpen, context?.activeView, context?.activeListId, today, tomorrow]);
+  }, [isOpen, context?.activeView, context?.activeListId, context?.activeGroupId, context?.taskGroups, today, tomorrow]);
 
   useEffect(() => {
     if (!showDatePicker) return;
@@ -136,6 +150,7 @@ export function QuickAddModal({
       title: result.title || title.trim(),
       description: description.trim() || undefined,
       listId: listId === "inbox" ? null : listId,
+      groupId: listId === "inbox" ? null : (groupId || null),
       dueDate: endDate || dueDate || null,
       startDate: dueDate || null,
       endDate: endDate || null,
@@ -376,7 +391,10 @@ export function QuickAddModal({
               </label>
               <select
                 value={listId}
-                onChange={(e) => setListId(e.target.value)}
+                onChange={(e) => {
+                  setListId(e.target.value);
+                  setGroupId(null);
+                }}
                 className="w-full rounded-xl border border-[var(--app-border)] bg-[var(--app-bg)] px-2.5 py-1.5 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
               >
                 <option value="inbox">📥 Inbox</option>
@@ -387,6 +405,26 @@ export function QuickAddModal({
                 ))}
               </select>
             </div>
+
+            {availableGroups.length > 0 && (
+              <div>
+                <label className="block app-overline font-semibold text-[var(--app-muted)] mb-1">
+                  Group / Section
+                </label>
+                <select
+                  value={groupId || ""}
+                  onChange={(e) => setGroupId(e.target.value || null)}
+                  className="w-full rounded-xl border border-[var(--app-border)] bg-[var(--app-bg)] px-2.5 py-1.5 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                >
+                  <option value="">None (Ungrouped)</option>
+                  {availableGroups.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div>
               <label className="block app-overline font-semibold text-[var(--app-muted)] mb-1">

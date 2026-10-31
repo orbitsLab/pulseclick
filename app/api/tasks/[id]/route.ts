@@ -18,6 +18,7 @@ export async function GET(
       relationLoadStrategy: "join",
       include: {
         list: true,
+        group: true,
         subtasks: { orderBy: { order: "asc" } },
         tags: { include: { tag: true } },
       },
@@ -81,7 +82,13 @@ export async function PATCH(
         }
       }
     }
-    if (body.listId !== undefined) updateData.listId = body.listId === "inbox" ? null : body.listId;
+    if (body.listId !== undefined) {
+      updateData.listId = body.listId === "inbox" ? null : body.listId;
+      if (!updateData.listId) {
+        updateData.groupId = null;
+      }
+    }
+    if (body.groupId !== undefined) updateData.groupId = body.groupId || null;
     if (body.pomodoroCount !== undefined) updateData.pomodoroCount = Number(body.pomodoroCount);
     if (body.startDate !== undefined) updateData.startDate = body.startDate || null;
     if (body.startTime !== undefined) updateData.startTime = body.startTime || null;
@@ -194,6 +201,7 @@ export async function PATCH(
       data: updateData,
       include: {
         list: true,
+        group: true,
         subtasks: { orderBy: { order: "asc" } },
         tags: { include: { tag: true } },
         reminders: { orderBy: { createdAt: "asc" } },

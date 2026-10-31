@@ -10,6 +10,7 @@ import {
   Trash2,
   CheckCircle2,
   Folder,
+  FolderPlus,
   ArrowUpDown,
   CheckSquare,
   Square,
@@ -19,8 +20,10 @@ import {
   Layers,
   Sunrise,
   AlertCircle,
+  Plus,
+  Pencil,
 } from "lucide-react";
-import { Task } from "@/hooks/use-workspace";
+import { Task, TaskGroup } from "@/hooks/use-workspace";
 import { getTodayISO, addDays, formatShortDate, formatTaskSchedule } from "@/lib/date-utils";
 import { WorkspaceContext } from "@/context/workspace-context";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
@@ -97,10 +100,50 @@ export function TaskListView(props: TaskListViewProps = {}) {
   // Multi-select state
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<"default" | "date" | "priority" | "title">("default");
-  const [groupBy, setGroupBy] = useState<"date" | "priority" | "list" | "none">("date");
+  const [groupBy, setGroupBy] = useState<"group" | "date" | "priority" | "list" | "none">("date");
   const isCompletedView = viewName === "Completed" || context?.activeView === "completed";
   const [showCompleted, setShowCompleted] = useState<boolean>(() => isCompletedView);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
+
+  // Group sections state
+  const isCustomList = Boolean(
+    context?.activeListId &&
+    context.activeListId !== "inbox" &&
+    context.activeListId !== "all"
+  );
+  const currentListGroups = isCustomList
+    ? (context?.taskGroups || []).filter((g) => g.listId === context?.activeListId)
+    : [];
+
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+  const [dragOverGroupId, setDragOverGroupId] = useState<string | null>(null);
+  const [quickAddTitle, setQuickAddTitle] = useState<Record<string, string>>({});
+
+  // Group modals state
+  const [showAddGroupModal, setShowAddGroupModal] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
+  const [newGroupColor, setNewGroupColor] = useState("#4772fa");
+
+  const [editingGroup, setEditingGroup] = useState<TaskGroup | null>(null);
+  const [editGroupName, setEditGroupName] = useState("");
+  const [editGroupColor, setEditGroupColor] = useState("#4772fa");
+
+  const [groupToDelete, setGroupToDelete] = useState<TaskGroup | null>(null);
+
+  const colorPalette = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#a855f7", "#06b6d4"];
+
+  const toggleSectionCollapse = (groupId: string) => {
+    setCollapsedSections((prev) => ({
+      ...prev,
+      [groupId]: !prev[groupId],
+    }));
+  };
+
+  React.useEffect(() => {
+    if (isCustomList && currentListGroups.length > 0) {
+      setGroupBy("group");
+    }
+  }, [context?.activeListId, currentListGroups.length]);
 
   React.useEffect(() => {
     if (isCompletedView) {
@@ -183,6 +226,12 @@ export function TaskListView(props: TaskListViewProps = {}) {
     return (
       <div
         key={task.id}
+        draggable={!task.completed}
+        onDragStart={(e) => {
+          e.dataTransfer.setData("text/taskId", task.id);
+          e.dataTransfer.setData("text/plain", task.id);
+          e.dataTransfer.effectAllowed = "move";
+        }}
         onClick={() => onSelectTask(task.id)}
         className={`group relative flex items-center justify-between gap-3 rounded-xl border-y border-r p-2.5 sm:px-3.5 transition-all cursor-pointer ${getPriorityColor( task.priority )} ${ isSelected ? "border-y-[var(--app-accent)]/40 border-r-[var(--app-accent)]/40 bg-[var(--app-accent)]/10 shadow-xs" : isCheckedInBatch ? "border-y-indigo-500/40 border-r-indigo-500/40 bg-indigo-500/10" : "border-y-[var(--app-border)] border-r-[var(--app-border)] bg-[var(--app-panel)] hover:bg-[var(--app-panel-alt)]" } ${task.completed ? "opacity-60" : ""}`}
       >
@@ -487,8 +536,193 @@ export function TaskListView(props: TaskListViewProps = {}) {
     );
   }
 
+  function renderGroupSection(
+    groupId: string | null,
+    title: string,
+    groupColor: string,
+    sectionTasks: Task[],
+    groupObj?: TaskGroup
+  ) {
+    const isCollapsed = groupId ? collapsedSections[groupId] : false;
+    const isDragOver = dragOverGroupId === (groupId || "ungrouped");
+    const inlineValue = quickAddTitle[groupId || "ungrouped"] || "";
+
+    return (
+      <div
+        key={groupId || "ungrouped"}
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "move";
+          if (dragOverGroupId !== (groupId || "ungrouped")) {
+            setDragOverGroupId(groupId || "ungrouped");
+          }
+        }}
+        onDragLeave={(e) => {
+          if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+          setDragOverGroupId(null);
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOverGroupId(null);
+          const draggedTaskId = e.dataTransfer.getData("text/taskId") || e.dataTransfer.getData("text/plain");
+          if (draggedTaskId && onUpdateTask) {
+            onUpdateTask({ taskId: draggedTaskId, groupId: groupId || null });
+          }
+        }}
+        className={cn(
+          "rounded-xl border border-transparent transition-all p-2 space-y-2",
+          isDragOver && "border-[var(--app-accent)] bg-[var(--app-accent)]/10 ring-1 ring-[var(--app-accent)]"
+        )}
+      >
+        {/* Section Header */}
+        <div className="flex items-center justify-between px-1 py-1 text-[var(--app-muted)] select-none">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            {groupId && (
+              <button
+                type="button"
+                onClick={() => toggleSectionCollapse(groupId)}
+                className="p-0.5 rounded hover:bg-[var(--app-panel-alt)] text-[var(--app-muted)] hover:text-[var(--app-text)] transition-colors"
+                title={isCollapsed ? "Expand group" : "Collapse group"}
+              >
+                {isCollapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+              </button>
+            )}
+            <span
+              className="h-2.5 w-2.5 rounded-full shrink-0"
+              style={{ backgroundColor: groupColor }}
+            />
+            <span className="app-label font-bold text-[var(--app-text)] truncate">{title}</span>
+            <span className="app-meta text-[var(--app-muted)] font-semibold">({sectionTasks.length})</span>
+          </div>
+
+          {groupObj && (
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingGroup(groupObj);
+                  setEditGroupName(groupObj.name);
+                  setEditGroupColor(groupObj.color || "#4772fa");
+                }}
+                title="Edit Group"
+                className="p-1 rounded text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] transition-colors"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setGroupToDelete(groupObj)}
+                title="Delete Group"
+                className="p-1 rounded text-[var(--app-muted)] hover:text-rose-400 hover:bg-[var(--app-panel-alt)] transition-colors"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Section Tasks */}
+        {!isCollapsed && (
+          <div className="space-y-1.5 pl-1 sm:pl-2">
+            {sectionTasks.length === 0 ? (
+              <div className="py-2 px-3 text-xs text-[var(--app-muted)]/70 italic border border-dashed border-[var(--app-border)]/50 rounded-lg">
+                No tasks in this group. Drag tasks here or use the input below.
+              </div>
+            ) : (
+              sectionTasks.map(renderTaskItem)
+            )}
+
+            {/* Inline Add Task Row */}
+            {context?.activeListId && (
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!inlineValue.trim() || !context?.addTask || !context?.activeListId) return;
+                  await context.addTask({
+                    title: inlineValue.trim(),
+                    listId: context.activeListId,
+                    groupId: groupId || null,
+                  });
+                  setQuickAddTitle((prev) => ({ ...prev, [groupId || "ungrouped"]: "" }));
+                }}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-dashed border-[var(--app-border)]/80 hover:border-[var(--app-accent)]/60 bg-[var(--app-panel)]/30 hover:bg-[var(--app-panel)]/60 transition-all text-xs"
+              >
+                <Plus className="h-3.5 w-3.5 text-[var(--app-muted)] shrink-0" />
+                <input
+                  type="text"
+                  value={inlineValue}
+                  onChange={(e) =>
+                    setQuickAddTitle((prev) => ({ ...prev, [groupId || "ungrouped"]: e.target.value }))
+                  }
+                  placeholder={`Add a task to ${title}...`}
+                  className="flex-1 bg-transparent app-body text-xs text-[var(--app-text)] placeholder-[var(--app-muted)]/70 focus:outline-none"
+                />
+                {inlineValue.trim() && (
+                  <button
+                    type="submit"
+                    className="rounded bg-[var(--app-accent)] px-2 py-0.5 app-meta font-medium text-white hover:bg-[var(--app-accent-strong)] transition-colors"
+                  >
+                    Add
+                  </button>
+                )}
+              </form>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   // Render grouped tasks based on groupBy setting
   function renderGroupedTasks() {
+    // If a single group is active in sidebar
+    if (context?.activeGroupId) {
+      const activeGroup = (context?.taskGroups || []).find((g) => g.id === context?.activeGroupId);
+      if (activeGroup) {
+        return (
+          <div className="space-y-4">
+            {renderGroupSection(
+              activeGroup.id,
+              activeGroup.name,
+              activeGroup.color || "#4772fa",
+              incompleteTasks,
+              activeGroup
+            )}
+          </div>
+        );
+      }
+    }
+
+    // If viewing a list and grouped by "group" or list has sections
+    if (groupBy === "group" || (isCustomList && currentListGroups.length > 0 && groupBy !== "date" && groupBy !== "priority" && groupBy !== "none")) {
+      const ungroupedTasks = incompleteTasks.filter(
+        (t) => !t.groupId || !currentListGroups.some((g) => g.id === t.groupId)
+      );
+
+      return (
+        <div className="space-y-6">
+          {currentListGroups.map((group) => {
+            const groupTasks = incompleteTasks.filter((t) => t.groupId === group.id);
+            return renderGroupSection(
+              group.id,
+              group.name,
+              group.color || "#4772fa",
+              groupTasks,
+              group
+            );
+          })}
+
+          {/* Ungrouped Section: always visible for lists with groups */}
+          {renderGroupSection(
+            null,
+            "Ungrouped",
+            "#64748b",
+            ungroupedTasks
+          )}
+        </div>
+      );
+    }
+
     if (groupBy === "none") {
       return <div className="space-y-1.5">{incompleteTasks.map(renderTaskItem)}</div>;
     }
@@ -565,6 +799,22 @@ export function TaskListView(props: TaskListViewProps = {}) {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Add Group button for custom lists */}
+          {isCustomList && (
+            <button
+              type="button"
+              onClick={() => {
+                setNewGroupName("");
+                setShowAddGroupModal(true);
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg app-meta font-semibold text-[var(--app-accent-text)] bg-[var(--app-accent)]/10 hover:bg-[var(--app-accent)]/20 transition-colors cursor-pointer"
+              title="Add a group under this list"
+            >
+              <FolderPlus className="h-3.5 w-3.5" />
+              <span>+ Add Group</span>
+            </button>
+          )}
+
           {/* Group By selector */}
           <div className="flex items-center gap-1.5">
             <Layers className="h-3.5 w-3.5 text-[var(--app-muted)]" />
@@ -573,6 +823,9 @@ export function TaskListView(props: TaskListViewProps = {}) {
               onChange={(e: any) => setGroupBy(e.target.value)}
               className="bg-transparent app-label text-[var(--app-muted)] focus:outline-none cursor-pointer"
             >
+              {isCustomList && currentListGroups.length > 0 && (
+                <option value="group">Group: Sections</option>
+              )}
               <option value="date">Group: Date</option>
               <option value="priority">Group: Priority</option>
               <option value="list">Group: List</option>
@@ -740,6 +993,141 @@ export function TaskListView(props: TaskListViewProps = {}) {
           if (taskToDelete) {
             onDeleteTask(taskToDelete.id);
             setTaskToDelete(null);
+          }
+        }}
+      />
+
+      {/* New Group Modal */}
+      {showAddGroupModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-xs rounded-xl border border-[var(--app-border)] bg-[var(--app-rail)] p-4 text-[var(--app-text)] shadow-xl">
+            <h4 className="app-label font-semibold mb-3 uppercase tracking-wider">New Group</h4>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!newGroupName.trim() || !context?.activeListId || !context?.addTaskGroup) return;
+                await context.addTaskGroup({
+                  listId: context.activeListId,
+                  name: newGroupName.trim(),
+                  color: newGroupColor,
+                });
+                setNewGroupName("");
+                setShowAddGroupModal(false);
+              }}
+              className="space-y-3"
+            >
+              <input
+                type="text"
+                required
+                autoFocus
+                value={newGroupName}
+                onChange={(e) => setNewGroupName(e.target.value)}
+                placeholder="Group name (e.g. Backlog, Sprint 1)"
+                className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+              />
+              <div className="flex items-center gap-2">
+                <span className="app-label text-[var(--app-muted)]">Color:</span>
+                {colorPalette.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setNewGroupColor(c)}
+                    className={`h-5 w-5 rounded-full ${newGroupColor === c ? "ring-2 ring-[var(--app-panel)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
+                    style={{ backgroundColor: c }}
+                  />
+                ))}
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddGroupModal(false)}
+                  className="rounded px-2.5 py-1 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!newGroupName.trim()}
+                  className="rounded bg-[var(--app-accent-strong)] px-3 py-1 app-label font-medium text-white hover:bg-[var(--app-accent-strong)] disabled:opacity-50"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Group Modal */}
+      {editingGroup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-xs rounded-xl border border-[var(--app-border)] bg-[var(--app-rail)] p-4 text-[var(--app-text)] shadow-xl">
+            <h4 className="app-label font-semibold mb-3 uppercase tracking-wider">Edit Group</h4>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!editingGroup || !editGroupName.trim() || !context?.updateTaskGroup) return;
+                await context.updateTaskGroup({
+                  id: editingGroup.id,
+                  name: editGroupName.trim(),
+                  color: editGroupColor,
+                });
+                setEditingGroup(null);
+              }}
+              className="space-y-3"
+            >
+              <input
+                type="text"
+                required
+                autoFocus
+                value={editGroupName}
+                onChange={(e) => setEditGroupName(e.target.value)}
+                placeholder="Group name"
+                className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+              />
+              <div className="flex items-center gap-2">
+                <span className="app-label text-[var(--app-muted)]">Color:</span>
+                {colorPalette.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setEditGroupColor(c)}
+                    className={`h-5 w-5 rounded-full ${editGroupColor === c ? "ring-2 ring-[var(--app-panel)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
+                    style={{ backgroundColor: c }}
+                  />
+                ))}
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingGroup(null)}
+                  className="rounded px-2.5 py-1 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="rounded bg-[var(--app-accent-strong)] px-3 py-1 app-label font-medium text-white hover:bg-[var(--app-accent-strong)]"
+                >
+                  Update
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Group Confirmation Dialog */}
+      <DeleteConfirmDialog
+        open={Boolean(groupToDelete)}
+        onOpenChange={(open) => !open && setGroupToDelete(null)}
+        title="Delete Group"
+        description={`Are you sure you want to delete group "${groupToDelete?.name}"? All tasks inside this group will be preserved in this list as ungrouped tasks.`}
+        onConfirm={async () => {
+          if (groupToDelete && context?.deleteTaskGroup) {
+            const target = groupToDelete;
+            setGroupToDelete(null);
+            await context.deleteTaskGroup(target.id);
           }
         }}
       />

@@ -42,6 +42,7 @@ interface TaskInputBarProps {
   onAddTask?: (task: {
     title: string;
     listId?: string | null;
+    groupId?: string | null;
     dueDate?: string | null;
     dueTime?: string | null;
     priority?: number;
@@ -65,6 +66,15 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
   const tags = props.tags ?? context?.tags ?? [];
   const onAddTask = props.onAddTask ?? context?.addTask ?? (async () => {});
 
+  const activeGroup = useMemo(() => {
+    if (context?.activeGroupId) {
+      return (context?.taskGroups || []).find((g) => g.id === context.activeGroupId);
+    }
+    return null;
+  }, [context?.activeGroupId, context?.taskGroups]);
+
+  const resolvedDefaultListId = currentListId ?? activeGroup?.listId ?? null;
+
   const today = getTodayISO();
   const tomorrow = addDays(today, 1);
 
@@ -80,12 +90,30 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
   const [dueTime, setDueTime] = useState<string | null>(null);
   const [endTime, setEndTime] = useState<string | null>(null);
   const [priority, setPriority] = useState<number>(0);
-  const [listId, setListId] = useState<string | null>(currentListId);
+  const [listId, setListId] = useState<string | null>(resolvedDefaultListId);
+  const [groupId, setGroupId] = useState<string | null>(() => context?.activeGroupId ?? null);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [recurrence, setRecurrence] = useState<string>("NONE");
 
+  const availableGroups = useMemo(() => {
+    if (!listId) return [];
+    return (context?.taskGroups || []).filter((g) => g.listId === listId);
+  }, [listId, context?.taskGroups]);
+
+  const targetGroup = useMemo(() => {
+    if (!groupId) return null;
+    return availableGroups.find((g) => g.id === groupId) || null;
+  }, [groupId, availableGroups]);
+
   // Fields the user set by hand always win over the natural language parse.
   const manual = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!manual.current.has("listId") && !title.trim()) {
+      setListId(resolvedDefaultListId);
+      setGroupId(context?.activeGroupId ?? null);
+    }
+  }, [resolvedDefaultListId, context?.activeGroupId]);
 
   // Popover toggles
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -175,6 +203,7 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
     const payload = {
       title: cleanTitle,
       listId: listId || currentListId,
+      groupId: groupId || null,
       dueDate: endDate || dueDate,
       startDate: dueDate,
       endDate: endDate || null,
@@ -372,6 +401,7 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
                   <DropdownMenuItem
                     onClick={() => {
                       setListId(null);
+                      setGroupId(null);
                     }}
                     className="cursor-pointer"
                   >
@@ -383,6 +413,7 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
                       key={l.id}
                       onClick={() => {
                         setListId(l.id);
+                        setGroupId(null);
                       }}
                       className="cursor-pointer flex items-center justify-between"
                     >
@@ -398,6 +429,41 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
                   ))}
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
+
+              {/* Group Selector Submenu */}
+              {availableGroups.length > 0 && (
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="cursor-pointer">
+                    <Folder className="h-4 w-4 mr-2" style={{ color: targetGroup?.color || undefined }} />
+                    <span className="truncate flex-1">{targetGroup ? `Group: ${targetGroup.name}` : "Group: None"}</span>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] min-w-36">
+                    <DropdownMenuItem
+                      onClick={() => setGroupId(null)}
+                      className="cursor-pointer flex items-center justify-between"
+                    >
+                      <span>None (Ungrouped)</span>
+                      {!groupId && <Check className="h-3.5 w-3.5 text-emerald-500" />}
+                    </DropdownMenuItem>
+                    {availableGroups.map((g) => (
+                      <DropdownMenuItem
+                        key={g.id}
+                        onClick={() => setGroupId(g.id)}
+                        className="cursor-pointer flex items-center justify-between"
+                      >
+                        <span className="flex items-center gap-2">
+                          <span
+                            className="h-2 w-2 rounded-full shrink-0"
+                            style={{ backgroundColor: g.color || "#4772fa" }}
+                          />
+                          <span>{g.name}</span>
+                        </span>
+                        {groupId === g.id && <Check className="h-3.5 w-3.5 text-emerald-500" />}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              )}
 
               {/* Tags Submenu */}
               <DropdownMenuSub>

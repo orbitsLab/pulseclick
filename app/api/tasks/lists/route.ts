@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getSessionAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(req: Request) {
+export async function GET(_req: Request) {
   try {
     const user = await getSessionAuth();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -11,6 +11,18 @@ export async function GET(req: Request) {
       where: { userId: user.id },
       orderBy: { order: "asc" },
       include: {
+        groups: {
+          orderBy: { order: "asc" },
+          include: {
+            _count: {
+              select: {
+                tasks: {
+                  where: { completed: false, isTrash: false },
+                },
+              },
+            },
+          },
+        },
         _count: {
           select: {
             tasks: {
@@ -22,8 +34,9 @@ export async function GET(req: Request) {
     });
 
     return NextResponse.json({ lists, inboxCount: 0, todayCount: 0, tomorrowCount: 0, allCount: 0 });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -54,10 +67,14 @@ export async function POST(req: Request) {
         background: background || "none",
         order: nextOrder,
       },
+      include: {
+        groups: true,
+      },
     });
 
     return NextResponse.json({ list }, { status: 201 });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

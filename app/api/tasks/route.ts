@@ -14,6 +14,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const view = searchParams.get("view") || "all";
     const listId = searchParams.get("listId");
+    const groupId = searchParams.get("groupId");
     const tag = searchParams.get("tag");
     const search = searchParams.get("search");
     const filterId = searchParams.get("filter");
@@ -46,6 +47,9 @@ export async function GET(req: Request) {
 
     if (listId && listId !== "inbox" && listId !== "all") {
       where.listId = listId;
+    }
+    if (groupId) {
+      where.groupId = groupId;
     }
 
     if (tag) {
@@ -86,6 +90,7 @@ export async function GET(req: Request) {
       ],
       include: {
         list: true,
+        group: true,
         subtasks: {
           orderBy: { order: "asc" },
         },
@@ -123,6 +128,7 @@ export async function POST(req: Request) {
       title,
       description,
       listId,
+      groupId,
       dueDate,
       dueTime,
       priority,
@@ -150,6 +156,7 @@ export async function POST(req: Request) {
 
     // Format listId (if "inbox" or empty, listId is null)
     const validListId = listId && listId !== "inbox" ? listId : null;
+    const validGroupId = validListId && groupId ? groupId : null;
 
     const task = await prisma.task.create({
       data: {
@@ -157,6 +164,7 @@ export async function POST(req: Request) {
         title: title.trim(),
         description: description?.trim() || null,
         listId: validListId,
+        groupId: validGroupId,
         dueDate: dueDate || null,
         dueTime: dueTime || null,
         priority: Number(priority) || 0,
@@ -205,6 +213,7 @@ export async function POST(req: Request) {
       },
       include: {
         list: true,
+        group: true,
         subtasks: true,
         tags: { include: { tag: true } },
         reminders: true,
@@ -229,6 +238,7 @@ export async function POST(req: Request) {
       relationLoadStrategy: "join",
       include: {
         list: true,
+        group: true,
         subtasks: true,
         tags: { include: { tag: true } },
         reminders: true,

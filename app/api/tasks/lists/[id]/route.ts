@@ -19,15 +19,25 @@ export async function PATCH(
 
     if (!existing) return NextResponse.json({ error: "List not found" }, { status: 404 });
 
-    const updateData: any = {};
+    const updateData: {
+      name?: string;
+      color?: string;
+      icon?: string;
+      background?: string;
+      order?: number;
+    } = {};
     if (body.name !== undefined) updateData.name = body.name.trim();
     if (body.color !== undefined) updateData.color = body.color;
     if (body.icon !== undefined) updateData.icon = body.icon;
     if (body.background !== undefined) updateData.background = body.background || "none";
+    if (body.order !== undefined) updateData.order = body.order;
 
     const list = await prisma.taskList.update({
       where: { id },
       data: updateData,
+      include: {
+        groups: true,
+      },
     });
 
     return NextResponse.json({ list });

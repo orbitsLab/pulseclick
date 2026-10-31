@@ -63,6 +63,7 @@ function WorkspaceContainer({
     setActiveModule,
     activeView,
     activeListId,
+    activeGroupId,
     activeTag,
     activeFilterId,
     setActiveFilterId,
@@ -77,6 +78,7 @@ function WorkspaceContainer({
     selectedTask,
     currentListName,
     currentList,
+    currentGroup,
     calView,
     setCalView,
     calDate,
@@ -408,6 +410,13 @@ function WorkspaceContainer({
                       </button>
                     )}
 
+                    {currentGroup && !currentList && (
+                      <span
+                        className="h-3.5 w-3.5 rounded-full shrink-0"
+                        style={{ backgroundColor: currentGroup.color || "#4772fa" }}
+                      />
+                    )}
+
                     <h1 className="text-lg sm:text-2xl md:app-display font-semibold text-[var(--app-text)] capitalize truncate">
                       {activeModule === "matrix"
                         ? "Eisenhower Matrix"
@@ -430,9 +439,11 @@ function WorkspaceContainer({
                         : currentListName}
                     </h1>
                     {activeModule === "tasks" && (
-                      <span className="rounded-full bg-[var(--app-panel-alt)] px-2 py-0.5 app-meta font-bold text-[var(--app-muted)] shrink-0">
-                        {tasks.filter((t) => !t.completed).length}
-                      </span>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="rounded-full bg-[var(--app-panel-alt)] px-2 py-0.5 app-meta font-bold text-[var(--app-muted)]">
+                          {tasks.filter((t) => !t.completed).length}
+                        </span>
+                      </div>
                     )}
                   </div>
 

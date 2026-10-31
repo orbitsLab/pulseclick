@@ -295,6 +295,9 @@ export function TaskInspector({
   }
 
   const currentList = lists.find((l) => l.id === task.listId);
+  const taskGroups = context?.taskGroups || [];
+  const availableGroups = task.listId ? taskGroups.filter((g) => g.listId === task.listId) : [];
+  const currentTaskGroup = task.groupId ? taskGroups.find((g) => g.id === task.groupId) : null;
   const normalizedTagIds = localTags.map((t) => t.id);
   const filteredTags = tags.filter((t) =>
     !tagSearch.trim() || t.name.toLowerCase().includes(tagSearch.trim().toLowerCase())
@@ -844,48 +847,99 @@ export function TaskInspector({
 
         {/* Bottom Action Footer Bar */}
         <div className="flex items-center justify-between border-t border-[var(--app-border)]/80 px-3 py-2 bg-[var(--app-panel)]">
-          {/* Left: List Selector */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className="flex items-center gap-1.5 app-meta font-medium px-2 py-1 rounded-md text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] transition-colors cursor-pointer"
-              >
-                <Folder
-                  className="h-3.5 w-3.5 shrink-0"
-                  style={{ color: currentList?.color || undefined }}
-                />
-                <span className="truncate max-w-[100px]">
-                  {currentList ? currentList.name : "Inbox"}
-                </span>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="start"
-              className="min-w-40 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)]"
-            >
-              <DropdownMenuItem
-                onClick={() => onUpdateTask({ taskId: task.id, listId: null })}
-                className="cursor-pointer"
-              >
-                <Folder className="h-3.5 w-3.5 mr-1.5 text-slate-400" />
-                <span>Inbox</span>
-              </DropdownMenuItem>
-              {lists.map((l) => (
-                <DropdownMenuItem
-                  key={l.id}
-                  onClick={() => onUpdateTask({ taskId: task.id, listId: l.id })}
-                  className="cursor-pointer flex items-center gap-2"
+          {/* Left: List & Group Selector */}
+          <div className="flex items-center gap-1.5 min-w-0">
+            {/* List Selector */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="flex items-center gap-1.5 app-meta font-medium px-2 py-1 rounded-md text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] transition-colors cursor-pointer"
                 >
-                  <span
-                    className="h-2 w-2 rounded-full shrink-0"
-                    style={{ backgroundColor: l.color || "#4772fa" }}
+                  <Folder
+                    className="h-3.5 w-3.5 shrink-0"
+                    style={{ color: currentList?.color || undefined }}
                   />
-                  <span>{l.name}</span>
+                  <span className="truncate max-w-[90px]">
+                    {currentList ? currentList.name : "Inbox"}
+                  </span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                className="min-w-40 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)]"
+              >
+                <DropdownMenuItem
+                  onClick={() => onUpdateTask({ taskId: task.id, listId: null, groupId: null })}
+                  className="cursor-pointer"
+                >
+                  <Folder className="h-3.5 w-3.5 mr-1.5 text-slate-400" />
+                  <span>Inbox</span>
                 </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                {lists.map((l) => (
+                  <DropdownMenuItem
+                    key={l.id}
+                    onClick={() => onUpdateTask({ taskId: task.id, listId: l.id, groupId: null })}
+                    className="cursor-pointer flex items-center gap-2"
+                  >
+                    <span
+                      className="h-2 w-2 rounded-full shrink-0"
+                      style={{ backgroundColor: l.color || "#4772fa" }}
+                    />
+                    <span>{l.name}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Group Selector (when task belongs to a list with groups) */}
+            {availableGroups.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex items-center gap-1.5 app-meta font-medium px-2 py-1 rounded-md text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] transition-colors cursor-pointer"
+                  >
+                    <span
+                      className="h-2 w-2 rounded-full shrink-0"
+                      style={{ backgroundColor: currentTaskGroup?.color || "#64748b" }}
+                    />
+                    <span className="truncate max-w-[90px]">
+                      {currentTaskGroup ? currentTaskGroup.name : "Ungrouped"}
+                    </span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  className="min-w-40 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)]"
+                >
+                  <DropdownMenuItem
+                    onClick={() => onUpdateTask({ taskId: task.id, groupId: null })}
+                    className="cursor-pointer flex items-center justify-between"
+                  >
+                    <span>None (Ungrouped)</span>
+                    {!task.groupId && <Check className="h-3.5 w-3.5 text-emerald-500" />}
+                  </DropdownMenuItem>
+                  {availableGroups.map((g) => (
+                    <DropdownMenuItem
+                      key={g.id}
+                      onClick={() => onUpdateTask({ taskId: task.id, groupId: g.id })}
+                      className="cursor-pointer flex items-center justify-between"
+                    >
+                      <span className="flex items-center gap-2">
+                        <span
+                          className="h-2 w-2 rounded-full shrink-0"
+                          style={{ backgroundColor: g.color || "#4772fa" }}
+                        />
+                        <span>{g.name}</span>
+                      </span>
+                      {task.groupId === g.id && <Check className="h-3.5 w-3.5 text-emerald-500" />}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
 
           {/* Right: Formatting, Activity & Options Menu */}
           <div className="flex items-center gap-1 text-[var(--app-muted)]">
