@@ -5,6 +5,7 @@ import { AuthModal } from "@/components/auth/auth-modal";
 import { WorkspaceApp } from "@/components/workspace/workspace-app";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { applyTheme, getTheme, DEFAULT_THEME_ID, getSystemDefaultThemeId } from "@/lib/themes";
+import { InitialLoaderScreen } from "@/components/motion/loader";
 
 export function WorkspaceMain() {
   const queryClient = useQueryClient();
@@ -85,6 +86,10 @@ export function WorkspaceMain() {
     handleThemeChange(isDark ? "notion-light" : "notion-dark");
   }
 
+  if (authQuery.isLoading) {
+    return <InitialLoaderScreen text="PULSEFLOW" label="Loading PulseFlow..." />;
+  }
+
   return (
     <>
       <AuthModal isOpen={!authQuery.isLoading && !authQuery.data} />
@@ -101,13 +106,7 @@ export function WorkspaceMain() {
 
 export function WorkspacePageWrapper() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-screen items-center justify-center bg-[var(--app-bg)] text-[var(--app-accent)] font-semibold text-sm">
-          Loading PulseFlow...
-        </div>
-      }
-    >
+    <Suspense fallback={<InitialLoaderScreen text="PULSEFLOW" label="Loading PulseFlow..." />}>
       <WorkspaceMain />
     </Suspense>
   );

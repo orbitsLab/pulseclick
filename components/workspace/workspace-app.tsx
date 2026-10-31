@@ -114,6 +114,7 @@ function WorkspaceContainer({
     filters,
     isInitialLoadingFilters,
     countdowns,
+    isLoadingCountdowns,
     stats,
     isLoadingStats,
     settings,
@@ -638,18 +639,19 @@ function WorkspaceContainer({
           {activeModule === "countdown" && (
             <CountdownView
               countdowns={countdowns}
+              isLoading={isLoadingCountdowns}
               onAddCountdown={addCountdown}
               onUpdateCountdown={(id, updates) => updateCountdown({ id, ...updates })}
               onDeleteCountdown={deleteCountdown}
             />
           )}
 
-          {activeModule === "statistics" && stats && (
+          {activeModule === "statistics" && (
             <StatisticsView
               stats={stats}
               range={statsRange}
               onRangeChange={setStatsRange}
-              isLoading={isLoadingStats}
+              isLoading={isLoadingStats || !stats}
             />
           )}
 

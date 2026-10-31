@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Bars, Scramble } from "@/components/motion/loader";
 
 export interface Countdown {
   id: string;
@@ -36,6 +37,7 @@ export interface Countdown {
 
 export interface CountdownViewProps {
   countdowns: Countdown[];
+  isLoading?: boolean;
   onAddCountdown: (input: {
     title: string;
     targetDate: string;
@@ -225,6 +227,7 @@ function UnitBox({ value, label, color }: { value: number; label: string; color:
 
 export function CountdownView({
   countdowns,
+  isLoading = false,
   onAddCountdown,
   onUpdateCountdown,
   onDeleteCountdown,
@@ -352,6 +355,12 @@ export function CountdownView({
           <p className="text-xs text-[var(--app-muted)]">
             Keep track of the dates that matter — birthdays, anniversaries, deadlines and launches.
           </p>
+          {isLoading && countdowns.length > 0 && (
+            <div className="flex items-center gap-1.5 text-[var(--app-accent)] app-meta mt-0.5">
+              <Bars size={10} speed={0.8} reduce={false} />
+              <span>Calculating days remaining and milestones...</span>
+            </div>
+          )}
         </div>
         <Button
           type="button"
@@ -364,7 +373,22 @@ export function CountdownView({
       </div>
 
       {/* Cards */}
-      {sorted.length === 0 ? (
+      {isLoading && countdowns.length === 0 ? (
+        <div className="flex flex-1 min-h-[380px] flex-col items-center justify-center gap-4 rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)]/50 p-12 text-center select-none animate-in fade-in-0 duration-200">
+          <div className="flex items-center gap-2.5 text-[var(--app-accent)]">
+            <Bars size={16} speed={0.8} reduce={false} />
+            <Scramble size={24} speed={0.8} reduce={false} text="COUNTDOWNS" />
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            <p className="text-xs font-semibold text-[var(--app-text)]">
+              Calculating days remaining and milestones...
+            </p>
+            <p className="app-meta text-[var(--app-muted)]">
+              Syncing your upcoming dates, birthdays, and deadlines.
+            </p>
+          </div>
+        </div>
+      ) : sorted.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-2 rounded-[8px] border border-dashed border-[var(--app-border)] bg-[var(--app-panel)] px-6 py-12 text-center">
           <span className="flex h-10 w-10 items-center justify-center rounded-[6px] bg-[var(--app-hover)] text-[var(--app-muted)]">
             <PartyPopper className="size-5" />

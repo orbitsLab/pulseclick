@@ -47,6 +47,13 @@ import { HabitStatsView } from "./habit-stats-view";
 import { HabitAchievementsView } from "./habit-achievements-view";
 import { HabitLogsView } from "./habit-logs-view";
 import { HabitEncouragementToast } from "./habit-encouragement-toast";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 export function HabitSkeleton({ count = 3 }: { count?: number }) {
   return (
@@ -1212,8 +1219,6 @@ function HabitRow({
   onDelete,
   onViewStats,
 }: HabitRowProps) {
-  const [showMenu, setShowMenu] = useState(false);
-
   const todayLog = habit.logs?.find((l) => l.date === today);
   const isCompletedToday = habit.isCompletedToday;
   const isSkippedToday = todayLog?.status === "SKIPPED";
@@ -1287,7 +1292,7 @@ function HabitRow({
       </div>
 
       {/* Middle/Right: Numeric Goal Progress OR 7-Day Week Check-ins */}
-      <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end overflow-x-auto">
+      <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end overflow-x-auto py-1 px-1">
         {isNumeric ? (
           <div className="flex items-center gap-2">
             {/* Numeric Progress Capsule */}
@@ -1339,7 +1344,7 @@ function HabitRow({
           </div>
         ) : (
           /* Boolean Habit: 7-Day week check-in circles (Mon-Sun) */
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 py-1 px-0.5">
             {weekDays.map((day) => {
               const log = habit.logs?.find((l) => l.date === day.iso);
               const isChecked = log?.completed || log?.status === "COMPLETED";
@@ -1351,33 +1356,35 @@ function HabitRow({
                   <span className="app-overline font-semibold text-[var(--app-muted)] app-meta">
                     {day.shortName[0]}
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => onToggleCheck({ habitId: habit.id, date: day.iso })}
-                    title={`${day.shortName} (${day.iso}) - ${
-                      isSkipped
-                        ? "Skipped (Streak protected)"
-                        : isChecked
-                        ? "Completed - click to toggle"
-                        : "Not checked - click to check in"
-                    }`}
-                    className={`flex h-7 w-7 items-center justify-center rounded-full border transition-all active:scale-90 ${
-                      isChecked
-                        ? "border-transparent text-white shadow-xs font-bold"
-                        : isSkipped
-                        ? "border-amber-500/50 bg-amber-500/10 text-amber-500"
-                        : "border-[var(--app-border)] bg-[var(--app-panel-alt)] hover:border-[var(--app-border)] dark:border-[var(--app-border)]"
-                    } ${isToday ? "ring-2 ring-[var(--app-accent)] ring-offset-1 dark:ring-offset-slate-900" : ""}`}
-                    style={{
-                      backgroundColor: isChecked ? habit.color || "var(--app-accent)" : undefined,
-                    }}
-                  >
-                    {isChecked ? (
-                      <Check className="h-3.5 w-3.5 stroke-[3]" />
-                    ) : isSkipped ? (
-                      <Minus className="h-3.5 w-3.5 stroke-[2.5]" />
-                    ) : null}
-                  </button>
+                  <div className="p-0.5">
+                    <button
+                      type="button"
+                      onClick={() => onToggleCheck({ habitId: habit.id, date: day.iso })}
+                      title={`${day.shortName} (${day.iso}) - ${
+                        isSkipped
+                          ? "Skipped (Streak protected)"
+                          : isChecked
+                          ? "Completed - click to toggle"
+                          : "Not checked - click to check in"
+                      }`}
+                      className={`flex h-7 w-7 items-center justify-center rounded-full border transition-all active:scale-90 ${
+                        isChecked
+                          ? "border-transparent text-white shadow-xs font-bold"
+                          : isSkipped
+                          ? "border-amber-500/50 bg-amber-500/10 text-amber-500"
+                          : "border-[var(--app-border)] bg-[var(--app-panel-alt)] hover:border-[var(--app-border)] dark:border-[var(--app-border)]"
+                      } ${isToday ? "ring-2 ring-[var(--app-accent)] ring-offset-2 ring-offset-[var(--app-panel)]" : ""}`}
+                      style={{
+                        backgroundColor: isChecked ? habit.color || "var(--app-accent)" : undefined,
+                      }}
+                    >
+                      {isChecked ? (
+                        <Check className="h-3.5 w-3.5 stroke-[3]" />
+                      ) : isSkipped ? (
+                        <Minus className="h-3.5 w-3.5 stroke-[2.5]" />
+                      ) : null}
+                    </button>
+                  </div>
                 </div>
               );
             })}
@@ -1385,12 +1392,12 @@ function HabitRow({
         )}
 
         {/* Action Controls: Quick Heat Map, Skip today, Context Menu */}
-        <div className="relative flex items-center gap-1 pl-1 border-l border-[var(--app-border)]/60">
+        <div className="flex items-center gap-1 pl-1 border-l border-[var(--app-border)]/60">
           <button
             type="button"
             onClick={() => onViewStats?.(habit)}
             title="View 365-day Heat Map & Trends"
-            className="rounded-lg p-1.5 text-[var(--app-muted)] hover:text-[var(--app-accent-text)] hover:bg-[var(--app-panel-alt)] transition-colors"
+            className="rounded-[4px] p-1.5 text-[var(--app-muted)] hover:text-[var(--app-accent-text)] hover:bg-[var(--app-hover)] transition-colors cursor-pointer"
           >
             <CalendarDays className="h-3.5 w-3.5" />
           </button>
@@ -1400,109 +1407,66 @@ function HabitRow({
               type="button"
               onClick={() => onSkip({ habitId: habit.id, date: today })}
               title="Skip today without breaking streak"
-              className="rounded-lg p-1.5 text-[var(--app-muted)] hover:text-amber-500 hover:bg-[var(--app-panel-alt)] transition-colors"
+              className="rounded-[4px] p-1.5 text-[var(--app-muted)] hover:text-amber-500 hover:bg-[var(--app-hover)] transition-colors cursor-pointer"
             >
               <SkipForward className="h-3.5 w-3.5" />
             </button>
           )}
 
-          {/* Three-dots menu trigger */}
-          <button
-            type="button"
-            onClick={() => setShowMenu((prev) => !prev)}
-            className="rounded-lg p-1.5 text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] transition-colors"
-          >
-            <MoreHorizontal className="h-4 w-4" />
-          </button>
-
-          {/* Dropdown Menu */}
-          {showMenu && (
-            <>
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setShowMenu(false)}
-              />
-              <div className="absolute right-0 top-9 z-50 w-44 rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-1 shadow-xl animate-in zoom-in-95 duration-100">
+          {/* Three-dots Dropdown Menu via Portal to prevent any overflow clipping */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowMenu(false);
-                    onViewStats?.(habit);
-                  }}
-                  className="flex w-full items-center gap-2 rounded-[4px] px-2.5 py-1.5 text-xs text-[var(--app-text)] hover:bg-[var(--app-panel-hover)]"
+                  title="More actions"
+                  className="rounded-[4px] p-1.5 text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)] transition-colors cursor-pointer"
                 >
-                  <BarChart3 className="h-3.5 w-3.5 text-[var(--app-accent-text)]" />
-                  <span>Heat Map & Trends</span>
+                  <MoreHorizontal className="h-4 w-4" />
                 </button>
+              }
+            />
+            <DropdownMenuContent align="end" side="bottom" sideOffset={4} className="w-48">
+              <DropdownMenuItem onClick={() => onViewStats?.(habit)}>
+                <BarChart3 className="h-3.5 w-3.5 text-[var(--app-accent-text)]" />
+                <span>Heat Map & Trends</span>
+              </DropdownMenuItem>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMenu(false);
-                    onEdit(habit);
-                  }}
-                  className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 app-label text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]"
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                  <span>Edit Habit</span>
-                </button>
+              <DropdownMenuItem onClick={() => onEdit(habit)}>
+                <Pencil className="h-3.5 w-3.5" />
+                <span>Edit Habit</span>
+              </DropdownMenuItem>
 
-                {activeTab === "ACTIVE" ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowMenu(false);
-                        onSkip({ habitId: habit.id, date: today });
-                      }}
-                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 app-label text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]"
-                    >
-                      <SkipForward className="h-3.5 w-3.5 text-amber-500" />
-                      <span>Skip Today</span>
-                    </button>
+              {activeTab === "ACTIVE" ? (
+                <>
+                  <DropdownMenuItem onClick={() => onSkip({ habitId: habit.id, date: today })}>
+                    <SkipForward className="h-3.5 w-3.5 text-amber-500" />
+                    <span>Skip Today</span>
+                  </DropdownMenuItem>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowMenu(false);
-                        onArchive(habit.id);
-                      }}
-                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 app-label text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]"
-                    >
-                      <Archive className="h-3.5 w-3.5" />
-                      <span>Archive</span>
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowMenu(false);
-                      onRestore(habit.id);
-                    }}
-                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 app-label text-[var(--app-accent-text)] hover:bg-[var(--app-panel-alt)] font-medium"
-                  >
-                    <ArchiveRestore className="h-3.5 w-3.5" />
-                    <span>Restore Habit</span>
-                  </button>
-                )}
+                  <DropdownMenuItem onClick={() => onArchive(habit.id)}>
+                    <Archive className="h-3.5 w-3.5" />
+                    <span>Archive</span>
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <DropdownMenuItem onClick={() => onRestore(habit.id)}>
+                  <ArchiveRestore className="h-3.5 w-3.5 text-[var(--app-accent-text)]" />
+                  <span>Restore Habit</span>
+                </DropdownMenuItem>
+              )}
 
-                <div className="my-1 border-t border-[var(--app-border)]/60" />
+              <DropdownMenuSeparator />
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMenu(false);
-                    onDelete(habit);
-                  }}
-                  className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 app-label text-rose-500 hover:bg-rose-500/10"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                  <span>Delete</span>
-                </button>
-              </div>
-            </>
-          )}
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => onDelete(habit)}
+              >
+                <Trash2 className="h-3.5 w-3.5 text-rose-500" />
+                <span>Delete</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>

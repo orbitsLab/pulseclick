@@ -29,6 +29,13 @@ import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { SideTooltip } from "@/components/ui/tooltip";
+import {
+  ColorPicker,
+  ColorPickerContent,
+  ColorPickerSwatch,
+  ColorPickerSwatches,
+  ColorPickerTrigger,
+} from "@/components/reui/color-picker";
 
 function SidebarItemSkeleton({
   count = 3,
@@ -934,17 +941,25 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                 placeholder="Group name (e.g. Backlog, Sprint 1)"
                 className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/30"
               />
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-[var(--app-muted)]">Color:</span>
-                {colorPalette.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => setNewGroupColor(c)}
-                    className={`h-4.5 w-4.5 rounded-full cursor-pointer ${newGroupColor === c ? "ring-2 ring-[var(--app-accent)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
-                    style={{ backgroundColor: c }}
-                  />
-                ))}
+              <div className="space-y-1.5">
+                <span className="app-meta font-medium text-[var(--app-muted)]">Color:</span>
+                <ColorPicker value={newGroupColor} onValueChange={(val) => val && setNewGroupColor(val)}>
+                  <div className="flex items-center gap-2">
+                    <ColorPickerSwatches
+                      colors={colorPalette.map((c) => ({ value: c, label: c }))}
+                      shape="circle"
+                      className="flex-1"
+                    />
+                    <ColorPickerTrigger size="icon-xs" aria-label="Custom color" className="rounded-full border border-[var(--app-border)] hover:border-[var(--app-accent)] shrink-0">
+                      {!colorPalette.includes(newGroupColor) ? (
+                        <ColorPickerSwatch shape="circle" />
+                      ) : (
+                        <Plus className="h-3 w-3" aria-hidden="true" />
+                      )}
+                    </ColorPickerTrigger>
+                    <ColorPickerContent align="end" />
+                  </div>
+                </ColorPicker>
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
@@ -982,17 +997,25 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                 placeholder="Group name"
                 className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/30"
               />
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-[var(--app-muted)]">Color:</span>
-                {colorPalette.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => setEditGroupColor(c)}
-                    className={`h-4.5 w-4.5 rounded-full cursor-pointer ${editGroupColor === c ? "ring-2 ring-[var(--app-accent)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
-                    style={{ backgroundColor: c }}
-                  />
-                ))}
+              <div className="space-y-1.5">
+                <span className="app-meta font-medium text-[var(--app-muted)]">Color:</span>
+                <ColorPicker value={editGroupColor} onValueChange={(val) => val && setEditGroupColor(val)}>
+                  <div className="flex items-center gap-2">
+                    <ColorPickerSwatches
+                      colors={colorPalette.map((c) => ({ value: c, label: c }))}
+                      shape="circle"
+                      className="flex-1"
+                    />
+                    <ColorPickerTrigger size="icon-xs" aria-label="Custom color" className="rounded-full border border-[var(--app-border)] hover:border-[var(--app-accent)] shrink-0">
+                      {!colorPalette.includes(editGroupColor) ? (
+                        <ColorPickerSwatch shape="circle" />
+                      ) : (
+                        <Plus className="h-3 w-3" aria-hidden="true" />
+                      )}
+                    </ColorPickerTrigger>
+                    <ColorPickerContent align="end" />
+                  </div>
+                </ColorPicker>
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
@@ -1029,17 +1052,25 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                 placeholder="List name (e.g. Work, Shopping)"
                 className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/30"
               />
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-[var(--app-muted)]">Color:</span>
-                {colorPalette.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => setNewListColor(c)}
-                    className={`h-4.5 w-4.5 rounded-full cursor-pointer ${newListColor === c ? "ring-2 ring-[var(--app-accent)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
-                    style={{ backgroundColor: c }}
-                  />
-                ))}
+              <div className="space-y-1.5">
+                <span className="app-meta font-medium text-[var(--app-muted)]">Color:</span>
+                <ColorPicker value={newListColor} onValueChange={(val) => val && setNewListColor(val)}>
+                  <div className="flex items-center gap-2">
+                    <ColorPickerSwatches
+                      colors={colorPalette.map((c) => ({ value: c, label: c }))}
+                      shape="circle"
+                      className="flex-1"
+                    />
+                    <ColorPickerTrigger size="icon-xs" aria-label="Custom color" className="rounded-full border border-[var(--app-border)] hover:border-[var(--app-accent)] shrink-0">
+                      {!colorPalette.includes(newListColor) ? (
+                        <ColorPickerSwatch shape="circle" />
+                      ) : (
+                        <Plus className="h-3 w-3" aria-hidden="true" />
+                      )}
+                    </ColorPickerTrigger>
+                    <ColorPickerContent align="end" />
+                  </div>
+                </ColorPicker>
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
@@ -1076,17 +1107,25 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                 placeholder="List name"
                 className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/30"
               />
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-[var(--app-muted)]">Color:</span>
-                {colorPalette.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => setEditListColor(c)}
-                    className={`h-4.5 w-4.5 rounded-full cursor-pointer ${editListColor === c ? "ring-2 ring-[var(--app-accent)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
-                    style={{ backgroundColor: c }}
-                  />
-                ))}
+              <div className="space-y-1.5">
+                <span className="app-meta font-medium text-[var(--app-muted)]">Color:</span>
+                <ColorPicker value={editListColor} onValueChange={(val) => val && setEditListColor(val)}>
+                  <div className="flex items-center gap-2">
+                    <ColorPickerSwatches
+                      colors={colorPalette.map((c) => ({ value: c, label: c }))}
+                      shape="circle"
+                      className="flex-1"
+                    />
+                    <ColorPickerTrigger size="icon-xs" aria-label="Custom color" className="rounded-full border border-[var(--app-border)] hover:border-[var(--app-accent)] shrink-0">
+                      {!colorPalette.includes(editListColor) ? (
+                        <ColorPickerSwatch shape="circle" />
+                      ) : (
+                        <Plus className="h-3 w-3" aria-hidden="true" />
+                      )}
+                    </ColorPickerTrigger>
+                    <ColorPickerContent align="end" />
+                  </div>
+                </ColorPicker>
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button

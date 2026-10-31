@@ -1,25 +1,19 @@
-import type * as React from "react";
-
-import { cn } from "@/lib/utils";
+import * as React from "react"
+import { Input as InputPrimitive } from "@base-ui/react/input"
+import { cn } from "cn"
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
-    <input
-      className={cn(
-        "flex h-8 w-full min-w-0 rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1 text-xs sm:text-sm text-[var(--app-text)] shadow-[0_1px_2px_rgba(15,15,15,0.04)] outline-none transition-colors file:inline-flex file:h-6 file:border-0 file:bg-transparent file:font-medium file:text-xs file:text-foreground placeholder:text-[var(--app-muted)]/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40",
-        "focus-visible:border-[var(--app-accent)] focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/35",
-        "aria-invalid:border-[#e03e3e] aria-invalid:ring-[#e03e3e]/20",
-        type === "search" &&
-          "[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none",
-        type === "file" &&
-          "p-0 pr-3 text-[var(--app-muted)]/70 italic file:me-3 file:h-full file:border-0 file:border-[var(--app-border)] file:border-r file:border-solid file:bg-transparent file:px-2.5 file:font-medium file:text-xs file:not-italic",
-        className,
-      )}
-      data-slot="input"
+    <InputPrimitive
       type={type}
+      data-slot="input"
+      className={cn(
+        "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
+        className
+      )}
       {...props}
     />
-  );
+  )
 }
 
-export { Input };
+export { Input }

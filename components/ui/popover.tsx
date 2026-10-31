@@ -1,7 +1,7 @@
 "use client";
 
 import { Popover as PopoverPrimitive } from "radix-ui";
-import type * as React from "react";
+import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -12,9 +12,21 @@ function Popover({
 }
 
 function PopoverTrigger({
+  render,
+  children,
   ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
-  return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />;
+}: React.ComponentProps<typeof PopoverPrimitive.Trigger> & {
+  render?: React.ReactElement;
+}) {
+  if (render) {
+    const renderChildren = (render.props as { children?: React.ReactNode })?.children;
+    return (
+      <PopoverPrimitive.Trigger data-slot="popover-trigger" asChild {...props}>
+        {React.cloneElement(render, undefined, children ?? renderChildren)}
+      </PopoverPrimitive.Trigger>
+    );
+  }
+  return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props}>{children}</PopoverPrimitive.Trigger>;
 }
 
 function PopoverContent({

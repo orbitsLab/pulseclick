@@ -99,6 +99,7 @@ export function TaskInspector({
   const [tagToDelete, setTagToDelete] = useState<{ id: string; name: string } | null>(null);
   const [localTags, setLocalTags] = useState<{ id: string; name: string; color: string }[]>([]);
   const newSubtaskInputRef = useRef<HTMLInputElement>(null);
+  const titleInputRef = useRef<HTMLInputElement>(null);
 
   // Sync localTags from task.tags with fallback to global tags cache
   useEffect(() => {
@@ -218,6 +219,12 @@ export function TaskInspector({
     if (task) {
       setTitle(task.title);
       setDescription(task.description || "");
+      if (task.title === "Untitled Task") {
+        setTimeout(() => {
+          titleInputRef.current?.focus();
+          titleInputRef.current?.select();
+        }, 50);
+      }
     }
   }, [task?.id, task?.title, task?.description]);
 
@@ -628,6 +635,7 @@ export function TaskInspector({
           {/* Title input */}
           <div>
             <input
+              ref={titleInputRef}
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}

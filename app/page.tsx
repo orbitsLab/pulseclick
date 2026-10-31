@@ -2,6 +2,7 @@
 
 import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { InitialLoaderScreen } from "@/components/motion/loader";
 
 function RootRedirect() {
   const router = useRouter();
@@ -12,22 +13,12 @@ function RootRedirect() {
     router.replace(qs ? `/tasks?${qs}` : "/tasks");
   }, [router, searchParams]);
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--app-bg)] text-[var(--app-accent)] font-semibold text-sm">
-      Loading PulseFlow...
-    </div>
-  );
+  return <InitialLoaderScreen text="PULSEFLOW" label="Loading PulseFlow..." />;
 }
 
 export default function Page() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-screen items-center justify-center bg-[var(--app-bg)] text-[var(--app-accent)] font-semibold text-sm">
-          Loading PulseFlow...
-        </div>
-      }
-    >
+    <Suspense fallback={<InitialLoaderScreen text="PULSEFLOW" label="Loading PulseFlow..." />}>
       <RootRedirect />
     </Suspense>
   );

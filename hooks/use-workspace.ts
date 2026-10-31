@@ -1779,6 +1779,7 @@ export function useWorkspace(filters: {
     filters: filtersQuery.data || [],
     isLoadingFilters: filtersQuery.isLoading,
     countdowns: countdownsQuery.data || [],
+    isLoadingCountdowns: countdownsQuery.isLoading,
     stats: statsQuery.data ?? null,
     isLoadingStats: statsQuery.isLoading,
     settings: settingsQuery.data ?? null,

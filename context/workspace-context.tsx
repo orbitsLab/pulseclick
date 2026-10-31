@@ -130,6 +130,7 @@ export interface WorkspaceContextType {
   isInitialLoadingFilters: boolean;
   hasLoadedFiltersOnce: boolean;
   countdowns: Countdown[];
+  isLoadingCountdowns: boolean;
   stats: StatisticsData | null;
   isLoadingStats: boolean;
   settings: UserSettings | null;
@@ -910,6 +911,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     isInitialLoadingFilters,
     hasLoadedFiltersOnce,
     countdowns: workspace.countdowns,
+    isLoadingCountdowns: workspace.isLoadingCountdowns,
     stats: workspace.stats,
     isLoadingStats: workspace.isLoadingStats,
     settings: workspace.settings,

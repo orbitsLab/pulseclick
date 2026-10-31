@@ -26,6 +26,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 /* -------------------------------------------------------------------------- */
 /*                                   Types                                     */
@@ -75,7 +77,7 @@ export interface StatisticsData {
 }
 
 export interface StatisticsViewProps {
-  stats: StatisticsData;
+  stats: StatisticsData | null | undefined;
   range: "week" | "month" | "quarter" | "year";
   onRangeChange: (range: "week" | "month" | "quarter" | "year") => void;
   isLoading?: boolean;
@@ -323,10 +325,233 @@ function DonutGauge({ percent, accent }: { percent: number; accent: string }) {
 }
 
 /* -------------------------------------------------------------------------- */
+/*                            Skeleton component                              */
+/* -------------------------------------------------------------------------- */
+
+export function StatisticsSkeleton({
+  range,
+  onRangeChange,
+}: {
+  range: StatsRange;
+  onRangeChange: (r: StatsRange) => void;
+}) {
+  return (
+    <div className="flex-1 min-h-0 overflow-y-auto pr-1 sm:pr-2 space-y-4 pb-12 select-none animate-in fade-in-0 duration-150">
+      {/* Header + range switcher */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
+          <Skeleton className="h-4 w-32 rounded bg-[var(--app-hover)]" />
+          <Skeleton className="h-3 w-48 rounded bg-[var(--app-hover)]" />
+        </div>
+
+        <div
+          className="inline-flex w-full items-center gap-0.5 self-start rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-0.5 sm:w-auto"
+          role="tablist"
+        >
+          {RANGE_OPTIONS.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              onClick={() => onRangeChange(option.id)}
+              className={cn(
+                "flex-1 rounded-[4px] px-2.5 py-1 text-xs font-medium transition-colors sm:flex-none cursor-pointer",
+                option.id === range
+                  ? "bg-[var(--app-hover)] text-[var(--app-text)] font-semibold shadow-xs"
+                  : "text-[var(--app-muted)] hover:text-[var(--app-text)]"
+              )}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 4 KPI summary cards */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex flex-col gap-2.5 rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3.5"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Skeleton className="h-4 w-4 rounded-[4px] bg-[var(--app-hover)]" />
+                <Skeleton className="h-3.5 w-24 rounded bg-[var(--app-hover)]" />
+              </div>
+            </div>
+            <Skeleton className="h-7 w-20 rounded bg-[var(--app-hover)] my-0.5" />
+            <Skeleton className="h-3 w-28 rounded bg-[var(--app-hover)]" />
+          </div>
+        ))}
+      </div>
+
+      {/* Activity bar chart skeleton */}
+      <div className="rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-4 space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-[var(--app-border)]/60">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-4 w-4 rounded bg-[var(--app-hover)]" />
+              <Skeleton className="h-4 w-28 rounded bg-[var(--app-hover)]" />
+            </div>
+            <Skeleton className="h-3 w-44 rounded bg-[var(--app-hover)]" />
+          </div>
+        </div>
+
+        <div className="h-64 w-full flex items-end gap-3 pt-6 pb-2 px-4 border-b border-[var(--app-border)]/40">
+          {[40, 65, 30, 80, 55, 90, 45, 70, 35, 60, 75, 50].map((h, i) => (
+            <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+              <div className="w-full flex gap-1 items-end justify-center h-48">
+                <Skeleton className="w-2.5 sm:w-3.5 rounded-t-[3px] bg-[var(--app-hover)]" style={{ height: `${h}%` }} />
+                <Skeleton className="w-2.5 sm:w-3.5 rounded-t-[3px] bg-[var(--app-hover)]/60" style={{ height: `${Math.max(15, h - 20)}%` }} />
+              </div>
+              <Skeleton className="h-2.5 w-5 sm:w-8 rounded bg-[var(--app-hover)]" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Priority mix + Focus time 2-column grid */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* Priority mix skeleton */}
+        <div className="rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-4 space-y-4">
+          <div className="flex items-center gap-2 pb-2 border-b border-[var(--app-border)]/60">
+            <Skeleton className="h-4 w-4 rounded bg-[var(--app-hover)]" />
+            <div className="space-y-1">
+              <Skeleton className="h-4 w-24 rounded bg-[var(--app-hover)]" />
+              <Skeleton className="h-3 w-36 rounded bg-[var(--app-hover)]" />
+            </div>
+          </div>
+          <div className="h-64 flex flex-col items-center justify-center gap-4">
+            <div className="relative flex items-center justify-center">
+              <Skeleton className="h-36 w-36 rounded-full bg-[var(--app-hover)]" />
+              <div className="absolute h-20 w-20 rounded-full bg-[var(--app-panel)]" />
+            </div>
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-3 w-16 rounded bg-[var(--app-hover)]" />
+              <Skeleton className="h-3 w-16 rounded bg-[var(--app-hover)]" />
+              <Skeleton className="h-3 w-16 rounded bg-[var(--app-hover)]" />
+            </div>
+          </div>
+        </div>
+
+        {/* Focus time skeleton */}
+        <div className="rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-4 space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-[var(--app-border)]/60">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-4 w-4 rounded bg-[var(--app-hover)]" />
+              <div className="space-y-1">
+                <Skeleton className="h-4 w-24 rounded bg-[var(--app-hover)]" />
+                <Skeleton className="h-3 w-36 rounded bg-[var(--app-hover)]" />
+              </div>
+            </div>
+            <Skeleton className="h-6 w-16 rounded-lg bg-[var(--app-hover)]" />
+          </div>
+          <div className="h-44 flex items-end gap-3 px-2 border-b border-[var(--app-border)]/40 pb-2">
+            {[30, 50, 20, 75, 60, 40, 85].map((h, i) => (
+              <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                <Skeleton className="w-full max-w-[28px] rounded-t-[3px] bg-[var(--app-hover)]" style={{ height: `${h}%` }} />
+                <Skeleton className="h-2.5 w-6 rounded bg-[var(--app-hover)]" />
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <div className="rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel-hover)] p-3 space-y-1.5">
+              <Skeleton className="h-3 w-20 rounded bg-[var(--app-hover)]" />
+              <Skeleton className="h-5 w-16 rounded bg-[var(--app-hover)]" />
+            </div>
+            <div className="rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel-hover)] p-3 space-y-1.5">
+              <Skeleton className="h-3 w-16 rounded bg-[var(--app-hover)]" />
+              <Skeleton className="h-5 w-12 rounded bg-[var(--app-hover)]" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Lists breakdown skeleton */}
+      <div className="rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-4 space-y-3">
+        <div className="flex items-center gap-2 pb-2 border-b border-[var(--app-border)]/60">
+          <Skeleton className="h-4 w-4 rounded bg-[var(--app-hover)]" />
+          <div className="space-y-1">
+            <Skeleton className="h-4 w-20 rounded bg-[var(--app-hover)]" />
+            <Skeleton className="h-3 w-40 rounded bg-[var(--app-hover)]" />
+          </div>
+        </div>
+        <div className="space-y-3 pt-1">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-2.5 w-2.5 rounded-full bg-[var(--app-hover)]" />
+                  <Skeleton className="h-3.5 w-32 rounded bg-[var(--app-hover)]" />
+                </div>
+                <Skeleton className="h-3 w-12 rounded bg-[var(--app-hover)]" />
+              </div>
+              <Skeleton className="h-1.5 w-full rounded-full bg-[var(--app-hover)]" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Habits + Busiest days skeleton */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-4 space-y-3">
+          <div className="flex items-center gap-2 pb-2 border-b border-[var(--app-border)]/60">
+            <Skeleton className="h-4 w-4 rounded bg-[var(--app-hover)]" />
+            <div className="space-y-1">
+              <Skeleton className="h-4 w-20 rounded bg-[var(--app-hover)]" />
+              <Skeleton className="h-3 w-28 rounded bg-[var(--app-hover)]" />
+            </div>
+          </div>
+          <div className="space-y-2 pt-1">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex items-center justify-between rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel-hover)] p-3">
+                <div className="flex items-center gap-2.5">
+                  <Skeleton className="h-2.5 w-2.5 rounded-full bg-[var(--app-hover)]" />
+                  <div className="space-y-1">
+                    <Skeleton className="h-3.5 w-28 rounded bg-[var(--app-hover)]" />
+                    <Skeleton className="h-3 w-20 rounded bg-[var(--app-hover)]" />
+                  </div>
+                </div>
+                <Skeleton className="h-6 w-10 rounded-lg bg-[var(--app-hover)]" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-4 space-y-3">
+          <div className="flex items-center gap-2 pb-2 border-b border-[var(--app-border)]/60">
+            <Skeleton className="h-4 w-4 rounded bg-[var(--app-hover)]" />
+            <div className="space-y-1">
+              <Skeleton className="h-4 w-28 rounded bg-[var(--app-hover)]" />
+              <Skeleton className="h-3 w-36 rounded bg-[var(--app-hover)]" />
+            </div>
+          </div>
+          <div className="space-y-2 pt-1">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex items-center justify-between rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel-hover)] p-3">
+                <div className="flex items-center gap-2.5">
+                  <Skeleton className="h-3.5 w-3.5 rounded bg-[var(--app-hover)]" />
+                  <Skeleton className="h-3.5 w-28 rounded bg-[var(--app-hover)]" />
+                </div>
+                <Skeleton className="h-3 w-16 rounded bg-[var(--app-hover)]" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /*                              Main component                                 */
 /* -------------------------------------------------------------------------- */
 
 export function StatisticsView({ stats, range, onRangeChange, isLoading }: StatisticsViewProps) {
+  if (isLoading || !stats) {
+    return <StatisticsSkeleton range={range} onRangeChange={onRangeChange} />;
+  }
+
   const theme = useThemeVars();
 
   const byDay = useMemo(() => safeArray(stats?.byDay), [stats]);
