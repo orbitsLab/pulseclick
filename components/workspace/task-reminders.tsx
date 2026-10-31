@@ -88,17 +88,17 @@ export function TaskReminders({
   return (
     <section className="space-y-2.5">
       <div className="flex items-center justify-between">
-        <h3 className="flex items-center gap-1.5 app-overline font-semibold text-[var(--app-muted)]">
+        <h3 className="flex items-center gap-1.5 text-xs font-semibold text-[var(--app-muted)]">
           <Bell className="h-3.5 w-3.5" />
           Reminders
         </h3>
-        <span className="rounded-full bg-[var(--app-panel-alt)] px-1.5 py-0.5 app-meta font-bold text-[var(--app-muted)]">
+        <span className="rounded-[3px] bg-[var(--app-panel-hover)] px-1.5 py-0.5 text-[11px] font-mono font-medium text-[var(--app-muted)]">
           {reminders.length}
         </span>
       </div>
 
       {reminders.length === 0 ? (
-        <p className="rounded-lg bg-[var(--app-panel-alt)] px-3 py-2 app-meta text-[var(--app-muted)]">
+        <p className="rounded-[6px] bg-[var(--app-panel-hover)] px-3 py-2 text-xs text-[var(--app-muted)]">
           No reminders yet. Add one so this task never slips.
         </p>
       ) : (
@@ -106,10 +106,10 @@ export function TaskReminders({
           {reminders.map((reminder) => (
             <li
               key={reminder.id}
-              className="flex items-center gap-2 rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1.5"
+              className="flex items-center gap-2 rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1.5 text-xs"
             >
               <span
-                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${ reminder.enabled ? "bg-[var(--app-accent)]/10 text-[var(--app-accent-text)]" : "bg-[var(--app-panel-alt)] text-[var(--app-muted)] dark:bg-[var(--app-panel-alt)] dark:text-[var(--app-muted)]" }`}
+                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-[4px] ${ reminder.enabled ? "bg-[var(--app-accent-tag-bg)] text-[var(--app-accent)]" : "bg-[var(--app-panel-hover)] text-[var(--app-muted)]" }`}
               >
                 {reminder.type === "CONSTANT" ? (
                   <Repeat className="h-3.5 w-3.5" />
@@ -118,7 +118,7 @@ export function TaskReminders({
                 )}
               </span>
               <span
-                className={`flex-1 truncate app-label ${ reminder.enabled ? "text-[var(--app-text)]" : "text-[var(--app-muted)] line-through dark:text-[var(--app-muted)]" }`}
+                className={`flex-1 truncate text-xs ${ reminder.enabled ? "text-[var(--app-text)]" : "text-[var(--app-muted)] line-through" }`}
               >
                 {describeReminder(reminder)}
               </span>
@@ -128,17 +128,17 @@ export function TaskReminders({
                 aria-checked={reminder.enabled}
                 aria-label={`Toggle reminder ${describeReminder(reminder)}`}
                 onClick={() => onUpdate(reminder.id, { enabled: !reminder.enabled })}
-                className={`relative h-4 w-7 shrink-0 rounded-full transition-colors ${ reminder.enabled ? "bg-[var(--app-accent)]" : "bg-[var(--app-panel-alt)] dark:bg-[var(--app-panel-alt)]" }`}
+                className={`relative h-4 w-7 shrink-0 rounded-full transition-colors ${ reminder.enabled ? "bg-[var(--app-accent)]" : "bg-[var(--app-border)]" }`}
               >
                 <span
-                  className={`absolute top-0.5 h-3 w-3 rounded-full bg-[var(--app-panel)] transition-transform ${ reminder.enabled ? "translate-x-3.5" : "translate-x-0.5" }`}
+                  className={`absolute top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${ reminder.enabled ? "translate-x-3.5" : "translate-x-0.5" }`}
                 />
               </button>
               <button
                 type="button"
                 aria-label="Delete reminder"
                 onClick={() => onDelete(reminder.id)}
-                className="shrink-0 rounded-md p-1 text-[var(--app-muted)] transition-colors hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-500/10"
+                className="shrink-0 rounded-[4px] p-1 text-[var(--app-muted)] transition-colors hover:bg-rose-500/10 hover:text-rose-500"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -152,7 +152,7 @@ export function TaskReminders({
           value={type}
           onChange={(e) => setType(e.target.value)}
           aria-label="Reminder type"
-          className="flex-1 rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] px-2 py-1.5 app-meta text-[var(--app-text)] outline-none focus:border-[var(--app-accent)]"
+          className="flex-1 rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2 py-1.5 text-xs text-[var(--app-text)] outline-none focus:border-[var(--app-accent)]"
         >
           {REMINDER_TYPES.map((option) => (
             <option key={option.value} value={option.value}>
@@ -166,14 +166,14 @@ export function TaskReminders({
             value={remindAt}
             onChange={(e) => setRemindAt(e.target.value)}
             aria-label="Reminder time"
-            className="rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] px-2 py-1.5 app-meta text-[var(--app-text)] outline-none focus:border-[var(--app-accent)]"
+            className="rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2 py-1.5 text-xs text-[var(--app-text)] outline-none focus:border-[var(--app-accent)] font-mono"
           />
         )}
         <button
           type="button"
           onClick={handleAdd}
           disabled={isAdding}
-          className="flex items-center gap-1 rounded-lg bg-[var(--app-accent-strong)] px-2 py-1.5 app-meta font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="flex items-center gap-1 rounded-[4px] bg-[var(--app-accent)] px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[var(--app-accent-hover)] disabled:opacity-50"
         >
           <Plus className="h-3 w-3" />
           Add
@@ -181,7 +181,7 @@ export function TaskReminders({
       </div>
 
       {reminders.some((r) => r.type === "CONSTANT") && (
-        <p className="flex items-start gap-1.5 app-meta leading-relaxed text-[var(--app-muted)]">
+        <p className="flex items-start gap-1.5 text-[11px] leading-relaxed text-[var(--app-muted)]">
           <BellRing className="mt-0.5 h-3 w-3 shrink-0" />
           Constant reminders keep notifying until the task is completed.
         </p>

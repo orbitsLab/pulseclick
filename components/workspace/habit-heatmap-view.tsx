@@ -121,28 +121,28 @@ export function HabitHeatmapView({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Top Filter and Highlights */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[var(--app-border)]/80 bg-[var(--app-panel)] p-4 sm:p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3.5 sm:p-4">
         <div>
           <div className="flex items-center gap-2">
-            <CalendarDays className="h-5 w-5 text-[var(--app-accent-text)]" />
-            <h3 className="app-heading font-semibold text-[var(--app-text)]">
+            <CalendarDays className="h-4 w-4 text-[var(--app-accent)]" />
+            <h3 className="text-sm font-semibold text-[var(--app-text)]">
               Annual Habit Consistency
             </h3>
           </div>
-          <p className="app-body text-[var(--app-muted)] text-xs mt-1">
+          <p className="text-xs text-[var(--app-muted)] mt-0.5">
             Visualizing 365 days of routine completions and practice density.
           </p>
         </div>
 
         {/* Filter dropdown */}
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-[var(--app-muted)]" />
+          <Filter className="h-3.5 w-3.5 text-[var(--app-muted)]" />
           <select
             value={selectedHabitId}
             onChange={(e) => onSelectHabitId(e.target.value)}
-            className="rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-1.5 app-label text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)]"
+            className="rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)] cursor-pointer"
           >
             <option value="all">All Habits (Combined)</option>
             {habits.map((h) => (
@@ -156,59 +156,59 @@ export function HabitHeatmapView({
 
       {/* KPI Stat Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-xl border border-[var(--app-border)]/70 bg-[var(--app-panel)] p-3.5">
-          <span className="app-overline font-semibold text-[var(--app-muted)] text-[10px]">
+        <div className="rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3">
+          <span className="text-[10px] font-semibold text-[var(--app-muted)] uppercase tracking-wider">
             ACTIVE DAYS
           </span>
-          <div className="app-figure text-2xl font-bold text-[var(--app-text)] mt-1">
+          <div className="text-xl font-semibold text-[var(--app-text)] font-mono tabular-nums mt-1">
             {activeDays}
-            <span className="app-meta font-normal text-[var(--app-muted)] ml-1">/ 365</span>
+            <span className="text-xs font-normal text-[var(--app-muted)] ml-1">/ 365</span>
           </div>
-          <span className="app-meta text-emerald-500 font-medium mt-0.5 block">
+          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5 block">
             {Math.round((activeDays / 365) * 100)}% consistency
           </span>
         </div>
 
-        <div className="rounded-xl border border-[var(--app-border)]/70 bg-[var(--app-panel)] p-3.5">
-          <span className="app-overline font-semibold text-[var(--app-muted)] text-[10px]">
+        <div className="rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3">
+          <span className="text-[10px] font-semibold text-[var(--app-muted)] uppercase tracking-wider">
             TOTAL CHECK-INS
           </span>
-          <div className="app-figure text-2xl font-bold text-[var(--app-text)] mt-1">
+          <div className="text-xl font-semibold text-[var(--app-text)] font-mono tabular-nums mt-1">
             {totalCheckIns}
           </div>
-          <span className="app-meta text-[var(--app-muted)] mt-0.5 block">
+          <span className="text-xs text-[var(--app-muted)] mt-0.5 block">
             Across {selectedHabit ? "selected habit" : `${habits.length} habits`}
           </span>
         </div>
 
-        <div className="rounded-xl border border-[var(--app-border)]/70 bg-[var(--app-panel)] p-3.5">
-          <span className="app-overline font-semibold text-[var(--app-muted)] text-[10px]">
+        <div className="rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3">
+          <span className="text-[10px] font-semibold text-[var(--app-muted)] uppercase tracking-wider">
             LONGEST STREAK
           </span>
-          <div className="app-figure text-2xl font-bold text-amber-500 mt-1 flex items-center gap-1">
-            <Flame className="h-5 w-5 fill-current" />
+          <div className="text-xl font-semibold text-amber-500 font-mono tabular-nums mt-1 flex items-center gap-1">
+            <Flame className="h-4 w-4 fill-current" />
             {analytics?.stats?.bestStreak || 0}
-            <span className="app-meta font-normal text-[var(--app-muted)]">days</span>
+            <span className="text-xs font-normal text-[var(--app-muted)]">days</span>
           </div>
-          <span className="app-meta text-[var(--app-muted)] mt-0.5 block">Personal best run</span>
+          <span className="text-xs text-[var(--app-muted)] mt-0.5 block">Personal best run</span>
         </div>
 
-        <div className="rounded-xl border border-[var(--app-border)]/70 bg-[var(--app-panel)] p-3.5">
-          <span className="app-overline font-semibold text-[var(--app-muted)] text-[10px]">
+        <div className="rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3">
+          <span className="text-[10px] font-semibold text-[var(--app-muted)] uppercase tracking-wider">
             PEAK DAY
           </span>
-          <div className="app-figure text-2xl font-bold text-[var(--app-accent-text)] mt-1">
+          <div className="text-xl font-semibold text-[var(--app-accent)] font-mono tabular-nums mt-1">
             {peakDay?.count || 0}
-            <span className="app-meta font-normal text-[var(--app-muted)] ml-1">habits</span>
+            <span className="text-xs font-normal text-[var(--app-muted)] ml-1">habits</span>
           </div>
-          <span className="app-meta text-[var(--app-muted)] mt-0.5 block">
+          <span className="text-xs text-[var(--app-muted)] mt-0.5 block">
             {peakDay ? peakDay.date : "—"}
           </span>
         </div>
       </div>
 
       {/* Heatmap Matrix Surface */}
-      <div className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4 sm:p-6 overflow-hidden">
+      <div className="rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-4 sm:p-5 overflow-hidden">
         {/* Month Labels Bar */}
         <div className="overflow-x-auto pb-4">
           <div className="min-w-[760px]">
@@ -294,13 +294,13 @@ export function HabitHeatmapView({
 
       {/* Selected Day Inspector Card */}
       {inspectedDay && (
-        <div className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4 sm:p-5 animate-in fade-in duration-150">
-          <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[var(--app-border)]/60">
+        <div className="rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-4 sm:p-5 animate-in fade-in duration-150">
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[var(--app-border)]">
             <div>
-              <span className="app-overline font-semibold text-[var(--app-muted)]">
+              <span className="text-[10px] font-semibold text-[var(--app-muted)] uppercase tracking-wider">
                 DAY DETAILS
               </span>
-              <h4 className="app-title font-semibold text-[var(--app-text)]">
+              <h4 className="text-sm font-semibold text-[var(--app-text)]">
                 {new Date(inspectedDay.date + "T12:00:00Z").toLocaleDateString(undefined, {
                   weekday: "long",
                   year: "numeric",
@@ -310,41 +310,41 @@ export function HabitHeatmapView({
               </h4>
             </div>
 
-            <span className="rounded-full bg-[var(--app-accent)]/15 px-3 py-1 app-label font-bold text-[var(--app-accent-text)]">
+            <span className="rounded-[3px] bg-[rgba(35,131,226,0.12)] text-[#2383e2] dark:text-[#529cca] border border-[rgba(35,131,226,0.25)] px-2.5 py-0.5 text-xs font-medium">
               {inspectedDay.count} routines checked in
             </span>
           </div>
 
-          <div className="mt-4 space-y-2.5">
+          <div className="mt-3.5 space-y-2">
             {inspectedDay.habits.length === 0 ? (
-              <p className="app-body text-[var(--app-muted)] text-sm py-4 text-center">
+              <p className="text-xs text-[var(--app-muted)] py-4 text-center">
                 No habit activity recorded on this day.
               </p>
             ) : (
               inspectedDay.habits.map((item, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between gap-4 rounded-xl border border-[var(--app-border)]/50 bg-[var(--app-panel-alt)]/50 p-3"
+                  className="flex items-center justify-between gap-3 rounded-[6px] border border-[var(--app-border)] bg-[var(--app-hover)]/30 p-2.5"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2.5">
                     <div
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-white font-bold"
+                      className="flex h-7 w-7 items-center justify-center rounded-[4px] text-white font-medium"
                       style={{ backgroundColor: item.color || "var(--app-accent)" }}
                     >
-                      <Check className="h-4 w-4 stroke-[3]" />
+                      <Check className="h-3.5 w-3.5 stroke-[3]" />
                     </div>
 
                     <div>
-                      <span className="app-label font-semibold text-[var(--app-text)]">
+                      <span className="text-xs font-semibold text-[var(--app-text)]">
                         {item.title}
                       </span>
                       {item.value !== null && item.value !== undefined && (
-                        <span className="app-meta text-[var(--app-accent-text)] font-semibold ml-2">
+                        <span className="text-xs text-[var(--app-accent)] font-mono ml-2">
                           Logged: {item.value} {item.unit || ""}
                         </span>
                       )}
                       {item.note && (
-                        <p className="app-meta italic text-[var(--app-muted)] flex items-center gap-1 mt-0.5">
+                        <p className="text-[11px] italic text-[var(--app-muted)] flex items-center gap-1 mt-0.5">
                           <StickyNote className="h-3 w-3" />
                           <span>&ldquo;{item.note}&rdquo;</span>
                         </p>
@@ -353,10 +353,10 @@ export function HabitHeatmapView({
                   </div>
 
                   <span
-                    className={`app-meta font-bold px-2 py-0.5 rounded-md ${
+                    className={`text-[10px] font-medium px-1.5 py-0.5 rounded-[3px] border ${
                       item.status === "SKIPPED"
-                        ? "bg-amber-500/15 text-amber-500"
-                        : "bg-emerald-500/15 text-emerald-500"
+                        ? "bg-[rgba(203,145,47,0.1)] text-[#dfab01] dark:text-[#f3cd46] border-[rgba(203,145,47,0.25)]"
+                        : "bg-[rgba(68,131,97,0.1)] text-[#448361] dark:text-[#4dab9a] border-[rgba(68,131,97,0.25)]"
                     }`}
                   >
                     {item.status === "SKIPPED" ? "Skipped" : "Completed"}

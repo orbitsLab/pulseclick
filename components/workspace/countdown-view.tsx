@@ -209,14 +209,14 @@ function withAlpha(hex: string, alpha: string): string {
 
 function UnitBox({ value, label, color }: { value: number; label: string; color: string }) {
   return (
-    <div className="flex min-w-0 flex-1 flex-col items-center gap-1 rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)]/80 px-1 py-2">
+    <div className="flex min-w-0 flex-1 flex-col items-center gap-1 rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-1 py-2">
       <span
-        className="font-mono text-2xl leading-none font-semibold tabular-nums tracking-tight"
+        className="font-mono text-xl leading-none font-semibold tabular-nums tracking-tight"
         style={{ color }}
       >
         {String(value).padStart(2, "0")}
       </span>
-      <span className="app-meta font-bold tracking-wider text-[var(--app-muted)] uppercase">
+      <span className="text-[10px] font-medium tracking-wider text-[var(--app-muted)] uppercase">
         {label}
       </span>
     </div>
@@ -347,43 +347,42 @@ export function CountdownView({
   return (
     <div className="flex-1 min-h-0 overflow-y-auto pr-1 sm:pr-2 pb-12 flex w-full flex-col gap-6">
       {/* Header strip */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-1">
-          <p className="app-body text-[var(--app-muted)]">
-            Keep track of the dates that matter — birthdays, anniversaries, deadlines
-            and launches.
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-0.5">
+          <p className="text-xs text-[var(--app-muted)]">
+            Keep track of the dates that matter — birthdays, anniversaries, deadlines and launches.
           </p>
         </div>
         <Button
           type="button"
           onClick={openCreate}
-          className="shrink-0 self-start rounded-xl px-3 py-1.5 font-semibold sm:self-auto"
+          className="shrink-0 self-start rounded-[4px] h-7 px-3 text-xs font-medium sm:self-auto"
         >
-          <Plus className="size-4" />
+          <Plus className="size-3.5" />
           New countdown
         </Button>
       </div>
 
       {/* Cards */}
       {sorted.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-[var(--app-border)] bg-[var(--app-panel)] px-6 py-14 text-center">
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--app-panel-alt)] text-[var(--app-muted)]">
-            <PartyPopper className="size-6" />
+        <div className="flex flex-col items-center justify-center gap-2 rounded-[8px] border border-dashed border-[var(--app-border)] bg-[var(--app-panel)] px-6 py-12 text-center">
+          <span className="flex h-10 w-10 items-center justify-center rounded-[6px] bg-[var(--app-hover)] text-[var(--app-muted)]">
+            <PartyPopper className="size-5" />
           </span>
-          <h3 className="app-heading font-semibold text-[var(--app-text)]">
+          <h3 className="text-sm font-semibold text-[var(--app-text)]">
             No countdowns yet
           </h3>
-          <p className="max-w-sm app-body text-[var(--app-muted)]">
+          <p className="max-w-sm text-xs text-[var(--app-muted)]">
             Add a date you are looking forward to and we will count every second
             until it arrives.
           </p>
-          <Button type="button" onClick={openCreate} className="mt-1 rounded-xl px-3 py-1.5 font-semibold">
-            <Plus className="size-4" />
+          <Button type="button" onClick={openCreate} className="mt-1 rounded-[4px] h-7 px-3 text-xs font-medium">
+            <Plus className="size-3.5" />
             Create your first countdown
           </Button>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {sorted.map(({ countdown, target, periodStart, isPassed, isRollover }) => {
             const color = countdown.color || PRESET_COLORS[0];
             const targetTime = target ? target.getTime() : 0;
@@ -400,13 +399,13 @@ export function CountdownView({
             return (
               <div
                 key={countdown.id}
-                className="flex flex-col gap-4 rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4 shadow-sm transition-colors"
+                className="flex flex-col gap-3 rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3.5 transition-colors"
               >
                 {/* Title row */}
                 <div className="flex items-start justify-between gap-2">
-                  <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex min-w-0 items-center gap-2.5">
                     <span
-                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg"
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[4px] text-base"
                       style={{
                         backgroundColor: withAlpha(color, "1f"),
                         color,
@@ -415,15 +414,15 @@ export function CountdownView({
                       {countdown.emoji ? (
                         <span className="leading-none">{countdown.emoji}</span>
                       ) : (
-                        <PartyPopper className="size-5" />
+                        <PartyPopper className="size-4" />
                       )}
                     </span>
                     <div className="min-w-0">
-                      <h3 className="truncate app-heading font-semibold text-[var(--app-text)]">
+                      <h3 className="truncate text-xs font-semibold text-[var(--app-text)]">
                         {countdown.title}
                       </h3>
-                      <span className="mt-0.5 flex items-center gap-1.5 app-label text-[var(--app-muted)]">
-                        <CalendarDays className="size-3.5 shrink-0" />
+                      <span className="mt-0.5 flex items-center gap-1 text-[11px] text-[var(--app-muted)]">
+                        <CalendarDays className="size-3 shrink-0" />
                         <span className="truncate">
                           {formatAbsoluteDate(countdown.targetDate)}
                         </span>
@@ -431,41 +430,41 @@ export function CountdownView({
                     </div>
                   </div>
 
-                  <div className="flex shrink-0 items-center gap-1">
+                  <div className="flex shrink-0 items-center gap-0.5">
                     <button
                       type="button"
                       onClick={() => openEdit(countdown)}
                       aria-label={`Edit ${countdown.title}`}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--app-muted)] transition-colors hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-text)] dark:hover:text-[var(--app-text)]"
+                      className="flex h-7 w-7 items-center justify-center rounded-[4px] text-[var(--app-muted)] transition-colors hover:bg-[var(--app-hover)] hover:text-[var(--app-text)] cursor-pointer"
                     >
-                      <Pencil className="size-4" />
+                      <Pencil className="size-3.5" />
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDelete(countdown.id)}
                       aria-label={`Delete ${countdown.title}`}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--app-muted)] transition-colors hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
+                      className="flex h-7 w-7 items-center justify-center rounded-[4px] text-[var(--app-muted)] transition-colors hover:bg-[rgba(255,0,26,0.1)] hover:text-[#eb5757] cursor-pointer"
                     >
-                      <Trash2 className="size-4" />
+                      <Trash2 className="size-3.5" />
                     </button>
                   </div>
                 </div>
 
                 {confirming && (
-                  <p className="flex items-center gap-1.5 rounded-lg bg-rose-50 px-2.5 py-1.5 app-label font-medium text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">
-                    <Trash2 className="size-3.5" />
+                  <p className="flex items-center gap-1.5 rounded-[4px] bg-[rgba(255,0,26,0.1)] px-2 py-1 text-xs font-medium text-[#eb5757]">
+                    <Trash2 className="size-3" />
                     Click delete again to confirm
                   </p>
                 )}
 
                 {/* Countdown / passed state */}
                 {isPassed ? (
-                  <div className="flex flex-col gap-2 rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)]/80 p-3">
+                  <div className="flex flex-col gap-2 rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel-hover)] p-3">
                     <div className="flex items-center gap-2">
-                      <span className="rounded-lg bg-[var(--app-panel-alt)] px-2 py-0.5 app-meta font-bold tracking-wider text-[var(--app-text)] uppercase">
+                      <span className="rounded-[3px] bg-[var(--app-panel)] px-1.5 py-0.5 text-[11px] font-mono font-medium text-[var(--app-text)] uppercase">
                         Ended
                       </span>
-                      <span className="app-label font-medium text-[var(--app-muted)]">
+                      <span className="text-xs font-medium text-[var(--app-muted)]">
                         Passed {splitDuration(elapsedSinceTarget).days} day
                         {splitDuration(elapsedSinceTarget).days === 1 ? "" : "s"} ago
                       </span>
@@ -509,12 +508,12 @@ export function CountdownView({
                 {/* Badges */}
                 <div className="flex flex-wrap items-center gap-1.5">
                   {(countdown.repeat || "NONE").toUpperCase() === "YEARLY" && (
-                    <span className="rounded-lg border border-[var(--app-border)] px-2 py-0.5 app-meta font-bold tracking-wider text-[var(--app-muted)] uppercase">
+                    <span className="rounded-[3px] border border-[var(--app-border)] px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-[var(--app-muted)] uppercase">
                       Repeats yearly
                     </span>
                   )}
                   {isRollover && (
-                    <span className="rounded-lg border border-[var(--app-border)] px-2 py-0.5 app-meta font-bold tracking-wider text-[var(--app-muted)] uppercase">
+                    <span className="rounded-[3px] border border-[var(--app-border)] px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-[var(--app-muted)] uppercase">
                       Next: {target ? formatAbsoluteDate(toDateInput(target)) : ""}
                     </span>
                   )}
@@ -536,21 +535,21 @@ export function CountdownView({
           }
         }}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-text)] shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="font-extrabold tracking-tight">
+            <DialogTitle className="text-base font-semibold tracking-tight text-[var(--app-text)]">
               {isEditing ? "Edit countdown" : "New countdown"}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-xs text-[var(--app-muted)]">
               {isEditing
                 ? "Update the details of this countdown."
                 : "Pick a date and we will count down the seconds."}
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="countdown-title">Title</Label>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="countdown-title" className="text-xs font-medium text-[var(--app-text)]">Title</Label>
               <Input
                 id="countdown-title"
                 value={form.title}
@@ -559,11 +558,12 @@ export function CountdownView({
                 }
                 placeholder="Trip to Kyoto"
                 autoComplete="off"
+                className="h-8 rounded-[4px] text-xs"
               />
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="countdown-date">Target date</Label>
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="countdown-date" className="text-xs font-medium text-[var(--app-text)]">Target date</Label>
               <input
                 id="countdown-date"
                 type="date"
@@ -571,12 +571,12 @@ export function CountdownView({
                 onChange={(event) =>
                   setForm((prev) => ({ ...prev, targetDate: event.target.value }))
                 }
-                className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 app-body transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
+                className="h-8 w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1 text-xs text-[var(--app-text)] transition-colors outline-none focus-visible:border-[var(--app-accent)]"
               />
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="countdown-emoji">Emoji (optional)</Label>
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="countdown-emoji" className="text-xs font-medium text-[var(--app-text)]">Emoji (optional)</Label>
               <Input
                 id="countdown-emoji"
                 value={form.emoji}
@@ -586,12 +586,13 @@ export function CountdownView({
                 }
                 placeholder="🎉"
                 autoComplete="off"
+                className="h-8 rounded-[4px] text-xs"
               />
             </div>
 
-            <div className="flex flex-col gap-2">
-              <Label>Colour</Label>
-              <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-xs font-medium text-[var(--app-text)]">Colour</Label>
+              <div className="flex flex-wrap items-center gap-1.5">
                 {PRESET_COLORS.map((preset) => {
                   const selected = form.color.toLowerCase() === preset.toLowerCase();
                   return (
@@ -602,13 +603,13 @@ export function CountdownView({
                       aria-label={`Use colour ${preset}`}
                       aria-pressed={selected}
                       className={cn(
-                        "flex h-7 w-7 items-center justify-center rounded-full transition-transform hover:scale-110",
-                        selected ? "ring-2 ring-[var(--app-panel)] ring-offset-2 dark:ring-white dark:ring-offset-slate-900" : ""
+                        "flex h-6 w-6 items-center justify-center rounded-[3px] transition-transform hover:scale-110",
+                        selected ? "ring-1 ring-[var(--app-text)] ring-offset-1" : ""
                       )}
                       style={{ backgroundColor: preset }}
                     >
                       {selected && (
-                        <Check className="size-3.5 text-white drop-shadow" />
+                        <Check className="size-3 text-white drop-shadow" />
                       )}
                     </button>
                   );
@@ -616,12 +617,12 @@ export function CountdownView({
               </div>
             </div>
 
-            <div className="flex items-center justify-between rounded-xl border border-[var(--app-border)] px-3 py-2.5">
+            <div className="flex items-center justify-between rounded-[4px] border border-[var(--app-border)] px-3 py-2">
               <div className="flex flex-col">
-                <Label htmlFor="countdown-repeat" className="app-body font-semibold">
+                <Label htmlFor="countdown-repeat" className="text-xs font-medium text-[var(--app-text)]">
                   Repeat yearly
                 </Label>
-                <span className="app-label text-[var(--app-muted)]">
+                <span className="text-[11px] text-[var(--app-muted)]">
                   Count down to this date every year.
                 </span>
               </div>
@@ -637,22 +638,22 @@ export function CountdownView({
             {error && (
               <p
                 role="alert"
-                className="rounded-lg bg-rose-50 px-3 py-2 app-label font-medium text-rose-600 dark:bg-rose-500/10 dark:text-rose-400"
+                className="rounded-[4px] bg-[rgba(255,0,26,0.1)] px-3 py-1.5 text-xs font-medium text-[#eb5757]"
               >
                 {error}
               </p>
             )}
 
-            <DialogFooter>
+            <DialogFooter className="mt-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setDialogOpen(false)}
-                className="rounded-xl"
+                className="h-7 rounded-[4px] px-3 text-xs"
               >
                 Cancel
               </Button>
-              <Button type="submit" className="rounded-xl font-semibold">
+              <Button type="submit" className="h-7 rounded-[4px] px-3 text-xs font-medium">
                 {isEditing ? "Save changes" : "Add countdown"}
               </Button>
             </DialogFooter>

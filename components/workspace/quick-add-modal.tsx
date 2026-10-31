@@ -187,26 +187,26 @@ export function QuickAddModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-[var(--app-border)] bg-[var(--app-rail)] text-[var(--app-text)] shadow-2xl animate-in zoom-in-95 duration-150">
+      <div className="w-full max-w-lg overflow-hidden rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-text)] shadow-2xl animate-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[var(--app-border)] px-5 py-3.5">
+        <div className="flex items-center justify-between border-b border-[var(--app-border)] px-4 py-3">
           <div className="flex items-center gap-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[var(--app-accent-strong)] text-white font-bold app-label">
+            <span className="flex h-5 w-5 items-center justify-center rounded-[3px] bg-[var(--app-accent)] text-white font-semibold text-xs">
               +
             </span>
-            <h3 className="app-heading font-semibold text-white">Quick Add Task</h3>
+            <h3 className="text-sm font-semibold text-[var(--app-text)]">Quick Add Task</h3>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded p-1 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)]"
+            className="rounded-[4px] p-1 text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)] transition-colors cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 space-y-3.5">
           <div>
             <div className="flex items-center gap-2">
               <input
@@ -216,7 +216,7 @@ export function QuickAddModal({
                 value={title}
                 onChange={(e) => handleTitleChange(e.target.value)}
                 placeholder="What would you like to accomplish?"
-                className="flex-1 bg-transparent app-title font-semibold text-white placeholder-[var(--app-muted)] focus:outline-none"
+                className="flex-1 bg-transparent text-sm font-medium text-[var(--app-text)] placeholder-[var(--app-muted)] focus:outline-none"
               />
             </div>
 
@@ -227,42 +227,42 @@ export function QuickAddModal({
               parsed.priority !== null ||
               parsed.tags?.length ||
               parsed.durationMinutes) && (
-              <div className="mt-2 flex flex-wrap items-center gap-1.5 app-meta">
-                <span className="flex items-center gap-1 font-bold uppercase tracking-wider text-[var(--app-muted)]">
+              <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs">
+                <span className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--app-muted)]">
                   <Wand2 className="h-3 w-3" />
                   Understood
                 </span>
                 {parsed.dueDate && (
-                  <span className="rounded-md bg-[var(--app-accent)]/15 px-1.5 py-0.5 font-semibold text-[var(--app-accent-text)]">
+                  <span className="rounded-[3px] bg-[rgba(35,131,226,0.12)] text-[#2383e2] dark:text-[#529cca] border border-[rgba(35,131,226,0.25)] px-1.5 py-0.2 font-mono text-[11px]">
                     {parsed.dueDate}
                   </span>
                 )}
                 {parsed.dueTime && (
-                  <span className="rounded-md bg-[var(--app-accent)]/15 px-1.5 py-0.5 font-semibold text-[var(--app-accent-text)]">
+                  <span className="rounded-[3px] bg-[rgba(35,131,226,0.12)] text-[#2383e2] dark:text-[#529cca] border border-[rgba(35,131,226,0.25)] px-1.5 py-0.2 font-mono text-[11px]">
                     {parsed.dueTime}
                   </span>
                 )}
                 {parsed.recurrence && parsed.recurrence !== "NONE" && (
-                  <span className="flex items-center gap-1 rounded-md bg-violet-500/15 px-1.5 py-0.5 font-semibold text-violet-400">
+                  <span className="flex items-center gap-1 rounded-[3px] bg-[rgba(144,101,176,0.12)] text-[#9065b0] dark:text-[#9a6dd7] border border-[rgba(144,101,176,0.25)] px-1.5 py-0.2 text-[11px]">
                     <Repeat className="h-3 w-3" />
                     {parsed.recurrence.toLowerCase()}
                   </span>
                 )}
                 {parsed.priority !== null && parsed.priority !== undefined && (
-                  <span className="rounded-md bg-amber-500/15 px-1.5 py-0.5 font-semibold text-amber-400">
+                  <span className="rounded-[3px] bg-[rgba(203,145,47,0.1)] text-[#dfab01] dark:text-[#f3cd46] border border-[rgba(203,145,47,0.25)] px-1.5 py-0.2 text-[11px] font-mono">
                     P{parsed.priority}
                   </span>
                 )}
                 {parsed.tags?.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-md bg-indigo-500/15 px-1.5 py-0.5 font-semibold text-indigo-400"
+                    className="rounded-[3px] bg-[rgba(35,131,226,0.1)] text-[#2383e2] dark:text-[#529cca] border border-[rgba(35,131,226,0.25)] px-1.5 py-0.2 text-[11px]"
                   >
                     #{tag}
                   </span>
                 ))}
                 {parsed.durationMinutes ? (
-                  <span className="rounded-md bg-emerald-500/15 px-1.5 py-0.5 font-semibold text-emerald-400">
+                  <span className="rounded-[3px] bg-[rgba(68,131,97,0.1)] text-[#448361] dark:text-[#4dab9a] border border-[rgba(68,131,97,0.25)] px-1.5 py-0.2 text-[11px] font-mono">
                     {parsed.durationMinutes}m
                   </span>
                 ) : null}
@@ -276,37 +276,37 @@ export function QuickAddModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Add description, notes, or checklist items..."
-              className="w-full rounded-xl border border-[var(--app-border)] bg-[var(--app-bg)]/60 p-2.5 app-label text-[var(--app-text)] placeholder-[var(--app-muted)] focus:border-[var(--app-accent)] focus:outline-none"
+              className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] p-2 text-xs text-[var(--app-text)] placeholder-[var(--app-muted)] focus:border-[var(--app-accent)] focus:outline-none"
             />
           </div>
 
           {/* Quick Date Presets */}
-          <div className="flex items-center gap-1.5 app-label">
+          <div className="flex items-center gap-1 text-xs">
             <button
               type="button"
               onClick={() => setDueDate(today)}
-              className={`rounded-lg px-2.5 py-1 app-label font-medium transition-colors ${ dueDate === today ? "bg-[var(--app-accent)]/20 text-[var(--app-accent-text)] border border-[var(--app-accent)]/40" : "bg-[var(--app-panel-alt)] text-[var(--app-muted)] hover:text-white" }`}
+              className={`rounded-[3px] px-2 py-0.5 text-xs font-medium transition-colors cursor-pointer ${ dueDate === today ? "bg-[rgba(35,131,226,0.12)] text-[#2383e2] dark:text-[#529cca] border border-[rgba(35,131,226,0.25)]" : "bg-[var(--app-panel)] border border-[var(--app-border)] text-[var(--app-muted)] hover:text-[var(--app-text)]" }`}
             >
               Today
             </button>
             <button
               type="button"
               onClick={() => setDueDate(addDays(today, 1))}
-              className={`rounded-lg px-2.5 py-1 app-label font-medium transition-colors ${ dueDate === addDays(today, 1) ? "bg-[var(--app-accent)]/20 text-[var(--app-accent-text)] border border-[var(--app-accent)]/40" : "bg-[var(--app-panel-alt)] text-[var(--app-muted)] hover:text-white" }`}
+              className={`rounded-[3px] px-2 py-0.5 text-xs font-medium transition-colors cursor-pointer ${ dueDate === addDays(today, 1) ? "bg-[rgba(35,131,226,0.12)] text-[#2383e2] dark:text-[#529cca] border border-[rgba(35,131,226,0.25)]" : "bg-[var(--app-panel)] border border-[var(--app-border)] text-[var(--app-muted)] hover:text-[var(--app-text)]" }`}
             >
               Tomorrow
             </button>
             <button
               type="button"
               onClick={() => setDueDate(addDays(today, 7))}
-              className={`rounded-lg px-2.5 py-1 app-label font-medium transition-colors ${ dueDate === addDays(today, 7) ? "bg-[var(--app-accent)]/20 text-[var(--app-accent-text)] border border-[var(--app-accent)]/40" : "bg-[var(--app-panel-alt)] text-[var(--app-muted)] hover:text-white" }`}
+              className={`rounded-[3px] px-2 py-0.5 text-xs font-medium transition-colors cursor-pointer ${ dueDate === addDays(today, 7) ? "bg-[rgba(35,131,226,0.12)] text-[#2383e2] dark:text-[#529cca] border border-[rgba(35,131,226,0.25)]" : "bg-[var(--app-panel)] border border-[var(--app-border)] text-[var(--app-muted)] hover:text-[var(--app-text)]" }`}
             >
               Next Week
             </button>
             <button
               type="button"
               onClick={() => setDueDate("")}
-              className={`rounded-lg px-2 py-1 app-label transition-colors ${ !dueDate ? "bg-[var(--app-panel-alt)] text-white" : "text-[var(--app-muted)] hover:text-[var(--app-muted)]" }`}
+              className={`rounded-[3px] px-2 py-0.5 text-xs transition-colors cursor-pointer ${ !dueDate ? "bg-[var(--app-hover)] text-[var(--app-text)] border border-[var(--app-border)]" : "border border-transparent text-[var(--app-muted)] hover:text-[var(--app-muted)]" }`}
             >
               No Date
             </button>
@@ -322,7 +322,7 @@ export function QuickAddModal({
               <button
                 type="button"
                 onClick={() => setShowDatePicker(!showDatePicker)}
-                className="flex w-full items-center justify-between rounded-xl border border-[var(--app-border)] bg-[var(--app-bg)] px-3 py-2 app-label text-white hover:bg-[var(--app-panel-alt)] transition-colors"
+                className="flex w-full items-center justify-between rounded-[4px] border border-[var(--app-border)] bg-[var(--app-canvas)] px-2.5 py-1.5 text-xs text-[var(--app-text)] hover:bg-[var(--app-panel-hover)] transition-colors"
               >
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-[var(--app-muted)]" />
@@ -395,7 +395,7 @@ export function QuickAddModal({
                   setListId(e.target.value);
                   setGroupId(null);
                 }}
-                className="w-full rounded-xl border border-[var(--app-border)] bg-[var(--app-bg)] px-2.5 py-1.5 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-canvas)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)]"
               >
                 <option value="inbox">📥 Inbox</option>
                 {lists.map((l) => (
@@ -408,13 +408,13 @@ export function QuickAddModal({
 
             {availableGroups.length > 0 && (
               <div>
-                <label className="block app-overline font-semibold text-[var(--app-muted)] mb-1">
+                <label className="block text-[11px] font-medium text-[var(--app-muted)] uppercase tracking-wider mb-1">
                   Group / Section
                 </label>
                 <select
                   value={groupId || ""}
                   onChange={(e) => setGroupId(e.target.value || null)}
-                  className="w-full rounded-xl border border-[var(--app-border)] bg-[var(--app-bg)] px-2.5 py-1.5 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                  className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-canvas)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)]"
                 >
                   <option value="">None (Ungrouped)</option>
                   {availableGroups.map((g) => (
@@ -427,13 +427,13 @@ export function QuickAddModal({
             )}
 
             <div>
-              <label className="block app-overline font-semibold text-[var(--app-muted)] mb-1">
+              <label className="block text-[11px] font-medium text-[var(--app-muted)] uppercase tracking-wider mb-1">
                 Priority
               </label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(Number(e.target.value))}
-                className="w-full rounded-xl border border-[var(--app-border)] bg-[var(--app-bg)] px-2.5 py-1.5 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-canvas)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)]"
               >
                 <option value="0">⚪ None</option>
                 <option value="1">🔵 Low Priority</option>
@@ -450,7 +450,7 @@ export function QuickAddModal({
               <select
                 value={recurrence}
                 onChange={(e) => setRecurrence(e.target.value)}
-                className="w-full rounded-xl border border-[var(--app-border)] bg-[var(--app-bg)] px-2.5 py-1.5 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)]"
               >
                 <option value="NONE">Never</option>
                 <option value="DAILY">🔁 Daily</option>
@@ -460,13 +460,13 @@ export function QuickAddModal({
             </div>
 
             <div>
-              <label className="block app-overline font-semibold text-[var(--app-muted)] mb-1">
+              <label className="block text-[11px] font-semibold text-[var(--app-muted)] uppercase tracking-wider mb-1">
                 Reminder
               </label>
               <select
                 value={reminder}
                 onChange={(e) => setReminder(e.target.value)}
-                className="w-full rounded-xl border border-[var(--app-border)] bg-[var(--app-bg)] px-2.5 py-1.5 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)]"
               >
                 <option value="NONE">None</option>
                 <option value="AT_TIME">🔔 At time of event</option>
@@ -482,7 +482,7 @@ export function QuickAddModal({
           {/* Tags */}
           {tags.length > 0 && (
             <div>
-              <label className="block app-overline font-semibold text-[var(--app-muted)] mb-1">
+              <label className="block text-[11px] font-semibold text-[var(--app-muted)] uppercase tracking-wider mb-1">
                 Tags
               </label>
               <div className="flex flex-wrap gap-1.5">
@@ -493,7 +493,7 @@ export function QuickAddModal({
                       key={tag.id}
                       type="button"
                       onClick={() => toggleTag(tag.id)}
-                      className={`rounded-full px-2.5 py-0.5 app-label font-medium transition-all ${ isSelected ? "bg-indigo-500 text-white shadow-xs" : "border border-[var(--app-border)] bg-[var(--app-bg)] text-[var(--app-muted)] hover:text-white" }`}
+                      className={`rounded-[3px] px-2 py-0.5 text-xs font-medium transition-colors cursor-pointer ${ isSelected ? "bg-[rgba(35,131,226,0.12)] text-[#2383e2] dark:text-[#529cca] border border-[rgba(35,131,226,0.25)]" : "border border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-muted)] hover:text-[var(--app-text)]" }`}
                     >
                       #{tag.name}
                     </button>
@@ -508,13 +508,13 @@ export function QuickAddModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl px-3.5 py-1.5 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
+              className="rounded-[4px] px-3 py-1 text-xs text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)] transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="rounded-xl bg-[var(--app-accent-strong)] px-4 py-1.5 app-label font-semibold text-white shadow-md shadow-[var(--app-accent)]/25 hover:bg-[var(--app-accent-strong)] transition-all active:scale-95"
+              className="rounded-[4px] bg-[var(--app-accent)] hover:bg-[var(--app-accent)]/90 px-3.5 py-1 text-xs font-medium text-white transition-colors cursor-pointer shadow-none"
             >
               Add Task
             </button>

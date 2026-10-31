@@ -58,13 +58,13 @@ const DAY_WIDTH = 44;
 const MIN_WINDOW_DAYS = 14;
 const MIN_BAR_WIDTH = 10;
 const DRAG_THRESHOLD_PX = 3;
-const ACCENT = "var(--app-accent, #4dabf7)";
+const ACCENT = "var(--app-accent, #2383e2)";
 
 const PRIORITY_COLORS: Record<number, string> = {
-  3: "#ef4444",
-  2: "#f59e0b",
-  1: "#4772fa",
-  0: "#94a3b8",
+  3: "#eb5757", // Notion Red
+  2: "#dfab01", // Notion Yellow
+  1: "#2383e2", // Notion Blue
+  0: "#999999", // Notion Gray
 };
 
 const PRIORITY_LABELS: Array<{ priority: number; label: string }> = [
@@ -395,21 +395,21 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
   const rangeLabel = `${format(windowStart, "d MMM")} – ${format(windowEnd, "d MMM yyyy")}`;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] shadow-sm transition-colors">
+    <div className="flex min-h-0 flex-1 flex-col rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] transition-colors">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--app-border)] px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--app-border)] px-4 py-2.5">
         <div className="flex items-center gap-2.5">
-          <CalendarDays className="h-5 w-5" style={{ color: ACCENT }} />
-          <div className="flex flex-col">
-            <h2 className="app-heading font-semibold text-[var(--app-text)] flex items-center gap-2">
+          <CalendarDays className="h-4 w-4 text-[var(--app-accent)]" />
+          <div className="flex items-center gap-2">
+            <h2 className="text-sm font-semibold text-[var(--app-text)] flex items-center gap-2">
               Timeline
               {isLoading && tasks.length === 0 && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--app-panel-alt)] px-2 py-0.5 app-meta font-normal text-[var(--app-muted)] animate-pulse">
+                <span className="inline-flex items-center gap-1 rounded-[3px] bg-[var(--app-hover)] px-2 py-0.5 text-xs text-[var(--app-muted)] animate-pulse">
                   <span className="h-1.5 w-1.5 rounded-full bg-[var(--app-accent)]" /> Syncing tasks…
                 </span>
               )}
             </h2>
-            <span className="app-label text-[var(--app-muted)]">{rangeLabel}</span>
+            <span className="text-xs text-[var(--app-muted)]">· {rangeLabel}</span>
           </div>
         </div>
 
@@ -417,27 +417,26 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
           <button
             type="button"
             onClick={goToday}
-            className="rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-1 app-label font-medium text-[var(--app-text)] transition-colors hover:bg-[var(--app-panel-alt)]"
-            style={{ borderColor: "var(--app-border, currentColor)" }}
+            className="h-7 rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 text-xs font-medium text-[var(--app-text)] transition-colors hover:bg-[var(--app-hover)]"
           >
             Today
           </button>
-          <div className="flex items-center rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)]">
+          <div className="flex items-center rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] p-0.5">
             <button
               type="button"
               onClick={goPrev}
               aria-label="Previous week"
-              className="p-1 text-[var(--app-text)] transition-colors hover:text-[var(--app-text)] dark:hover:text-white"
+              className="p-1 text-[var(--app-muted)] transition-colors hover:text-[var(--app-text)] hover:bg-[var(--app-hover)] rounded-[3px]"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-3.5 w-3.5" />
             </button>
             <button
               type="button"
               onClick={goNext}
               aria-label="Next week"
-              className="p-1 text-[var(--app-text)] transition-colors hover:text-[var(--app-text)] dark:hover:text-white"
+              className="p-1 text-[var(--app-muted)] transition-colors hover:text-[var(--app-text)] hover:bg-[var(--app-hover)] rounded-[3px]"
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
@@ -445,8 +444,8 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
 
       {/* Unscheduled tray */}
       {unscheduled.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 border-b border-[var(--app-border)] bg-[var(--app-panel-alt)]/70 px-4 py-2.5">
-          <span className="flex items-center gap-1 app-meta font-semibold uppercase tracking-wide text-[var(--app-muted)]">
+        <div className="flex flex-wrap items-center gap-2 border-b border-[var(--app-border)] bg-[var(--app-panel)]/50 px-4 py-2">
+          <span className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--app-muted)]">
             <Plus className="h-3 w-3" />
             Unscheduled
           </span>
@@ -455,7 +454,7 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
               key={task.id}
               type="button"
               onClick={() => onSelectTask(task.id)}
-              className="group flex max-w-[220px] items-center gap-1.5 rounded-full border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1 app-label text-[var(--app-text)] transition-colors hover:border-[var(--app-border)] hover:bg-[var(--app-panel-alt)]"
+              className="group flex max-w-[220px] items-center gap-1.5 rounded-[3px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2 py-0.5 text-xs text-[var(--app-text)] transition-colors hover:bg-[var(--app-hover)]"
             >
               <span
                 className="h-1.5 w-1.5 shrink-0 rounded-full"
@@ -600,7 +599,7 @@ export function TimelineView({ tasks, onSelectTask, onUpdateTask, isLoading }: T
                             onSelectTask(task.id);
                           }
                         }}
-                        className={`group absolute top-1.5 flex h-8 select-none items-center overflow-hidden rounded-lg border border-[var(--app-border)] shadow-xs transition-[filter,opacity] hover:brightness-110 ${ task.completed ? "opacity-50" : "" } ${isDragging ? "cursor-grabbing ring-2 ring-white/60" : "cursor-grab"}`}
+                        className={`group absolute top-1.5 flex h-8 select-none items-center overflow-hidden rounded-[4px] border border-black/10 dark:border-white/10 shadow-xs transition-[filter,opacity] hover:brightness-110 ${ task.completed ? "opacity-50" : "" } ${isDragging ? "cursor-grabbing ring-2 ring-[var(--app-accent)]" : "cursor-grab"}`}
                         style={{
                           left,
                           width,

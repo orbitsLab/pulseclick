@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   CheckSquare,
   Calendar as CalendarIcon,
@@ -11,12 +11,12 @@ import {
   Moon,
   LogOut,
   Palette,
-  Check,
   GanttChartSquare,
   BarChart3,
   TimerReset,
   Settings2,
 } from "lucide-react";
+import { SideTooltip } from "@/components/ui/tooltip";
 
 export type WorkspaceModule =
   | "tasks"
@@ -48,82 +48,114 @@ export function ModuleRail({
   onLogout,
   onOpenThemePicker,
 }: ModuleRailProps) {
-  const modules: { id: WorkspaceModule; label: string; icon: React.ReactNode }[] = [
-    { id: "tasks", label: "Tasks", icon: <CheckSquare className="h-5 w-5" /> },
-    { id: "calendar", label: "Calendar", icon: <CalendarIcon className="h-5 w-5" /> },
-    { id: "timeline", label: "Timeline", icon: <GanttChartSquare className="h-5 w-5" /> },
-    { id: "habits", label: "Habits", icon: <Flame className="h-5 w-5" /> },
-    { id: "matrix", label: "Eisenhower Matrix", icon: <Grid2x2 className="h-5 w-5" /> },
-    { id: "pomodoro", label: "Pomodoro Focus", icon: <Timer className="h-5 w-5" /> },
-    { id: "countdown", label: "Countdowns", icon: <TimerReset className="h-5 w-5" /> },
-    { id: "statistics", label: "Statistics", icon: <BarChart3 className="h-5 w-5" /> },
-    { id: "settings", label: "Settings", icon: <Settings2 className="h-5 w-5" /> },
+  const modules: { id: WorkspaceModule; label: string; shortcut: string; icon: React.ReactNode }[] = [
+    { id: "tasks", label: "Tasks", shortcut: "1", icon: <CheckSquare className="h-4.5 w-4.5" /> },
+    { id: "calendar", label: "Calendar", shortcut: "2", icon: <CalendarIcon className="h-4.5 w-4.5" /> },
+    { id: "timeline", label: "Timeline", shortcut: "3", icon: <GanttChartSquare className="h-4.5 w-4.5" /> },
+    { id: "habits", label: "Habits", shortcut: "4", icon: <Flame className="h-4.5 w-4.5" /> },
+    { id: "matrix", label: "Eisenhower Matrix", shortcut: "5", icon: <Grid2x2 className="h-4.5 w-4.5" /> },
+    { id: "pomodoro", label: "Pomodoro Focus", shortcut: "6", icon: <Timer className="h-4.5 w-4.5" /> },
+    { id: "countdown", label: "Countdowns", shortcut: "7", icon: <TimerReset className="h-4.5 w-4.5" /> },
+    { id: "statistics", label: "Statistics", shortcut: "8", icon: <BarChart3 className="h-4.5 w-4.5" /> },
+    { id: "settings", label: "Settings", shortcut: "9", icon: <Settings2 className="h-4.5 w-4.5" /> },
   ];
 
   return (
-    <aside className="hidden md:flex flex-col items-center justify-between border-r border-[var(--app-border)] bg-[var(--app-rail)] py-4 px-2 text-[var(--app-muted)] select-none z-30 w-16 flex-shrink-0">
-      {/* Brand icon / User avatar */}
-      <div className="flex flex-col items-center gap-4">
-        <div
-          title="PulseFlow"
-          className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--app-accent)] to-indigo-600 font-extrabold text-white text-xl shadow-md shadow-[var(--app-accent)]/25 cursor-pointer"
+    <aside className="hidden md:flex flex-col items-center justify-between border-r border-[var(--app-border)] bg-[var(--app-rail)] py-3 px-1.5 text-[var(--app-muted)] select-none z-30 w-14 flex-shrink-0">
+      {/* Notion Workspace Brand Mark */}
+      <div className="flex flex-col items-center gap-3">
+        <SideTooltip
+          content="PulseFlow Workspace"
+          description="Productivity & Habit Tracker"
+          side="right"
+          sideOffset={12}
         >
-          ✓
-        </div>
+          <div
+            className="flex h-8 w-8 items-center justify-center rounded-[5px] border border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-text)] font-semibold text-xs shadow-xs cursor-pointer hover:bg-[var(--app-hover)] transition-colors"
+          >
+            <span className="text-[var(--app-accent)] font-bold">P</span>
+          </div>
+        </SideTooltip>
 
         {/* Navigation module icons */}
-        <nav className="flex flex-col items-center gap-2 mt-2">
+        <nav className="flex flex-col items-center gap-1 mt-1">
           {modules.map((m) => {
             const isActive = activeModule === m.id;
             return (
-              <button
+              <SideTooltip
                 key={m.id}
-                type="button"
-                onClick={() => onSelectModule(m.id)}
-                title={m.label}
-                className={`relative flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-150 ${ isActive ? "bg-[var(--app-accent-strong)] text-white shadow-lg shadow-[var(--app-accent)]/30 font-bold" : "text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-text)]" }`}
+                content={m.label}
+                shortcut={m.shortcut}
+                side="right"
+                sideOffset={12}
               >
-                {m.icon}
-                {isActive && (
-                  <span className="absolute -left-2 top-2 bottom-2 w-1 rounded-r-full bg-[var(--app-accent)]" />
-                )}
-              </button>
+                <button
+                  type="button"
+                  onClick={() => onSelectModule(m.id)}
+                  aria-label={m.label}
+                  className={`relative flex h-8 w-8 items-center justify-center rounded-[5px] transition-colors cursor-pointer ${
+                    isActive
+                      ? "bg-[var(--app-panel)] text-[var(--app-accent)] border border-[var(--app-border)] shadow-xs"
+                      : "text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)]"
+                  }`}
+                >
+                  {m.icon}
+                  {isActive && (
+                    <span className="absolute -left-1.5 top-2 bottom-2 w-0.5 rounded-r-full bg-[var(--app-accent)]" />
+                  )}
+                </button>
+              </SideTooltip>
             );
           })}
         </nav>
       </div>
 
       {/* Bottom controls: Theme picker, Theme toggle, Logout */}
-      <div className="flex flex-col items-center gap-3">
+      <div className="flex flex-col items-center gap-1.5">
         {onOpenThemePicker && (
-          <button
-            type="button"
-            onClick={onOpenThemePicker}
-            title="Themes"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-accent-text)] transition-colors"
-          >
-            <Palette className="h-4 w-4" />
-          </button>
+          <SideTooltip content="Themes" description="Customize interface theme" side="right" sideOffset={12}>
+            <button
+              type="button"
+              onClick={onOpenThemePicker}
+              aria-label="Themes"
+              className="flex h-8 w-8 items-center justify-center rounded-[5px] text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)] transition-colors cursor-pointer"
+            >
+              <Palette className="h-4 w-4" />
+            </button>
+          </SideTooltip>
         )}
 
-        <button
-          type="button"
-          onClick={onToggleTheme}
-          title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)] hover:text-amber-400 transition-colors"
+        <SideTooltip
+          content={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          side="right"
+          sideOffset={12}
         >
-          {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </button>
-
-        {user && (
           <button
             type="button"
-            onClick={onLogout}
-            title={`Sign out (${user.email})`}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--app-muted)] hover:bg-rose-500/20 hover:text-rose-400 transition-colors"
+            onClick={onToggleTheme}
+            aria-label={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            className="flex h-8 w-8 items-center justify-center rounded-[5px] text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)] transition-colors cursor-pointer"
           >
-            <LogOut className="h-4 w-4" />
+            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
+        </SideTooltip>
+
+        {user && (
+          <SideTooltip
+            content="Sign out"
+            description={user.email}
+            side="right"
+            sideOffset={12}
+          >
+            <button
+              type="button"
+              onClick={onLogout}
+              aria-label={`Sign out (${user.email})`}
+              className="flex h-8 w-8 items-center justify-center rounded-[5px] text-[var(--app-muted)] hover:bg-[#e03e3e]/15 hover:text-[#e03e3e] transition-colors cursor-pointer"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </SideTooltip>
         )}
       </div>
     </aside>

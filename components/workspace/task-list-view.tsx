@@ -43,7 +43,7 @@ export function TaskListSkeleton({ count = 5 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="flex items-center justify-between gap-3 rounded-xl border border-[var(--app-border)]/60 bg-[var(--app-panel)]/30 p-2.5 transition-opacity"
+          className="flex items-center justify-between gap-3 rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-2.5 transition-opacity"
           style={{ opacity: Math.max(0.35, 1 - i * 0.15) }}
         >
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
@@ -130,7 +130,17 @@ export function TaskListView(props: TaskListViewProps = {}) {
 
   const [groupToDelete, setGroupToDelete] = useState<TaskGroup | null>(null);
 
-  const colorPalette = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#a855f7", "#06b6d4"];
+  const colorPalette = [
+    "#9b9a97", // Gray
+    "#64473a", // Brown
+    "#d9730d", // Orange
+    "#dfab01", // Yellow
+    "#0f7b6c", // Green
+    "#0b6e99", // Blue
+    "#6940a5", // Purple
+    "#ad1a72", // Pink
+    "#e03e3e", // Red
+  ];
 
   const toggleSectionCollapse = (groupId: string) => {
     setCollapsedSections((prev) => ({
@@ -233,16 +243,24 @@ export function TaskListView(props: TaskListViewProps = {}) {
           e.dataTransfer.effectAllowed = "move";
         }}
         onClick={() => onSelectTask(task.id)}
-        className={`group relative flex items-center justify-between gap-3 rounded-xl border-y border-r p-2.5 sm:px-3.5 transition-all cursor-pointer ${getPriorityColor( task.priority )} ${ isSelected ? "border-y-[var(--app-accent)]/40 border-r-[var(--app-accent)]/40 bg-[var(--app-accent)]/10 shadow-xs" : isCheckedInBatch ? "border-y-indigo-500/40 border-r-indigo-500/40 bg-indigo-500/10" : "border-y-[var(--app-border)] border-r-[var(--app-border)] bg-[var(--app-panel)] hover:bg-[var(--app-panel-alt)]" } ${task.completed ? "opacity-60" : ""}`}
+        className={cn(
+          "group relative flex items-center justify-between gap-2.5 rounded-[4px] border border-[var(--app-border)]/70 py-1.5 px-2.5 sm:px-3 transition-colors cursor-pointer select-none mb-1",
+          isSelected
+            ? "border-[var(--app-accent)]/50 bg-[var(--app-active)]"
+            : isCheckedInBatch
+            ? "border-[var(--app-accent)]/40 bg-[var(--app-accent)]/10"
+            : "bg-[var(--app-panel)] hover:bg-[var(--app-hover)]",
+          task.completed && "opacity-60"
+        )}
       >
         {/* Left: Multi-select checkbox + Completion Checkbox + Title + Badges */}
-        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           {/* Multi-select box (visible on hover or when checked) */}
           <button
             type="button"
             onClick={(e) => toggleSelectTask(e, task.id)}
             title="Select for batch action"
-            className={`opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded text-[var(--app-muted)] hover:text-[var(--app-text)] ${ isCheckedInBatch ? "!opacity-100 text-[var(--app-accent-text)] font-bold" : "" }`}
+            className={`opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded-[3px] text-[var(--app-muted)] hover:text-[var(--app-text)] ${ isCheckedInBatch ? "!opacity-100 text-[var(--app-accent-text)] font-bold" : "" }`}
           >
             {isCheckedInBatch ? (
               <CheckSquare className="h-3.5 w-3.5" />
@@ -268,18 +286,18 @@ export function TaskListView(props: TaskListViewProps = {}) {
                     : "Mark complete (Right-click for options)"
                 }
                 className={cn(
-                  "flex h-4.5 w-4.5 flex-shrink-0 items-center justify-center rounded-md border transition-all active:scale-90 cursor-pointer",
+                  "flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-[3px] border transition-colors cursor-pointer",
                   task.completed
                     ? isWontDo
-                      ? "border-rose-500 bg-rose-500 text-white shadow-xs"
-                      : "border-[var(--app-accent)] bg-[var(--app-accent-strong)] text-white shadow-xs shadow-[var(--app-accent)]/30"
+                      ? "border-[#e03e3e] bg-[#e03e3e] text-white shadow-xs"
+                      : "border-[var(--app-accent)] bg-[var(--app-accent)] text-white shadow-xs"
                     : task.priority === 3
-                    ? "border-rose-500 hover:bg-rose-500/20"
+                    ? "border-[#e03e3e] hover:bg-[#e03e3e]/20"
                     : task.priority === 2
-                    ? "border-amber-500 hover:bg-amber-500/20"
+                    ? "border-[#dfab01] hover:bg-[#dfab01]/20"
                     : task.priority === 1
-                    ? "border-blue-400 hover:bg-blue-500/20"
-                    : "border-[var(--app-border)] hover:border-[var(--app-accent)] dark:hover:border-[var(--app-accent)]"
+                    ? "border-[#2383e2] hover:bg-[#2383e2]/20"
+                    : "border-[var(--app-border)] hover:border-[var(--app-accent)]"
                 )}
               >
                 {task.completed && (
@@ -294,7 +312,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
 
             <ContextMenuContent
               onClick={(e) => e.stopPropagation()}
-              className="w-48 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] shadow-xl p-1.5 z-50 rounded-xl"
+              className="w-48 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] shadow-[0_4px_16px_rgba(15,15,15,0.1),0_0_0_1px_rgba(15,15,15,0.08)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.08)] p-1 z-50 rounded-md"
             >
               <ContextMenuItem
                 onClick={(e) => {
@@ -306,14 +324,14 @@ export function TaskListView(props: TaskListViewProps = {}) {
                     kanbanStatus: nextCompleted ? "DONE" : "TODO",
                   });
                 }}
-                className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-lg text-xs hover:bg-[var(--app-panel-alt)]"
+                className="flex items-center justify-between cursor-pointer py-1 px-2 rounded-[4px] text-xs hover:bg-[var(--app-hover)] text-[var(--app-text)]"
               >
-                <span className="flex items-center gap-2">
-                  <Check className="h-3.5 w-3.5 text-emerald-500 stroke-[2.5]" />
+                <span className="flex items-center gap-1.5">
+                  <Check className="h-3.5 w-3.5 text-[#0f7b6c] stroke-[2.5]" />
                   Completed
                 </span>
                 {task.completed && !isWontDo && (
-                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                  <Check className="h-3.5 w-3.5 text-[#0f7b6c]" />
                 )}
               </ContextMenuItem>
 
@@ -327,13 +345,13 @@ export function TaskListView(props: TaskListViewProps = {}) {
                     kanbanStatus: nextWonDo ? "WONT_DO" : "TODO",
                   });
                 }}
-                className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-lg text-xs hover:bg-[var(--app-panel-alt)]"
+                className="flex items-center justify-between cursor-pointer py-1 px-2 rounded-[4px] text-xs hover:bg-[var(--app-hover)] text-[var(--app-text)]"
               >
-                <span className="flex items-center gap-2">
-                  <X className="h-3.5 w-3.5 text-rose-500 stroke-[2.5]" />
+                <span className="flex items-center gap-1.5">
+                  <X className="h-3.5 w-3.5 text-[#e03e3e] stroke-[2.5]" />
                   Won&apos;t Do
                 </span>
-                {isWontDo && <Check className="h-3.5 w-3.5 text-rose-500" />}
+                {isWontDo && <Check className="h-3.5 w-3.5 text-[#e03e3e]" />}
               </ContextMenuItem>
 
               {task.completed && (
@@ -348,7 +366,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
                         kanbanStatus: "TODO",
                       });
                     }}
-                    className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-lg text-xs text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]"
+                    className="flex items-center justify-between cursor-pointer py-1 px-2 rounded-[4px] text-xs text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]"
                   >
                     <span>Mark Incomplete</span>
                   </ContextMenuItem>
@@ -362,7 +380,15 @@ export function TaskListView(props: TaskListViewProps = {}) {
             type="button"
             onClick={(e) => cyclePriority(e, task)}
             title={`Priority: ${task.priority === 3 ? "High" : task.priority === 2 ? "Medium" : task.priority === 1 ? "Low" : "None"}. Click to cycle.`}
-            className={`p-0.5 rounded transition-all ${ task.priority === 3 ? "text-rose-500" : task.priority === 2 ? "text-amber-500" : task.priority === 1 ? "text-blue-400" : "text-[var(--app-muted)] dark:text-[var(--app-text)] hover:text-[var(--app-muted)]" }`}
+            className={`p-0.5 rounded-[3px] transition-colors cursor-pointer ${
+              task.priority === 3
+                ? "text-[#e03e3e]"
+                : task.priority === 2
+                ? "text-[#dfab01]"
+                : task.priority === 1
+                ? "text-[#2383e2]"
+                : "text-[var(--app-muted)] hover:text-[var(--app-text)]"
+            }`}
           >
             <Flag className="h-3 w-3 fill-current" />
           </button>
@@ -370,14 +396,16 @@ export function TaskListView(props: TaskListViewProps = {}) {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span
-                className={`app-heading font-semibold truncate ${ task.completed ? "line-through text-[var(--app-muted)]" : "text-[var(--app-text)] dark:text-[var(--app-text)]" }`}
+                className={`text-xs sm:text-sm font-medium truncate ${
+                  task.completed ? "line-through text-[var(--app-muted)]" : "text-[var(--app-text)]"
+                }`}
               >
                 {task.title}
               </span>
 
               {isWontDo && (
-                <span className="inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.2 app-meta font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25">
-                  <X className="h-3 w-3 stroke-[2.5]" />
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-[3px] px-1.5 py-0.2 text-[10px] font-semibold bg-[#e03e3e]/15 text-[#e03e3e] border border-[#e03e3e]/25">
+                  <X className="h-2.5 w-2.5 stroke-[2.5]" />
                   Won&apos;t Do
                 </span>
               )}
@@ -424,21 +452,21 @@ export function TaskListView(props: TaskListViewProps = {}) {
               {schedule && (
                 <span
                   className={cn(
-                    "inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium transition-colors app-meta",
+                    "inline-flex items-center gap-1 rounded-[3px] px-1.5 py-0.5 text-[11px] font-medium transition-colors",
                     schedule.isOverdue
-                      ? "bg-rose-500/15 text-rose-500 font-bold"
+                      ? "bg-[#e03e3e]/15 text-[#e03e3e]"
                       : schedule.isDueToday
-                      ? "bg-[var(--app-accent)]/15 text-[var(--app-accent-text)] font-semibold"
-                      : "bg-[var(--app-panel-alt)] text-[var(--app-text)] dark:text-[var(--app-muted)]"
+                      ? "bg-[var(--app-accent)]/15 text-[var(--app-accent-text)]"
+                      : "bg-[var(--app-panel-alt)] text-[var(--app-muted)] border border-[var(--app-border)]/60"
                   )}
                 >
                   <Calendar className="h-3 w-3 shrink-0" />
                   <span>{schedule.dateLabel}</span>
                   {schedule.timeLabel && (
-                    <span className="opacity-80 font-mono app-meta">{schedule.timeLabel}</span>
+                    <span className="opacity-80 font-mono text-[10px]">{schedule.timeLabel}</span>
                   )}
                   {schedule.durationBadge && (
-                    <span className="ml-0.5 rounded px-1 py-0.2 bg-[var(--app-accent)]/20 text-[var(--app-accent-text)] font-mono app-meta font-semibold">
+                    <span className="ml-0.5 rounded-[2px] px-1 py-0.2 bg-[var(--app-accent)]/20 text-[var(--app-accent-text)] font-mono text-[10px] font-semibold">
                       {schedule.durationBadge}
                     </span>
                   )}
@@ -446,21 +474,21 @@ export function TaskListView(props: TaskListViewProps = {}) {
               )}
 
               {task.recurrence && task.recurrence !== "NONE" && (
-                <span className="flex items-center gap-0.5 text-indigo-400" title={`Repeats ${task.recurrence}`}>
+                <span className="flex items-center gap-0.5 text-[var(--app-accent)] text-[11px]" title={`Repeats ${task.recurrence}`}>
                   <Repeat className="h-2.5 w-2.5" />
                   {task.recurrence.toLowerCase()}
                 </span>
               )}
 
               {totalSubtasks > 0 && (
-                <span className="inline-flex items-center gap-1 font-semibold text-[var(--app-muted)]">
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[var(--app-muted)]">
                   <CheckCircle2 className="h-3 w-3 text-[var(--app-accent-text)]" />
                   {completedSubtasks}/{totalSubtasks}
                 </span>
               )}
 
               {task.pomodoroCount > 0 && (
-                <span className="inline-flex items-center gap-0.5 text-rose-400 font-semibold" title="Focus sessions">
+                <span className="inline-flex items-center gap-0.5 text-[#e03e3e] text-[11px] font-medium" title="Focus sessions">
                   🍅 {task.pomodoroCount}
                 </span>
               )}
@@ -468,8 +496,8 @@ export function TaskListView(props: TaskListViewProps = {}) {
               {task.tags?.map(({ tag }) => (
                 <span
                   key={tag.id}
-                  className="rounded px-1.5 py-0.2 font-semibold"
-                  style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
+                  className="rounded-[3px] px-1.5 py-0.5 text-[11px] font-medium border"
+                  style={{ backgroundColor: `${tag.color}15`, color: tag.color, borderColor: `${tag.color}30` }}
                 >
                   #{tag.name}
                 </span>
@@ -570,8 +598,8 @@ export function TaskListView(props: TaskListViewProps = {}) {
           }
         }}
         className={cn(
-          "rounded-xl border border-transparent transition-all p-2 space-y-2",
-          isDragOver && "border-[var(--app-accent)] bg-[var(--app-accent)]/10 ring-1 ring-[var(--app-accent)]"
+          "rounded-[6px] border border-transparent transition-colors p-2 space-y-2",
+          isDragOver && "border-[var(--app-accent)] bg-[var(--app-accent-tag-bg)]"
         )}
       >
         {/* Section Header */}
@@ -645,7 +673,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
                   });
                   setQuickAddTitle((prev) => ({ ...prev, [groupId || "ungrouped"]: "" }));
                 }}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-dashed border-[var(--app-border)]/80 hover:border-[var(--app-accent)]/60 bg-[var(--app-panel)]/30 hover:bg-[var(--app-panel)]/60 transition-all text-xs"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-[4px] border border-dashed border-[var(--app-border)] hover:border-[var(--app-accent)] bg-[var(--app-panel)] hover:bg-[var(--app-panel-hover)] transition-colors text-xs"
               >
                 <Plus className="h-3.5 w-3.5 text-[var(--app-muted)] shrink-0" />
                 <input
@@ -917,22 +945,24 @@ export function TaskListView(props: TaskListViewProps = {}) {
 
       {/* Floating Batch Actions Bar */}
       {selectedTaskIds.length > 0 && onBatchAction && (
-        <div className="absolute bottom-3 left-4 right-4 z-30 flex items-center justify-between rounded-2xl border border-[var(--app-border)] bg-[var(--app-rail)]/95 p-3 shadow-2xl backdrop-blur-md animate-in slide-in-from-bottom duration-200">
-          <div className="flex items-center gap-3">
-            <span className="rounded-lg bg-[var(--app-accent-strong)] px-2 py-0.5 app-label font-semibold text-white">
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] px-3 py-1.5 shadow-[0_8px_30px_rgba(15,15,15,0.12),0_0_0_1px_rgba(15,15,15,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.08)] animate-in slide-in-from-bottom-2 duration-150">
+          <div className="flex items-center gap-2 mr-1">
+            <span className="rounded-[3px] bg-[var(--app-accent)] px-1.5 py-0.2 text-xs font-semibold text-white">
               {selectedTaskIds.length}
             </span>
-            <span className="app-label font-medium text-[var(--app-text)]">Selected</span>
+            <span className="text-xs text-[var(--app-text)] font-medium">Selected</span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="h-4 w-px bg-[var(--app-border)]" />
+
+          <div className="flex items-center gap-1.5">
             <button
               type="button"
               onClick={async () => {
                 await onBatchAction({ taskIds: selectedTaskIds, action: "complete", value: true });
                 setSelectedTaskIds([]);
               }}
-              className="rounded-lg bg-[var(--app-accent)]/20 px-2.5 py-1 app-label font-medium text-[var(--app-accent-text)] hover:bg-[var(--app-accent-strong)]/30"
+              className="rounded-[4px] bg-[var(--app-accent)]/15 border border-[var(--app-accent)]/20 px-2 py-0.5 text-xs font-medium text-[var(--app-accent-text)] hover:bg-[var(--app-accent)]/25 cursor-pointer"
             >
               Complete ✓
             </button>
@@ -943,7 +973,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
                 await onBatchAction({ taskIds: selectedTaskIds, action: "dueDate", value: today });
                 setSelectedTaskIds([]);
               }}
-              className="rounded-lg bg-[var(--app-panel-alt)] px-2.5 py-1 app-label font-medium text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
+              className="rounded-[4px] bg-[var(--app-panel-alt)] border border-[var(--app-border)]/60 px-2 py-0.5 text-xs font-medium text-[var(--app-text)] hover:bg-[var(--app-hover)] cursor-pointer"
             >
               Set Today
             </button>
@@ -954,7 +984,7 @@ export function TaskListView(props: TaskListViewProps = {}) {
                 await onBatchAction({ taskIds: selectedTaskIds, action: "priority", value: 3 });
                 setSelectedTaskIds([]);
               }}
-              className="rounded-lg bg-rose-500/20 px-2.5 py-1 app-label font-medium text-rose-400 hover:bg-rose-500/30"
+              className="rounded-[4px] bg-[#e03e3e]/15 border border-[#e03e3e]/20 px-2 py-0.5 text-xs font-medium text-[#e03e3e] hover:bg-[#e03e3e]/25 cursor-pointer"
             >
               High Priority
             </button>
@@ -965,19 +995,19 @@ export function TaskListView(props: TaskListViewProps = {}) {
                 await onBatchAction({ taskIds: selectedTaskIds, action: "delete" });
                 setSelectedTaskIds([]);
               }}
-              className="rounded-lg p-1 text-[var(--app-muted)] hover:text-rose-400 hover:bg-[var(--app-panel-alt)]"
+              className="rounded-[4px] p-1 text-[var(--app-muted)] hover:text-[#e03e3e] hover:bg-[#e03e3e]/15 cursor-pointer transition-colors"
               title="Delete selected"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-3.5 w-3.5" />
             </button>
 
             <button
               type="button"
               onClick={() => setSelectedTaskIds([])}
-              className="rounded-lg p-1 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)]"
+              className="rounded-[4px] p-1 text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)] cursor-pointer transition-colors"
               title="Cancel selection"
             >
-              <X className="h-4 w-4" />
+              <X className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
@@ -999,9 +1029,9 @@ export function TaskListView(props: TaskListViewProps = {}) {
 
       {/* New Group Modal */}
       {showAddGroupModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-xs rounded-xl border border-[var(--app-border)] bg-[var(--app-rail)] p-4 text-[var(--app-text)] shadow-xl">
-            <h4 className="app-label font-semibold mb-3 uppercase tracking-wider">New Group</h4>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px] p-4">
+          <div className="w-full max-w-xs rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] p-4 text-[var(--app-text)] shadow-[0_8px_30px_rgba(15,15,15,0.12),0_0_0_1px_rgba(15,15,15,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.08)]">
+            <h4 className="text-xs font-semibold mb-3 uppercase tracking-wider text-[var(--app-text)]">New Group</h4>
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
@@ -1023,16 +1053,16 @@ export function TaskListView(props: TaskListViewProps = {}) {
                 value={newGroupName}
                 onChange={(e) => setNewGroupName(e.target.value)}
                 placeholder="Group name (e.g. Backlog, Sprint 1)"
-                className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/30"
               />
               <div className="flex items-center gap-2">
-                <span className="app-label text-[var(--app-muted)]">Color:</span>
+                <span className="text-xs text-[var(--app-muted)]">Color:</span>
                 {colorPalette.map((c) => (
                   <button
                     key={c}
                     type="button"
                     onClick={() => setNewGroupColor(c)}
-                    className={`h-5 w-5 rounded-full ${newGroupColor === c ? "ring-2 ring-[var(--app-panel)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
+                    className={`h-4.5 w-4.5 rounded-full cursor-pointer ${newGroupColor === c ? "ring-2 ring-[var(--app-accent)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
                     style={{ backgroundColor: c }}
                   />
                 ))}
@@ -1041,14 +1071,14 @@ export function TaskListView(props: TaskListViewProps = {}) {
                 <button
                   type="button"
                   onClick={() => setShowAddGroupModal(false)}
-                  className="rounded px-2.5 py-1 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
+                  className="rounded-[4px] px-2.5 py-1 text-xs text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!newGroupName.trim()}
-                  className="rounded bg-[var(--app-accent-strong)] px-3 py-1 app-label font-medium text-white hover:bg-[var(--app-accent-strong)] disabled:opacity-50"
+                  className="rounded-[4px] bg-[var(--app-accent)] px-3 py-1 text-xs font-medium text-white hover:bg-[var(--app-accent-strong)] disabled:opacity-40 cursor-pointer shadow-xs"
                 >
                   Save
                 </button>
@@ -1060,9 +1090,9 @@ export function TaskListView(props: TaskListViewProps = {}) {
 
       {/* Edit Group Modal */}
       {editingGroup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-xs rounded-xl border border-[var(--app-border)] bg-[var(--app-rail)] p-4 text-[var(--app-text)] shadow-xl">
-            <h4 className="app-label font-semibold mb-3 uppercase tracking-wider">Edit Group</h4>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px] p-4">
+          <div className="w-full max-w-xs rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] p-4 text-[var(--app-text)] shadow-[0_8px_30px_rgba(15,15,15,0.12),0_0_0_1px_rgba(15,15,15,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.08)]">
+            <h4 className="text-xs font-semibold mb-3 uppercase tracking-wider text-[var(--app-text)]">Edit Group</h4>
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
@@ -1083,16 +1113,16 @@ export function TaskListView(props: TaskListViewProps = {}) {
                 value={editGroupName}
                 onChange={(e) => setEditGroupName(e.target.value)}
                 placeholder="Group name"
-                className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/30"
               />
               <div className="flex items-center gap-2">
-                <span className="app-label text-[var(--app-muted)]">Color:</span>
+                <span className="text-xs text-[var(--app-muted)]">Color:</span>
                 {colorPalette.map((c) => (
                   <button
                     key={c}
                     type="button"
                     onClick={() => setEditGroupColor(c)}
-                    className={`h-5 w-5 rounded-full ${editGroupColor === c ? "ring-2 ring-[var(--app-panel)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
+                    className={`h-4.5 w-4.5 rounded-full cursor-pointer ${editGroupColor === c ? "ring-2 ring-[var(--app-accent)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
                     style={{ backgroundColor: c }}
                   />
                 ))}
@@ -1101,13 +1131,13 @@ export function TaskListView(props: TaskListViewProps = {}) {
                 <button
                   type="button"
                   onClick={() => setEditingGroup(null)}
-                  className="rounded px-2.5 py-1 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
+                  className="rounded-[4px] px-2.5 py-1 text-xs text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded bg-[var(--app-accent-strong)] px-3 py-1 app-label font-medium text-white hover:bg-[var(--app-accent-strong)]"
+                  className="rounded-[4px] bg-[var(--app-accent)] px-3 py-1 text-xs font-medium text-white hover:bg-[var(--app-accent-strong)] cursor-pointer shadow-xs"
                 >
                   Update
                 </button>

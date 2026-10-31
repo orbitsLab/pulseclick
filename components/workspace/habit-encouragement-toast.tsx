@@ -40,36 +40,30 @@ export function HabitEncouragementToast({
     DEFAULT_QUOTES[Math.floor(Math.random() * DEFAULT_QUOTES.length)];
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 max-w-sm w-full animate-in slide-in-from-bottom-5 fade-in duration-200">
-      <div className="relative overflow-hidden rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4 shadow-2xl backdrop-blur-md">
-        {/* Glow accent */}
-        <div
-          className="absolute -top-12 -right-12 h-28 w-28 rounded-full opacity-20 blur-2xl pointer-events-none"
-          style={{ backgroundColor: color }}
-        />
-
+    <div className="fixed bottom-6 right-6 z-50 max-w-sm w-full animate-in slide-in-from-bottom-3 fade-in duration-150">
+      <div className="relative overflow-hidden rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3.5 shadow-xl">
         <div className="flex items-start gap-3">
           <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-bold text-white shadow-md"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] text-white"
             style={{ backgroundColor: color }}
           >
-            <Sparkles className="h-5 w-5" />
+            <Sparkles className="h-4 w-4" />
           </div>
 
-          <div className="flex-1 min-w-0 pr-4">
-            <div className="flex items-center gap-2">
-              <span className="app-label font-bold text-[var(--app-text)] truncate">
+          <div className="flex-1 min-w-0 pr-2">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-xs font-semibold text-[var(--app-text)] truncate">
                 {habitTitle} completed!
               </span>
               {streak > 0 && (
-                <span className="flex items-center gap-0.5 rounded-full bg-amber-500/15 px-2 py-0.5 app-meta font-bold text-amber-500 shrink-0">
+                <span className="inline-flex items-center gap-0.5 rounded-[3px] bg-amber-500/15 px-1.5 py-0.5 text-[11px] font-mono font-medium text-amber-600 dark:text-amber-400 shrink-0">
                   <Flame className="h-3 w-3 fill-current" />
                   {streak}d
                 </span>
               )}
             </div>
 
-            <p className="app-body text-[var(--app-muted)] text-xs mt-1 italic leading-relaxed">
+            <p className="text-xs text-[var(--app-muted)] mt-1 italic leading-relaxed">
               &ldquo;{quote}&rdquo;
             </p>
           </div>
@@ -77,9 +71,9 @@ export function HabitEncouragementToast({
           <button
             type="button"
             onClick={onDismiss}
-            className="rounded-lg p-1 text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] transition-colors"
+            className="rounded-[4px] p-1 text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-hover)] transition-colors"
           >
-            <X className="h-4 w-4" />
+            <X className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>

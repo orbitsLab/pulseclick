@@ -45,19 +45,23 @@ const COLUMN_CONFIG: Record<
   {
     title: string;
     dotColor: string;
+    pillClass: string;
   }
 > = {
   TODO: {
     title: "To Do",
-    dotColor: "bg-slate-400",
+    dotColor: "bg-[#9b9a97]",
+    pillClass: "bg-[#ebeced] text-[#9b9a97] dark:bg-[#2f2f2f] dark:text-[#9b9b9b]",
   },
   IN_PROGRESS: {
     title: "In Progress",
-    dotColor: "bg-amber-500",
+    dotColor: "bg-[#2383e2]",
+    pillClass: "bg-[#ddebf1] text-[#0b6e99] dark:bg-[#213041] dark:text-[#e5f2fc]",
   },
   DONE: {
     title: "Done",
-    dotColor: "bg-emerald-500",
+    dotColor: "bg-[#0f7b6c]",
+    pillClass: "bg-[#ddedea] text-[#0f7b6c] dark:bg-[#2a533c] dark:text-[#e8f1ec]",
   },
 };
 
@@ -124,35 +128,23 @@ function TaskCard({
   // Priority and completion card styling
   const priorityCardStyles = useMemo(() => {
     if (task.completed) {
-      return "bg-[var(--app-panel-alt)]/50 border-[var(--app-border)]/60 text-[var(--app-muted)]";
+      return "bg-[var(--app-panel)] border-[var(--app-border)]/60 text-[var(--app-muted)]";
     }
-    if (task.priority === 3) {
-      return "border-rose-500/35 bg-rose-500/10 hover:bg-rose-500/15";
-    }
-    if (task.priority === 2) {
-      return "border-amber-500/35 bg-amber-500/10 hover:bg-amber-500/15";
-    }
-    if (task.priority === 1) {
-      return "border-sky-500/35 bg-sky-500/10 hover:bg-sky-500/15";
-    }
-    return "border-[var(--app-border)] bg-[var(--app-panel)] hover:border-[var(--app-border)]/80";
-  }, [task.completed, task.priority]);
+    return "border-[var(--app-border)] bg-[var(--app-panel)] hover:border-[var(--app-muted)]/60";
+  }, [task.completed]);
 
   const cardContent = (
     <Card
       size="sm"
       onClick={onSelect}
       className={cn(
-        "group/card flex flex-col gap-2 rounded-xl border p-2.5 text-left transition-all",
+        "group/card flex flex-col gap-2 rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-2.5 text-left transition-colors shadow-[0_1px_2px_rgba(15,15,15,0.04)]",
         priorityCardStyles,
         asHandle && !isOverlay && "cursor-grab active:cursor-grabbing",
         isSelected &&
-          "ring-2 ring-[var(--app-accent)] border-[var(--app-accent)] shadow-sm",
+          "ring-2 ring-[var(--app-accent)] border-[var(--app-accent)]",
         isOverlay &&
-          "rotate-1 shadow-2xl border-[var(--app-accent)] ring-2 ring-[var(--app-accent)]/30 cursor-grabbing",
-        !isSelected &&
-          !isOverlay &&
-          "hover:shadow-xs"
+          "rotate-1 shadow-xl border-[var(--app-accent)] ring-2 ring-[var(--app-accent)]/30 cursor-grabbing"
       )}
     >
       <CardContent className="flex flex-col gap-2 p-0">
@@ -463,7 +455,7 @@ export function KanbanColumnSkeleton({ count = 3 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="flex flex-col gap-2 rounded-xl border border-[var(--app-border)]/60 bg-[var(--app-panel)]/40 p-2.5"
+          className="flex flex-col gap-2 rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-2.5"
           style={{ opacity: Math.max(0.35, 1 - i * 0.25) }}
         >
           {/* Header: Checkbox + Title + Priority */}
@@ -527,7 +519,8 @@ function TaskColumn({
 }: TaskColumnProps) {
   const config = COLUMN_CONFIG[value] || {
     title: value,
-    dotColor: "bg-slate-400",
+    dotColor: "bg-[#9b9a97]",
+    pillClass: "bg-[#ebeced] text-[#9b9a97] dark:bg-[#2f2f2f] dark:text-[#9b9b9b]",
   };
 
   return (
@@ -536,24 +529,24 @@ function TaskColumn({
       {...props}
       className={cn(
         "flex flex-col min-w-[280px] flex-1 h-full min-h-0",
-        isOverlay && "opacity-90 rotate-0.5 shadow-2xl cursor-grabbing"
+        isOverlay && "opacity-90 rotate-0.5 shadow-xl cursor-grabbing"
       )}
     >
-      <Card className="flex flex-col h-full rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel-alt)]/40 p-3 shadow-xs min-h-0 overflow-hidden">
-        <CardHeader className="flex items-center justify-between pb-3 mb-2.5 border-b border-[var(--app-border)]/80 p-0 shrink-0">
-          <div className="flex items-center gap-2">
+      <Card className="flex flex-col h-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)]/40 p-2.5 shadow-none min-h-0 overflow-hidden">
+        <CardHeader className="flex items-center justify-between pb-2 mb-2 border-b border-[var(--app-border)] p-0 shrink-0">
+          <div className="flex items-center gap-1.5">
             <span
-              className={cn("h-2.5 w-2.5 rounded-full shrink-0", config.dotColor)}
-            />
-            <span className="app-heading font-semibold text-[var(--app-text)]">
+              className={cn(
+                "inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[3px] text-xs font-medium",
+                config.pillClass
+              )}
+            >
+              <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", config.dotColor)} />
               {config.title}
             </span>
-            <Badge
-              variant="outline"
-              className="border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-muted)] h-5 px-1.5 app-meta font-bold rounded-md"
-            >
+            <span className="text-xs text-[var(--app-muted)] font-normal ml-0.5">
               {tasks.length}
-            </Badge>
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <Button
@@ -592,7 +585,7 @@ function TaskColumn({
               {isLoading && tasks.length === 0 ? (
                 <KanbanColumnSkeleton count={2} />
               ) : tasks.length === 0 ? (
-                <div className="flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-[var(--app-border)]/60 p-6 text-center app-meta text-[var(--app-muted)] min-h-[140px] gap-2">
+                <div className="flex flex-1 flex-col items-center justify-center rounded-[6px] border border-dashed border-[var(--app-border)] p-6 text-center text-xs text-[var(--app-muted)] min-h-[140px] gap-2">
                   <span>No tasks in {config.title}</span>
                   <Button
                     size="sm"
@@ -600,7 +593,7 @@ function TaskColumn({
                     onClick={() =>
                       onQuickAdd(value as "TODO" | "IN_PROGRESS" | "DONE")
                     }
-                    className="h-7 text-xs text-[var(--app-accent-text)] hover:text-[var(--app-accent-text)] hover:bg-[var(--app-accent)]/10 cursor-pointer"
+                    className="h-7 text-xs text-[var(--app-accent)] hover:text-[var(--app-accent)] hover:bg-[var(--app-panel-hover)] rounded-[4px] cursor-pointer"
                   >
                     <Plus className="h-3 w-3 mr-1" /> Add task
                   </Button>
@@ -708,7 +701,7 @@ export function TaskKanbanView({
   return (
     <div className="flex-1 h-full overflow-hidden flex flex-col">
       {/* Mobile Column Switcher Segmented Control (< md) */}
-      <div className="flex md:hidden items-center rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] p-1 mb-2.5 shrink-0">
+      <div className="flex md:hidden items-center rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel-hover)] p-0.5 mb-2.5 shrink-0">
         {(
           [
             { id: "TODO", label: "To Do", dotColor: "bg-slate-400" },
@@ -724,9 +717,9 @@ export function TaskKanbanView({
               type="button"
               onClick={() => setActiveMobileColumn(col.id)}
               className={cn(
-                "flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 app-label font-medium transition-colors cursor-pointer",
+                "flex flex-1 items-center justify-center gap-1.5 rounded-[3px] py-1 text-xs font-medium transition-colors cursor-pointer",
                 isActive
-                  ? "bg-[var(--app-panel)] text-[var(--app-text)] font-semibold shadow-xs border border-[var(--app-border)]/60"
+                  ? "bg-[var(--app-panel)] text-[var(--app-text)] font-semibold shadow-xs border border-[var(--app-border)]"
                   : "text-[var(--app-muted)] hover:text-[var(--app-text)]"
               )}
             >

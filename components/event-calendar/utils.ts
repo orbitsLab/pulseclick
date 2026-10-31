@@ -10,27 +10,27 @@ import type {
  */
 export function getEventColorClasses(color?: EventColor | string, completed?: boolean): string {
   if (completed) {
-    return "bg-[var(--app-panel-alt)]/50 text-[var(--app-muted)] border border-[var(--app-border)]/60 hover:bg-[var(--app-panel-alt)]/70 line-through opacity-60";
+    return "bg-[var(--app-hover)] text-[var(--app-muted)] border border-[var(--app-border)] line-through opacity-60";
   }
 
   const eventColor = color || "slate";
 
   switch (eventColor) {
     case "rose":
-      return "bg-rose-500/15 hover:bg-rose-500/25 text-rose-700 dark:text-rose-300 border border-rose-500/35";
+      return "bg-[rgba(255,0,26,0.08)] hover:bg-[rgba(255,0,26,0.14)] text-[#eb5757] dark:text-[#ff7369] border border-[rgba(255,0,26,0.2)]";
     case "amber":
-      return "bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 border border-amber-500/35";
+      return "bg-[rgba(203,145,47,0.1)] hover:bg-[rgba(203,145,47,0.16)] text-[#dfab01] dark:text-[#f3cd46] border border-[rgba(203,145,47,0.25)]";
     case "sky":
-      return "bg-sky-500/15 hover:bg-sky-500/25 text-sky-700 dark:text-sky-300 border border-sky-500/35";
+      return "bg-[rgba(35,131,226,0.1)] hover:bg-[rgba(35,131,226,0.16)] text-[#2383e2] dark:text-[#529cca] border border-[rgba(35,131,226,0.25)]";
     case "emerald":
-      return "bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-700 dark:text-emerald-300 border border-emerald-500/35";
+      return "bg-[rgba(68,131,97,0.1)] hover:bg-[rgba(68,131,97,0.16)] text-[#448361] dark:text-[#4dab9a] border border-[rgba(68,131,97,0.25)]";
     case "violet":
-      return "bg-violet-500/15 hover:bg-violet-500/25 text-violet-700 dark:text-violet-300 border border-violet-500/35";
+      return "bg-[rgba(144,101,176,0.1)] hover:bg-[rgba(144,101,176,0.16)] text-[#9065b0] dark:text-[#9a6dd7] border border-[rgba(144,101,176,0.25)]";
     case "orange":
-      return "bg-orange-500/15 hover:bg-orange-500/25 text-orange-700 dark:text-orange-300 border border-orange-500/35";
+      return "bg-[rgba(217,115,13,0.1)] hover:bg-[rgba(217,115,13,0.16)] text-[#d9730d] dark:text-[#ff9231] border border-[rgba(217,115,13,0.25)]";
     case "slate":
     default:
-      return "bg-[var(--app-panel-alt)] hover:bg-[var(--app-panel-alt)]/80 text-[var(--app-text)] border border-[var(--app-border)]";
+      return "bg-[var(--app-hover)] hover:bg-[var(--app-active)] text-[var(--app-text)] border border-[var(--app-border)]";
   }
 }
 
@@ -42,13 +42,13 @@ export function getBorderRadiusClasses(
   isLastDay: boolean,
 ): string {
   if (isFirstDay && isLastDay) {
-    return "rounded"; // Both ends rounded
+    return "rounded-[3px]"; // Both ends rounded
   }
   if (isFirstDay) {
-    return "rounded-l rounded-r-none"; // Only left end rounded
+    return "rounded-l-[3px] rounded-r-none"; // Only left end rounded
   }
   if (isLastDay) {
-    return "rounded-r rounded-l-none"; // Only right end rounded
+    return "rounded-r-[3px] rounded-l-none"; // Only right end rounded
   }
   return "rounded-none"; // No rounded corners
 }

@@ -12,19 +12,19 @@ export function SyncIndicator() {
       type="button"
       onClick={() => refetchAll()}
       title={isBackgroundFetching ? "Background fetching updates..." : "Click to refresh all workspace data"}
-      className="flex items-center gap-1.5 rounded-lg border border-[var(--app-border)]/70 bg-[var(--app-panel-alt)]/60 px-2 py-1 app-meta transition-all hover:bg-[var(--app-panel-alt)] active:scale-95 cursor-pointer"
+      className="flex items-center gap-1.5 rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2 py-1 text-xs text-[var(--app-muted)] transition-colors hover:bg-[var(--app-panel-hover)] hover:text-[var(--app-text)] cursor-pointer"
     >
       {isBackgroundFetching ? (
         <>
-          <RefreshCw className="h-3 w-3 animate-spin text-[var(--app-accent-text)]" />
-          <span className="hidden md:inline font-medium text-[var(--app-accent-text)]">
+          <RefreshCw className="h-3 w-3 animate-spin text-[var(--app-accent)]" />
+          <span className="hidden md:inline font-medium text-[var(--app-accent)]">
             Syncing...
           </span>
         </>
       ) : (
         <>
-          <CheckCircle2 className="h-3 w-3 text-emerald-500/80" />
-          <span className="hidden md:inline text-[var(--app-muted)]">
+          <CheckCircle2 className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+          <span className="hidden md:inline">
             Synced
           </span>
         </>

@@ -66,36 +66,40 @@ export interface Theme {
 }
 
 const light = (p: Partial<ThemePalette>): ThemePalette => ({
-  accent: "#4772fa",
+  accent: "#2383e2",
   accentContrast: "#ffffff",
-  accentText: "#3b60d8",
-  accentStrong: "#3e64dc",
-  bg: "#f7f8fa",
+  accentText: "#2383e2",
+  accentStrong: "#0077d4",
+  bg: "#ffffff",
   panel: "#ffffff",
-  panelAlt: "#f2f4f8",
-  text: "#191919",
-  muted: "#7c8496",
-  border: "#e6e9f0",
-  rail: "#ffffff",
+  panelAlt: "#f9f8f7",
+  text: "#37352f",
+  muted: "#787774",
+  border: "#e6e5e3",
+  rail: "#f9f8f7",
   ...p,
 });
 
 const dark = (p: Partial<ThemePalette>): ThemePalette => ({
-  accent: "#4772fa",
+  accent: "#2383e2",
   accentContrast: "#ffffff",
-  accentText: "#7b9dfb",
-  accentStrong: "#3e64dc",
-  bg: "#0f1115",
-  panel: "#171a21",
-  panelAlt: "#1f232c",
-  text: "#eef1f6",
-  muted: "#8b94a7",
-  border: "#262b36",
-  rail: "#12151b",
+  accentText: "#4fa7ff",
+  accentStrong: "#0077d4",
+  bg: "#191919",
+  panel: "#202020",
+  panelAlt: "#262626",
+  text: "#f0efed",
+  muted: "#999999",
+  border: "#383836",
+  rail: "#202020",
   ...p,
 });
 
 const RAW_THEMES: Theme[] = [
+  // --- Featured Notion Themes -------------------------------------------
+  { id: "notion-dark", name: "Notion Dark", mode: "dark", palette: dark({}) },
+  { id: "notion-light", name: "Notion Light", mode: "light", palette: light({}) },
+
   // --- Light ------------------------------------------------------------
   { id: "flow-blue", name: "Flow Blue", mode: "light", palette: light({}) },
   { id: "classic-grey", name: "Classic Grey", mode: "light", palette: light({ accent: "#6b7280", rail: "#f2f3f5" }) },
@@ -177,7 +181,14 @@ export const THEME_MAP: Record<string, Theme> = Object.fromEntries(
   THEMES.map((t) => [t.id, t])
 );
 
-export const DEFAULT_THEME_ID = "midnight";
+export const DEFAULT_THEME_ID = "notion-dark";
+
+export function getSystemDefaultThemeId(): string {
+  if (typeof window !== "undefined" && window.matchMedia) {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "notion-dark" : "notion-light";
+  }
+  return DEFAULT_THEME_ID;
+}
 
 export function getTheme(id: string | null | undefined): Theme {
   return THEME_MAP[id ?? ""] ?? THEME_MAP[DEFAULT_THEME_ID];
@@ -205,6 +216,14 @@ export function applyTheme(themeId: string | null | undefined, root?: HTMLElemen
   for (const [key, cssVar] of THEME_CSS_VARS) {
     target.style.setProperty(cssVar, theme.palette[key]);
   }
+  target.style.setProperty(
+    "--app-hover",
+    theme.mode === "dark" ? "rgba(255, 255, 255, 0.055)" : "rgba(55, 53, 47, 0.08)"
+  );
+  target.style.setProperty(
+    "--app-active",
+    theme.mode === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(55, 53, 47, 0.12)"
+  );
   target.dataset.appTheme = theme.id;
   target.dataset.appMode = theme.mode;
   target.classList.toggle("dark", theme.mode === "dark");

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { onest, instrumentSerif, geistMono } from "./fonts";
+import { inter, geistMono } from "./fonts";
 import "./globals.css";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { Toaster } from "@/components/ui/toast";
@@ -9,7 +9,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   viewportFit: "cover",
-  themeColor: "#0f172a",
+  themeColor: "#191919",
 };
 
 export const metadata: Metadata = {
@@ -26,9 +26,21 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${onest.variable} ${instrumentSerif.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${geistMono.variable} ${inter.className} font-sans h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[var(--app-bg)] text-[var(--app-text)] selection:bg-[var(--app-accent)]/30">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className={`${inter.className} font-sans min-h-full flex flex-col bg-[var(--app-bg)] text-[var(--app-text)] selection:bg-[var(--app-accent)]/20`}>
         <QueryProvider>
           {children}
           <Toaster />

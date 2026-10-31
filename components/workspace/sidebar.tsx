@@ -28,6 +28,7 @@ import { WorkspaceContext } from "@/context/workspace-context";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { SideTooltip } from "@/components/ui/tooltip";
 
 function SidebarItemSkeleton({
   count = 3,
@@ -278,16 +279,26 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
   }
 
   const smartLists = [
-    { id: "all", label: "All", icon: <ListTodo className="h-4 w-4 text-[var(--app-muted)]" />, count: allCount },
-    { id: "today", label: "Today", icon: <CalendarIcon className="h-4 w-4 text-[var(--app-accent-text)]" />, count: todayCount },
-    { id: "tomorrow", label: "Tomorrow", icon: <Sunrise className="h-4 w-4 text-amber-400" />, count: tomorrowCount },
-    { id: "next7", label: "Next 7 Days", icon: <CalendarDays className="h-4 w-4 text-indigo-400" /> },
-    { id: "inbox", label: "Inbox", icon: <Inbox className="h-4 w-4 text-blue-400" />, count: inboxCount },
-    { id: "completed", label: "Completed", icon: <CheckCircle className="h-4 w-4 text-emerald-400" /> },
-    { id: "trash", label: "Trash", icon: <Trash2 className="h-4 w-4 text-rose-400" /> },
+    { id: "all", label: "All", description: "All active tasks across your lists", icon: <ListTodo className="h-4 w-4 text-[var(--app-muted)]" />, count: allCount },
+    { id: "today", label: "Today", description: "Tasks scheduled for today", icon: <CalendarIcon className="h-4 w-4 text-[var(--app-accent-text)]" />, count: todayCount },
+    { id: "tomorrow", label: "Tomorrow", description: "Tasks scheduled for tomorrow", icon: <Sunrise className="h-4 w-4 text-amber-400" />, count: tomorrowCount },
+    { id: "next7", label: "Next 7 Days", description: "Upcoming tasks for the next 7 days", icon: <CalendarDays className="h-4 w-4 text-indigo-400" /> },
+    { id: "inbox", label: "Inbox", description: "Default folder for unsorted tasks", icon: <Inbox className="h-4 w-4 text-blue-400" />, count: inboxCount },
+    { id: "completed", label: "Completed", description: "Archive of completed tasks", icon: <CheckCircle className="h-4 w-4 text-emerald-400" /> },
+    { id: "trash", label: "Trash", description: "Deleted tasks", icon: <Trash2 className="h-4 w-4 text-rose-400" /> },
   ];
 
-  const colorPalette = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#a855f7", "#06b6d4"];
+  const colorPalette = [
+    "#9b9a97", // Gray
+    "#64473a", // Brown
+    "#d9730d", // Orange
+    "#dfab01", // Yellow
+    "#0f7b6c", // Green
+    "#0b6e99", // Blue
+    "#6940a5", // Purple
+    "#ad1a72", // Pink
+    "#e03e3e", // Red
+  ];
 
   // Mini Calendar computations
   const calYear = miniCalDate.getFullYear();
@@ -308,51 +319,70 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
   const renderSidebarInner = (isMobile = false) => (
     <div className="flex flex-col h-full min-w-0">
       {/* Search Input & Collapse Button */}
-      <div className="p-3 border-b border-[var(--app-border)]/80 flex items-center gap-2">
+      <div className="p-2.5 border-b border-[var(--app-border)] flex items-center gap-1.5">
         <div className="relative flex-1 min-w-0">
-          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-[var(--app-muted)]" />
+          <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-[var(--app-muted)]" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search tasks..."
-            className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] py-1.5 pl-8 pr-3 app-label text-[var(--app-text)] placeholder-[var(--app-muted)] focus:border-[var(--app-accent)] focus:outline-none"
+            className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] py-1 pl-8 pr-2.5 text-xs text-[var(--app-text)] placeholder-[var(--app-muted)]/70 focus:border-[var(--app-accent)] focus:outline-none transition-colors"
           />
         </div>
 
-        <button
-          type="button"
-          onClick={onToggleCollapse}
-          title={isMobile ? "Close sidebar" : "Collapse sidebar (Ctrl+B)"}
-          aria-label={isMobile ? "Close sidebar" : "Collapse sidebar"}
-          className="p-1.5 rounded-lg text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel)] border border-transparent hover:border-[var(--app-border)] transition-colors cursor-pointer shrink-0"
+        <SideTooltip
+          content={isMobile ? "Close sidebar" : "Collapse sidebar"}
+          shortcut={isMobile ? undefined : "Ctrl+B"}
+          side="right"
+          sideOffset={8}
+          disabled={isMobile}
         >
-          {isMobile ? <X className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-        </button>
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            aria-label={isMobile ? "Close sidebar" : "Collapse sidebar"}
+            className="p-1 rounded-[4px] text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)] transition-colors cursor-pointer shrink-0"
+          >
+            {isMobile ? <X className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+          </button>
+        </SideTooltip>
       </div>
 
-      <div className="p-2 space-y-4 flex-1 overflow-y-auto">
+      <div className="p-2 space-y-3 flex-1 overflow-y-auto">
         {/* Smart Lists */}
         <div className="space-y-0.5">
           {smartLists.map((item) => {
             const isSelected = activeView === item.id && !activeListId && !activeTag;
             return (
-              <button
+              <SideTooltip
                 key={item.id}
-                type="button"
-                onClick={() => handleItemSelect(() => onSelectView(item.id, null, null))}
-                className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 app-label font-medium transition-colors ${ isSelected ? "bg-[var(--app-accent)]/10 text-[var(--app-accent-text)] dark:bg-[var(--app-accent)]/15 font-bold" : "text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/60 dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]/60" }`}
+                content={item.label}
+                description={item.description}
+                side="right"
+                sideOffset={10}
+                disabled={isMobile}
               >
-                <div className="flex items-center gap-2.5">
-                  {item.icon}
-                  <span>{item.label}</span>
-                </div>
-                {item.count !== undefined && item.count > 0 && (
-                  <span className="rounded-full bg-[var(--app-panel-alt)]/80 px-1.5 py-0.5 app-meta text-[var(--app-text)] font-bold">
-                    {item.count}
-                  </span>
-                )}
-              </button>
+                <button
+                  type="button"
+                  onClick={() => handleItemSelect(() => onSelectView(item.id, null, null))}
+                  className={`flex w-full items-center justify-between rounded-[4px] px-2 py-1 text-xs transition-colors cursor-pointer ${
+                    isSelected
+                      ? "bg-[var(--app-active)] text-[var(--app-text)] font-semibold"
+                      : "text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    {item.icon}
+                    <span className="truncate">{item.label}</span>
+                  </div>
+                  {item.count !== undefined && item.count > 0 && (
+                    <span className="px-1 text-[11px] text-[var(--app-muted)] font-normal">
+                      {item.count}
+                    </span>
+                  )}
+                </button>
+              </SideTooltip>
             );
           })}
         </div>
@@ -360,20 +390,21 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
         {/* Smart Filters */}
         {(filters.length > 0 || Boolean(props.onOpenFilterPanel || context?.setIsFilterPanelOpen)) && (
           <div className="space-y-0.5">
-            <div className="flex items-center justify-between px-2.5 pb-1">
-              <span className="app-overline font-semibold text-[var(--app-muted)]">
+            <div className="flex items-center justify-between px-2 pb-1">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--app-muted)]">
                 Filters
               </span>
               {onOpenFilterPanel && (
-                <button
-                  type="button"
-                  onClick={onOpenFilterPanel}
-                  title="Manage smart filters"
-                  aria-label="Manage smart filters"
-                  className="rounded p-0.5 text-[var(--app-muted)] transition-colors hover:bg-[var(--app-panel-alt)]/60 hover:text-[var(--app-text)] dark:hover:bg-[var(--app-panel-alt)] dark:hover:text-[var(--app-text)]"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                </button>
+                <SideTooltip content="New smart filter" side="right" sideOffset={8} disabled={isMobile}>
+                  <button
+                    type="button"
+                    onClick={onOpenFilterPanel}
+                    aria-label="Manage smart filters"
+                    className="rounded p-0.5 text-[var(--app-muted)] transition-colors hover:bg-[var(--app-hover)] hover:text-[var(--app-text)] cursor-pointer"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </button>
+                </SideTooltip>
               )}
             </div>
 
@@ -383,27 +414,39 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
               <button
                 type="button"
                 onClick={onOpenFilterPanel}
-                className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 app-label font-medium text-[var(--app-muted)] transition-colors hover:bg-[var(--app-panel-alt)]/60"
+                className="flex w-full items-center gap-2 rounded-[4px] px-2 py-1 text-xs text-[var(--app-muted)] transition-colors hover:bg-[var(--app-hover)] hover:text-[var(--app-text)] cursor-pointer"
               >
-                <Filter className="h-4 w-4" />
+                <Filter className="h-3.5 w-3.5" />
                 <span>Create a filter</span>
               </button>
             ) : (
               filters.map((filter) => {
                 const isSelected = activeFilterId === filter.id;
                 return (
-                  <button
+                  <SideTooltip
                     key={filter.id}
-                    type="button"
-                    onClick={() => handleItemSelect(() => onSelectFilter?.(isSelected ? null : filter.id))}
-                    className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 app-label font-medium transition-colors ${ isSelected ? "bg-[var(--app-accent)]/10 text-[var(--app-accent-text)] font-bold" : "text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/60 dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]/60" }`}
+                    content={filter.name}
+                    description="Smart filter"
+                    side="right"
+                    sideOffset={10}
+                    disabled={isMobile}
                   >
-                    <span
-                      className="h-2 w-2 shrink-0 rounded-full"
-                      style={{ backgroundColor: filter.color }}
-                    />
-                    <span className="truncate">{filter.name}</span>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => handleItemSelect(() => onSelectFilter?.(isSelected ? null : filter.id))}
+                      className={`flex w-full items-center gap-2 rounded-[4px] px-2 py-1 text-xs transition-colors cursor-pointer ${
+                        isSelected
+                          ? "bg-[var(--app-active)] text-[var(--app-text)] font-semibold"
+                          : "text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)]"
+                      }`}
+                    >
+                      <span
+                        className="h-2 w-2 shrink-0 rounded-full"
+                        style={{ backgroundColor: filter.color }}
+                      />
+                      <span className="truncate">{filter.name}</span>
+                    </button>
+                  </SideTooltip>
                 );
               })
             )}
@@ -413,26 +456,35 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
         {/* Custom Lists Section */}
         <div>
           <div className="flex items-center justify-between px-2 py-1 text-[var(--app-muted)]">
-            <button
-              type="button"
-              onClick={() => setListsCollapsed(!listsCollapsed)}
-              className="flex items-center gap-1 hover:text-[var(--app-text)]"
+            <SideTooltip
+              content={listsCollapsed ? "Expand lists" : "Collapse lists"}
+              side="right"
+              sideOffset={8}
+              disabled={isMobile}
             >
-              {listsCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-              <span className="app-overline font-semibold">Lists</span>
-            </button>
-            <div className="flex items-center gap-0.5">
               <button
                 type="button"
-                onClick={() => {
-                  setNewListName("");
-                  setShowAddList(true);
-                }}
-                title="Add List"
-                className="rounded p-0.5 hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-text)] transition-colors"
+                onClick={() => setListsCollapsed(!listsCollapsed)}
+                className="flex items-center gap-1 hover:text-[var(--app-text)] cursor-pointer"
               >
-                <Plus className="h-3.5 w-3.5" />
+                {listsCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                <span className="app-overline font-semibold">Lists</span>
               </button>
+            </SideTooltip>
+            <div className="flex items-center gap-0.5">
+              <SideTooltip content="Add list" side="right" sideOffset={8} disabled={isMobile}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewListName("");
+                    setShowAddList(true);
+                  }}
+                  aria-label="Add List"
+                  className="rounded p-0.5 hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-text)] transition-colors cursor-pointer"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                </button>
+              </SideTooltip>
             </div>
           </div>
 
@@ -457,81 +509,95 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                       <div
                         onClick={() => handleItemSelect(() => onSelectView("list", list.id, null, null))}
                         className={cn(
-                          "group flex w-full items-center justify-between rounded-lg px-2 py-1.5 app-label font-medium transition-all cursor-pointer select-none",
+                          "group flex w-full items-center justify-between rounded-[4px] px-2 py-1 text-xs font-normal transition-colors cursor-pointer select-none",
                           isListActive
-                            ? "bg-[var(--app-accent)]/10 text-[var(--app-accent-text)] dark:bg-[var(--app-accent)]/15 font-bold"
-                            : "text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/60 dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]/60"
+                            ? "bg-[var(--app-active)] text-[var(--app-text)] font-semibold"
+                            : "text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)]"
                         )}
                       >
-                        <div className="flex items-center gap-1.5 truncate flex-1 min-w-0">
-                          {listChildren.length > 0 ? (
-                            <button
-                              type="button"
-                              onClick={(e) => toggleListCollapse(list.id, e)}
-                              className="p-0.5 rounded hover:bg-[var(--app-panel)] text-[var(--app-muted)] hover:text-[var(--app-text)] shrink-0 transition-colors"
-                              title={isListCollapsed ? "Expand groups" : "Collapse groups"}
-                            >
-                              {isListCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-                            </button>
-                          ) : (
-                            <span className="w-4 shrink-0" />
-                          )}
-                          <span
-                            className="h-2.5 w-2.5 rounded-full shrink-0"
-                            style={{ backgroundColor: list.color }}
-                          />
-                          <span className="truncate">{list.name}</span>
-                        </div>
+                        <SideTooltip
+                          content={list.name}
+                          description={count > 0 ? `${count} active ${count === 1 ? "task" : "tasks"}` : "List"}
+                          side="right"
+                          sideOffset={10}
+                          disabled={isMobile}
+                        >
+                          <div className="flex items-center gap-1.5 truncate flex-1 min-w-0">
+                            {listChildren.length > 0 ? (
+                              <button
+                                type="button"
+                                onClick={(e) => toggleListCollapse(list.id, e)}
+                                className="p-0.5 rounded hover:bg-[var(--app-hover)] text-[var(--app-muted)] hover:text-[var(--app-text)] shrink-0 transition-colors"
+                                aria-label={isListCollapsed ? "Expand groups" : "Collapse groups"}
+                              >
+                                {isListCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                              </button>
+                            ) : (
+                              <span className="w-4 shrink-0" />
+                            )}
+                            <span
+                              className="h-2 w-2 rounded-[3px] shrink-0"
+                              style={{ backgroundColor: list.color }}
+                            />
+                            <span className="truncate">{list.name}</span>
+                          </div>
+                        </SideTooltip>
 
                         <div className="flex items-center gap-1">
                           {count > 0 && (
-                            <span className="group-hover:hidden rounded-full bg-[var(--app-panel-alt)]/80 px-1.5 py-0.5 app-meta text-[var(--app-text)] font-bold">
+                            <span className="group-hover:hidden px-1 text-[11px] text-[var(--app-muted)] font-normal">
                               {count}
                             </span>
                           )}
 
                           <div className="hidden group-hover:flex items-center gap-0.5">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setNewGroupListId(list.id);
-                                setNewGroupName("");
-                                setShowAddGroup(true);
-                              }}
-                              title="Add Group in List"
-                              className="rounded p-0.5 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)]/50"
-                            >
-                              <FolderPlus className="h-3 w-3" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingList(list);
-                                setEditListName(list.name);
-                                setEditListColor(list.color);
-                              }}
-                              title="Edit List"
-                              className="rounded p-0.5 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)]/50"
-                            >
-                              <Pencil className="h-3 w-3" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => handleDeleteListClick(e, list.id, list.name)}
-                              title="Delete List"
-                              className="rounded p-0.5 text-[var(--app-muted)] hover:text-rose-400 hover:bg-[var(--app-panel-alt)]/50"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </button>
+                            <SideTooltip content="Add group in list" side="top" sideOffset={6} disabled={isMobile}>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setNewGroupListId(list.id);
+                                  setNewGroupName("");
+                                  setShowAddGroup(true);
+                                }}
+                                aria-label="Add Group in List"
+                                className="rounded p-0.5 text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]"
+                              >
+                                <FolderPlus className="h-3 w-3" />
+                              </button>
+                            </SideTooltip>
+                            <SideTooltip content="Edit list" side="top" sideOffset={6} disabled={isMobile}>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingList(list);
+                                  setEditListName(list.name);
+                                  setEditListColor(list.color);
+                                }}
+                                aria-label="Edit List"
+                                className="rounded p-0.5 text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]"
+                              >
+                                <Pencil className="h-3 w-3" />
+                              </button>
+                            </SideTooltip>
+                            <SideTooltip content="Delete list" side="top" sideOffset={6} disabled={isMobile}>
+                              <button
+                                type="button"
+                                onClick={(e) => handleDeleteListClick(e, list.id, list.name)}
+                                aria-label="Delete List"
+                                className="rounded p-0.5 text-[var(--app-muted)] hover:text-[#e03e3e] hover:bg-[#e03e3e]/15"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            </SideTooltip>
                           </div>
                         </div>
                       </div>
 
                       {/* Child Groups Under This List */}
                       {listChildren.length > 0 && !isListCollapsed && (
-                        <div className="pl-5 space-y-0.5 border-l border-[var(--app-border)]/40 ml-4 my-0.5">
+                        <div className="pl-4 space-y-0.5 border-l border-[var(--app-border)]/60 ml-3.5 my-0.5">
                           {listChildren.map((group) => {
                             const isGroupActive = activeListId === list.id && activeGroupId === group.id;
                             const groupTaskCount = allActiveTasks.filter(
@@ -543,51 +609,63 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                                 key={group.id}
                                 onClick={() => handleItemSelect(() => onSelectView("list", list.id, null, group.id))}
                                 className={cn(
-                                  "group/grp flex w-full items-center justify-between rounded-md px-2 py-1 app-meta font-medium transition-all cursor-pointer select-none",
+                                  "group/grp flex w-full items-center justify-between rounded-[4px] px-2 py-0.5 text-xs transition-colors cursor-pointer select-none",
                                   isGroupActive
-                                    ? "bg-[var(--app-accent)]/15 text-[var(--app-accent-text)] font-bold"
-                                    : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/50"
+                                    ? "bg-[var(--app-active)] text-[var(--app-text)] font-semibold"
+                                    : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]"
                                 )}
                               >
-                                <div className="flex items-center gap-2 truncate flex-1 min-w-0">
-                                  <span
-                                    className="h-1.5 w-1.5 rounded-full shrink-0"
-                                    style={{ backgroundColor: group.color || list.color }}
-                                  />
-                                  <span className="truncate">{group.name}</span>
-                                </div>
+                                <SideTooltip
+                                  content={group.name}
+                                  description={groupTaskCount > 0 ? `${groupTaskCount} active ${groupTaskCount === 1 ? "task" : "tasks"}` : "Group"}
+                                  side="right"
+                                  sideOffset={10}
+                                  disabled={isMobile}
+                                >
+                                  <div className="flex items-center gap-1.5 truncate flex-1 min-w-0">
+                                    <span
+                                      className="h-1.5 w-1.5 rounded-[2px] shrink-0"
+                                      style={{ backgroundColor: group.color || list.color }}
+                                    />
+                                    <span className="truncate">{group.name}</span>
+                                  </div>
+                                </SideTooltip>
 
                                 <div className="flex items-center gap-1">
                                   {groupTaskCount > 0 && (
-                                    <span className="group-hover/grp:hidden rounded-full bg-[var(--app-panel-alt)] px-1.5 py-0.2 app-meta text-[var(--app-muted)] font-semibold">
+                                    <span className="group-hover/grp:hidden px-1 text-[11px] text-[var(--app-muted)] font-normal">
                                       {groupTaskCount}
                                     </span>
                                   )}
                                   <div className="hidden group-hover/grp:flex items-center gap-0.5">
-                                    <button
-                                      type="button"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setEditingGroup(group);
-                                        setEditGroupName(group.name);
-                                        setEditGroupColor(group.color || list.color);
-                                      }}
-                                      title="Edit Group"
-                                      className="rounded p-0.5 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)]/50"
-                                    >
-                                      <Pencil className="h-2.5 w-2.5" />
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setGroupToDelete(group);
-                                      }}
-                                      title="Delete Group"
-                                      className="rounded p-0.5 text-[var(--app-muted)] hover:text-rose-400 hover:bg-[var(--app-panel-alt)]/50"
-                                    >
-                                      <Trash2 className="h-2.5 w-2.5" />
-                                    </button>
+                                    <SideTooltip content="Edit group" side="top" sideOffset={6} disabled={isMobile}>
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setEditingGroup(group);
+                                          setEditGroupName(group.name);
+                                          setEditGroupColor(group.color || list.color);
+                                        }}
+                                        aria-label="Edit Group"
+                                        className="rounded p-0.5 text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]"
+                                      >
+                                        <Pencil className="h-2.5 w-2.5" />
+                                      </button>
+                                    </SideTooltip>
+                                    <SideTooltip content="Delete group" side="top" sideOffset={6} disabled={isMobile}>
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setGroupToDelete(group);
+                                        }}
+                                        aria-label="Delete Group"
+                                        className="rounded p-0.5 text-[var(--app-muted)] hover:text-[#e03e3e] hover:bg-[#e03e3e]/15"
+                                      >
+                                        <Trash2 className="h-2.5 w-2.5" />
+                                      </button>
+                                    </SideTooltip>
                                   </div>
                                 </div>
                               </div>
@@ -606,22 +684,31 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
         {/* Tags Section */}
         <div>
           <div className="flex items-center justify-between px-2 py-1 text-[var(--app-muted)]">
-            <button
-              type="button"
-              onClick={() => setTagsCollapsed(!tagsCollapsed)}
-              className="flex items-center gap-1 hover:text-[var(--app-text)]"
+            <SideTooltip
+              content={tagsCollapsed ? "Expand tags" : "Collapse tags"}
+              side="right"
+              sideOffset={8}
+              disabled={isMobile}
             >
-              {tagsCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-              <span className="app-overline font-semibold">Tags</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowAddTag(true)}
-              title="Add Tag"
-              className="rounded p-0.5 hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-text)]"
-            >
-              <Plus className="h-3.5 w-3.5" />
-            </button>
+              <button
+                type="button"
+                onClick={() => setTagsCollapsed(!tagsCollapsed)}
+                className="flex items-center gap-1 hover:text-[var(--app-text)] cursor-pointer"
+              >
+                {tagsCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                <span className="app-overline font-semibold">Tags</span>
+              </button>
+            </SideTooltip>
+            <SideTooltip content="Add tag" side="right" sideOffset={8} disabled={isMobile}>
+              <button
+                type="button"
+                onClick={() => setShowAddTag(true)}
+                aria-label="Add Tag"
+                className="rounded p-0.5 hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-text)] cursor-pointer"
+              >
+                <Plus className="h-3.5 w-3.5" />
+              </button>
+            </SideTooltip>
           </div>
 
           {!tagsCollapsed && (
@@ -636,26 +723,40 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                     <div
                       key={tag.id}
                       onClick={() => handleItemSelect(() => onSelectView("tag", null, tag.name))}
-                      className={`group flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 app-label font-medium transition-colors cursor-pointer ${ isSelected ? "bg-indigo-500/15 text-indigo-400 font-bold" : "text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/60 dark:text-[var(--app-muted)] dark:hover:bg-[var(--app-panel-alt)]/60" }`}
+                      className={`group flex w-full items-center justify-between rounded-[4px] px-2 py-1 text-xs transition-colors cursor-pointer ${
+                        isSelected
+                          ? "bg-[var(--app-active)] text-[var(--app-text)] font-semibold"
+                          : "text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)]"
+                      }`}
                     >
-                      <div className="flex items-center gap-2 truncate flex-1 min-w-0">
-                        <TagIcon className="h-3 w-3 text-indigo-400 flex-shrink-0" />
-                        <span className="truncate">#{tag.name}</span>
-                      </div>
+                      <SideTooltip
+                        content={`#${tag.name}`}
+                        description={count > 0 ? `${count} active ${count === 1 ? "task" : "tasks"}` : "Tag"}
+                        side="right"
+                        sideOffset={10}
+                        disabled={isMobile}
+                      >
+                        <div className="flex items-center gap-2 truncate flex-1 min-w-0">
+                          <TagIcon className="h-3 w-3 text-indigo-400 flex-shrink-0" />
+                          <span className="truncate">#{tag.name}</span>
+                        </div>
+                      </SideTooltip>
 
                       <div className="flex items-center gap-1">
                         {count > 0 && (
                           <span className="group-hover:hidden app-meta text-[var(--app-muted)]">{count}</span>
                         )}
 
-                        <button
-                          type="button"
-                          onClick={(e) => handleDeleteTagClick(e, tag.id, tag.name)}
-                          title="Delete Tag"
-                          className="hidden group-hover:block rounded p-0.5 text-[var(--app-muted)] hover:text-rose-400 hover:bg-[var(--app-panel-alt)]/50"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
+                        <SideTooltip content="Delete tag" side="top" sideOffset={6} disabled={isMobile}>
+                          <button
+                            type="button"
+                            onClick={(e) => handleDeleteTagClick(e, tag.id, tag.name)}
+                            aria-label="Delete Tag"
+                            className="hidden group-hover:block rounded p-0.5 text-[var(--app-muted)] hover:text-rose-400 hover:bg-[var(--app-panel-alt)]/50"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </SideTooltip>
                       </div>
                     </div>
                   );
@@ -668,30 +769,43 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
         {/* Interactive Mini Calendar Widget */}
         <div className="border-t border-[var(--app-border)]/80 pt-3">
           <div className="flex items-center justify-between px-2 py-1 text-[var(--app-muted)]">
-            <button
-              type="button"
-              onClick={() => setMiniCalCollapsed(!miniCalCollapsed)}
-              className="flex items-center gap-1 hover:text-[var(--app-text)]"
+            <SideTooltip
+              content={miniCalCollapsed ? "Expand mini calendar" : "Collapse mini calendar"}
+              side="right"
+              sideOffset={8}
+              disabled={isMobile}
             >
-              {miniCalCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-              <span className="app-overline font-semibold">Mini Calendar</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => setMiniCalCollapsed(!miniCalCollapsed)}
+                className="flex items-center gap-1 hover:text-[var(--app-text)] cursor-pointer"
+              >
+                {miniCalCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                <span className="app-overline font-semibold">Mini Calendar</span>
+              </button>
+            </SideTooltip>
             <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => setMiniCalDate(new Date(calYear, calMonth - 1, 1))}
-                className="rounded p-0.5 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)]"
-              >
-                <ChevronLeft className="h-3 w-3" />
-              </button>
+              <SideTooltip content="Previous month" side="top" sideOffset={6} disabled={isMobile}>
+                <button
+                  type="button"
+                  onClick={() => setMiniCalDate(new Date(calYear, calMonth - 1, 1))}
+                  aria-label="Previous month"
+                  className="rounded p-0.5 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)] cursor-pointer"
+                >
+                  <ChevronLeft className="h-3 w-3" />
+                </button>
+              </SideTooltip>
               <span className="app-meta font-semibold text-[var(--app-muted)]">{miniCalLabel}</span>
-              <button
-                type="button"
-                onClick={() => setMiniCalDate(new Date(calYear, calMonth + 1, 1))}
-                className="rounded p-0.5 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)]"
-              >
-                <ChevronRight className="h-3 w-3" />
-              </button>
+              <SideTooltip content="Next month" side="top" sideOffset={6} disabled={isMobile}>
+                <button
+                  type="button"
+                  onClick={() => setMiniCalDate(new Date(calYear, calMonth + 1, 1))}
+                  aria-label="Next month"
+                  className="rounded p-0.5 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)] cursor-pointer"
+                >
+                  <ChevronRight className="h-3 w-3" />
+                </button>
+              </SideTooltip>
             </div>
           </div>
 
@@ -789,19 +903,19 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
 
       {/* New Group Modal */}
       {showAddGroup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-xs rounded-xl border border-[var(--app-border)] bg-[var(--app-rail)] p-4 text-[var(--app-text)] shadow-xl">
-            <h4 className="app-label font-semibold mb-3 uppercase tracking-wider">New Group</h4>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px] p-4">
+          <div className="w-full max-w-xs rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] p-4 text-[var(--app-text)] shadow-[0_8px_30px_rgba(15,15,15,0.12),0_0_0_1px_rgba(15,15,15,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.08)]">
+            <h4 className="text-xs font-semibold mb-3 uppercase tracking-wider text-[var(--app-text)]">New Group</h4>
             <form onSubmit={handleCreateGroup} className="space-y-3">
               <div>
-                <label className="block app-meta font-medium text-[var(--app-muted)] mb-1">
+                <label className="block text-[11px] font-medium text-[var(--app-muted)] mb-1">
                   List:
                 </label>
                 <select
                   required
                   value={newGroupListId}
                   onChange={(e) => setNewGroupListId(e.target.value)}
-                  className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-1.5 app-label text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)]"
+                  className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/30"
                 >
                   <option value="" disabled>Select a list...</option>
                   {lists.map((l) => (
@@ -818,16 +932,16 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                 value={newGroupName}
                 onChange={(e) => setNewGroupName(e.target.value)}
                 placeholder="Group name (e.g. Backlog, Sprint 1)"
-                className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/30"
               />
               <div className="flex items-center gap-2">
-                <span className="app-label text-[var(--app-muted)]">Color:</span>
+                <span className="text-xs text-[var(--app-muted)]">Color:</span>
                 {colorPalette.map((c) => (
                   <button
                     key={c}
                     type="button"
                     onClick={() => setNewGroupColor(c)}
-                    className={`h-5 w-5 rounded-full ${newGroupColor === c ? "ring-2 ring-[var(--app-panel)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
+                    className={`h-4.5 w-4.5 rounded-full cursor-pointer ${newGroupColor === c ? "ring-2 ring-[var(--app-accent)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
                     style={{ backgroundColor: c }}
                   />
                 ))}
@@ -836,14 +950,14 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                 <button
                   type="button"
                   onClick={() => setShowAddGroup(false)}
-                  className="rounded px-2.5 py-1 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
+                  className="rounded-[4px] px-2.5 py-1 text-xs text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!newGroupListId || !newGroupName.trim()}
-                  className="rounded bg-[var(--app-accent-strong)] px-3 py-1 app-label font-medium text-white hover:bg-[var(--app-accent-strong)] disabled:opacity-50"
+                  className="rounded-[4px] bg-[var(--app-accent)] px-3 py-1 text-xs font-medium text-white hover:bg-[var(--app-accent-strong)] disabled:opacity-40 cursor-pointer shadow-xs"
                 >
                   Save
                 </button>
@@ -855,9 +969,9 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
 
       {/* Edit Group Modal */}
       {editingGroup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-xs rounded-xl border border-[var(--app-border)] bg-[var(--app-rail)] p-4 text-[var(--app-text)] shadow-xl">
-            <h4 className="app-label font-semibold mb-3 uppercase tracking-wider">Edit Group</h4>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px] p-4">
+          <div className="w-full max-w-xs rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] p-4 text-[var(--app-text)] shadow-[0_8px_30px_rgba(15,15,15,0.12),0_0_0_1px_rgba(15,15,15,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.08)]">
+            <h4 className="text-xs font-semibold mb-3 uppercase tracking-wider text-[var(--app-text)]">Edit Group</h4>
             <form onSubmit={handleSaveEditGroup} className="space-y-3">
               <input
                 type="text"
@@ -866,16 +980,16 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                 value={editGroupName}
                 onChange={(e) => setEditGroupName(e.target.value)}
                 placeholder="Group name"
-                className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/30"
               />
               <div className="flex items-center gap-2">
-                <span className="app-label text-[var(--app-muted)]">Color:</span>
+                <span className="text-xs text-[var(--app-muted)]">Color:</span>
                 {colorPalette.map((c) => (
                   <button
                     key={c}
                     type="button"
                     onClick={() => setEditGroupColor(c)}
-                    className={`h-5 w-5 rounded-full ${editGroupColor === c ? "ring-2 ring-[var(--app-panel)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
+                    className={`h-4.5 w-4.5 rounded-full cursor-pointer ${editGroupColor === c ? "ring-2 ring-[var(--app-accent)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
                     style={{ backgroundColor: c }}
                   />
                 ))}
@@ -884,13 +998,13 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                 <button
                   type="button"
                   onClick={() => setEditingGroup(null)}
-                  className="rounded px-2.5 py-1 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
+                  className="rounded-[4px] px-2.5 py-1 text-xs text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded bg-[var(--app-accent-strong)] px-3 py-1 app-label font-medium text-white hover:bg-[var(--app-accent-strong)]"
+                  className="rounded-[4px] bg-[var(--app-accent)] px-3 py-1 text-xs font-medium text-white hover:bg-[var(--app-accent-strong)] cursor-pointer shadow-xs"
                 >
                   Update
                 </button>
@@ -902,9 +1016,9 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
 
       {/* New List Modal */}
       {showAddList && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-xs rounded-xl border border-[var(--app-border)] bg-[var(--app-rail)] p-4 text-[var(--app-text)] shadow-xl">
-            <h4 className="app-label font-semibold mb-3 uppercase tracking-wider">New List</h4>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px] p-4">
+          <div className="w-full max-w-xs rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] p-4 text-[var(--app-text)] shadow-[0_8px_30px_rgba(15,15,15,0.12),0_0_0_1px_rgba(15,15,15,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.08)]">
+            <h4 className="text-xs font-semibold mb-3 uppercase tracking-wider text-[var(--app-text)]">New List</h4>
             <form onSubmit={handleCreateList} className="space-y-3">
               <input
                 type="text"
@@ -913,16 +1027,16 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                 value={newListName}
                 onChange={(e) => setNewListName(e.target.value)}
                 placeholder="List name (e.g. Work, Shopping)"
-                className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/30"
               />
               <div className="flex items-center gap-2">
-                <span className="app-label text-[var(--app-muted)]">Color:</span>
+                <span className="text-xs text-[var(--app-muted)]">Color:</span>
                 {colorPalette.map((c) => (
                   <button
                     key={c}
                     type="button"
                     onClick={() => setNewListColor(c)}
-                    className={`h-5 w-5 rounded-full ${newListColor === c ? "ring-2 ring-[var(--app-panel)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
+                    className={`h-4.5 w-4.5 rounded-full cursor-pointer ${newListColor === c ? "ring-2 ring-[var(--app-accent)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
                     style={{ backgroundColor: c }}
                   />
                 ))}
@@ -931,13 +1045,13 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                 <button
                   type="button"
                   onClick={() => setShowAddList(false)}
-                  className="rounded px-2.5 py-1 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
+                  className="rounded-[4px] px-2.5 py-1 text-xs text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded bg-[var(--app-accent-strong)] px-3 py-1 app-label font-medium text-white hover:bg-[var(--app-accent-strong)]"
+                  className="rounded-[4px] bg-[var(--app-accent)] px-3 py-1 text-xs font-medium text-white hover:bg-[var(--app-accent-strong)] cursor-pointer shadow-xs"
                 >
                   Save
                 </button>
@@ -949,9 +1063,9 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
 
       {/* Edit List Modal */}
       {editingList && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-xs rounded-xl border border-[var(--app-border)] bg-[var(--app-rail)] p-4 text-[var(--app-text)] shadow-xl">
-            <h4 className="app-label font-semibold mb-3 uppercase tracking-wider">Edit List</h4>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px] p-4">
+          <div className="w-full max-w-xs rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] p-4 text-[var(--app-text)] shadow-[0_8px_30px_rgba(15,15,15,0.12),0_0_0_1px_rgba(15,15,15,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.08)]">
+            <h4 className="text-xs font-semibold mb-3 uppercase tracking-wider text-[var(--app-text)]">Edit List</h4>
             <form onSubmit={handleSaveEditList} className="space-y-3">
               <input
                 type="text"
@@ -960,16 +1074,16 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                 value={editListName}
                 onChange={(e) => setEditListName(e.target.value)}
                 placeholder="List name"
-                className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/30"
               />
               <div className="flex items-center gap-2">
-                <span className="app-label text-[var(--app-muted)]">Color:</span>
+                <span className="text-xs text-[var(--app-muted)]">Color:</span>
                 {colorPalette.map((c) => (
                   <button
                     key={c}
                     type="button"
                     onClick={() => setEditListColor(c)}
-                    className={`h-5 w-5 rounded-full ${editListColor === c ? "ring-2 ring-[var(--app-panel)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
+                    className={`h-4.5 w-4.5 rounded-full cursor-pointer ${editListColor === c ? "ring-2 ring-[var(--app-accent)] ring-offset-1 ring-offset-[var(--app-panel)]" : ""}`}
                     style={{ backgroundColor: c }}
                   />
                 ))}
@@ -978,13 +1092,13 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                 <button
                   type="button"
                   onClick={() => setEditingList(null)}
-                  className="rounded px-2.5 py-1 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
+                  className="rounded-[4px] px-2.5 py-1 text-xs text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded bg-[var(--app-accent-strong)] px-3 py-1 app-label font-medium text-white hover:bg-[var(--app-accent-strong)]"
+                  className="rounded-[4px] bg-[var(--app-accent)] px-3 py-1 text-xs font-medium text-white hover:bg-[var(--app-accent-strong)] cursor-pointer shadow-xs"
                 >
                   Update
                 </button>
@@ -993,10 +1107,11 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
           </div>
         </div>
       )}
+
       {showAddTag && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-xs rounded-xl border border-[var(--app-border)] bg-[var(--app-rail)] p-4 text-[var(--app-text)] shadow-xl">
-            <h4 className="app-label font-semibold mb-3 uppercase tracking-wider">New Tag</h4>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px] p-4">
+          <div className="w-full max-w-xs rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] p-4 text-[var(--app-text)] shadow-[0_8px_30px_rgba(15,15,15,0.12),0_0_0_1px_rgba(15,15,15,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.08)]">
+            <h4 className="text-xs font-semibold mb-3 uppercase tracking-wider text-[var(--app-text)]">New Tag</h4>
             <form onSubmit={handleCreateTag} className="space-y-3">
               <input
                 type="text"
@@ -1005,19 +1120,19 @@ export function WorkspaceSidebar(props: SidebarProps = {}) {
                 value={newTagName}
                 onChange={(e) => setNewTagName(e.target.value)}
                 placeholder="Tag name (e.g. urgent, idea)"
-                className="w-full rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/30"
               />
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowAddTag(false)}
-                  className="rounded px-2.5 py-1 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
+                  className="rounded-[4px] px-2.5 py-1 text-xs text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded bg-[var(--app-accent-strong)] px-3 py-1 app-label font-medium text-white hover:bg-[var(--app-accent-strong)]"
+                  className="rounded-[4px] bg-[var(--app-accent)] px-3 py-1 text-xs font-medium text-white hover:bg-[var(--app-accent-strong)] cursor-pointer shadow-xs"
                 >
                   Save
                 </button>

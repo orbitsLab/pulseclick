@@ -1,18 +1,34 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/inter-variable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/geist-mono-variable.woff2') format('woff2');
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  /* Three voices: Onest (UI), Instrument Serif (display),
-     Geist Mono (data). See app/fonts.ts. */
-  --font-sans: var(--font-onest);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-onest);
-  --font-display: var(--font-instrument-serif);
+  /* Notion typography stack: Inter for product UI, Geist Mono for tabular data */
+  --font-sans: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Ubuntu", "Cantarell", "Noto Sans", Arial, sans-serif;
+  --font-mono: var(--font-geist-mono, "Geist Mono"), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --font-heading: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Ubuntu", "Cantarell", "Noto Sans", Arial, sans-serif;
+  --font-display: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Ubuntu", "Cantarell", "Noto Sans", Arial, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -42,13 +58,15 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  /* Notion restrained geometry scale: 4px to 10px */
+  --radius-xs: 0.1875rem; /* 3px: tags & checkboxes */
+  --radius-sm: 0.25rem;   /* 4px: buttons & inputs */
+  --radius-md: 0.375rem;  /* 6px: rows & controls */
+  --radius-lg: 0.5rem;    /* 8px: cards & callouts */
+  --radius-xl: 0.625rem;  /* 10px: dialogs & popovers */
+  --radius-2xl: 0.75rem;  /* 12px: modals */
+  --radius-3xl: 1rem;
+  --radius-4xl: 1.25rem;
   --color-invert-foreground: var(--invert-foreground);
   --color-invert: var(--invert);
   --color-warning-foreground: var(--warning-foreground);
@@ -60,199 +78,301 @@
   --color-destructive-foreground: var(--destructive-foreground);
 }
 
-/* Type scale.
-   Roles, not values: each role below does one job and is named after that job.
-   A role only reads as a role because weight, colour and space travel with it —
-   size alone never carries the hierarchy. Weights are set on the element so a
-   single role can play different jobs (a task title is heavier than a helper
-   line that shares its size). */
+/* Notion Typography Scale (Inter + Geist Mono) */
 @utility app-display {
-  font-family: var(--font-instrument-serif);
-  font-size: 1.625rem;
-  line-height: 1.15;
-  letter-spacing: -0.018em;
+  font-family: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Ubuntu", "Cantarell", "Noto Sans", Arial, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.022em;
 }
 
 @utility app-title {
+  font-family: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Ubuntu", "Cantarell", "Noto Sans", Arial, sans-serif;
   font-size: 1.0625rem;
-  line-height: 1.3;
+  font-weight: 600;
+  line-height: 1.35;
   letter-spacing: -0.012em;
 }
 
 @utility app-heading {
-  font-size: 0.9375rem;
+  font-family: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Ubuntu", "Cantarell", "Noto Sans", Arial, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
   line-height: 1.4;
   letter-spacing: -0.006em;
 }
 
 @utility app-body {
-  font-size: 0.8125rem;
-  line-height: 1.55;
+  font-family: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Ubuntu", "Cantarell", "Noto Sans", Arial, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
 }
 
 @utility app-label {
+  font-family: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Ubuntu", "Cantarell", "Noto Sans", Arial, sans-serif;
   font-size: 0.75rem;
-  line-height: 1.45;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
 @utility app-meta {
+  font-family: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Ubuntu", "Cantarell", "Noto Sans", Arial, sans-serif;
   font-size: 0.6875rem;
-  line-height: 1.45;
+  font-weight: 400;
+  line-height: 1.4;
   letter-spacing: 0.004em;
 }
 
 @utility app-overline {
+  font-family: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Ubuntu", "Cantarell", "Noto Sans", Arial, sans-serif;
   font-size: 0.6875rem;
+  font-weight: 600;
   line-height: 1.3;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 @utility app-figure {
+  font-family: var(--font-geist-mono, "Geist Mono"), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   font-size: 1.75rem;
+  font-weight: 600;
   line-height: 1.05;
   letter-spacing: -0.022em;
   font-variant-numeric: tabular-nums;
 }
 
 @theme {
-  /* Tighten the two sizes the planner runs on most. */
-  --text-xs--line-height: 1.45;
+  --text-xs--line-height: 1.4;
   --text-sm--line-height: 1.5;
 }
 
 :root {
-  /* Workspace theme palette — overridden at runtime by applyTheme() (lib/themes.ts).
-     These defaults are the "Midnight" theme so the first paint matches the
-     persisted theme instead of flashing a different palette. */
-  --app-accent: #4772fa;
+  /* Notion Light Mode (Tatami tokens) */
+  --app-accent: #2383e2;
   --app-accent-contrast: #ffffff;
-  /* Derived from the accent: a darker fill so white text on it clears 4.5:1,
-     and a lighter tone for accent-coloured text on dark surfaces. */
-  --app-accent-strong: #3e64dc;
-  --app-accent-text: #7b9dfb;
-  --app-bg: #0f1115;
-  --app-panel: #171a21;
-  --app-panel-alt: #1f232c;
-  --app-text: #eef1f6;
-  --app-muted: #8b94a7;
-  --app-border: #262b36;
-  --app-rail: #12151b;
+  --app-accent-strong: #0077d4;
+  --app-accent-text: #2383e2;
+  --app-bg: #ffffff;
+  --app-panel: #ffffff;
+  --app-panel-alt: #f9f8f7;
+  --app-text: #37352f;
+  --app-muted: #787774;
+  --app-border: #e6e5e3;
+  --app-rail: #f9f8f7;
+  --app-hover: rgba(55, 53, 47, 0.08);
+  --app-active: rgba(55, 53, 47, 0.12);
 
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-  --destructive-foreground: var(--color-red-800);
-  --success: var(--color-emerald-500);
-  --success-foreground: var(--color-emerald-900);
-  --info: var(--color-violet-500);
-  --info-foreground: var(--color-violet-900);
-  --warning: var(--color-yellow-500);
-  --warning-foreground: var(--color-yellow-900);
-  --invert: var(--color-zinc-900);
-  --invert-foreground: var(--color-zinc-50);
+  --background: #ffffff;
+  --foreground: #37352f;
+  --card: #ffffff;
+  --card-foreground: #37352f;
+  --popover: #ffffff;
+  --popover-foreground: #37352f;
+  --primary: #2383e2;
+  --primary-foreground: #ffffff;
+  --secondary: #f0efed;
+  --secondary-foreground: #37352f;
+  --muted: #f9f8f7;
+  --muted-foreground: #787774;
+  --accent: #f0efed;
+  --accent-foreground: #37352f;
+  --destructive: #e03e3e;
+  --destructive-foreground: #ffffff;
+  --border: #e6e5e3;
+  --input: #e6e5e3;
+  --ring: #2383e2;
+  --radius: 0.375rem;
+  --sidebar: #f9f8f7;
+  --sidebar-foreground: #37352f;
+  --sidebar-primary: #2383e2;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(55, 53, 47, 0.08);
+  --sidebar-accent-foreground: #37352f;
+  --sidebar-border: #e6e5e3;
+  --sidebar-ring: #2383e2;
+
+  --chart-1: #2383e2;
+  --chart-2: #0f7b6c;
+  --chart-3: #dfab01;
+  --chart-4: #d9730d;
+  --chart-5: #e03e3e;
+  --success: #0f7b6c;
+  --success-foreground: #ffffff;
+  --info: #2383e2;
+  --info-foreground: #ffffff;
+  --warning: #dfab01;
+  --warning-foreground: #37352f;
+  --invert: #37352f;
+  --invert-foreground: #ffffff;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-  --destructive-foreground: var(--color-red-600);
-  --success: var(--color-emerald-500);
-  --success-foreground: var(--color-emerald-600);
-  --info: var(--color-violet-500);
-  --info-foreground: var(--color-violet-600);
-  --warning: var(--color-yellow-500);
-  --warning-foreground: var(--color-yellow-600);
-  --invert: var(--color-zinc-700);
-  --invert-foreground: var(--color-zinc-50);
+  /* Notion Dark Mode (Tatami tokens) */
+  --app-accent: #2383e2;
+  --app-accent-contrast: #ffffff;
+  --app-accent-strong: #4fa7ff;
+  --app-accent-text: #4fa7ff;
+  --app-bg: #191919;
+  --app-panel: #202020;
+  --app-panel-alt: #262626;
+  --app-text: #f0efed;
+  --app-muted: #999999;
+  --app-border: #383836;
+  --app-rail: #202020;
+  --app-hover: rgba(255, 255, 255, 0.055);
+  --app-active: rgba(255, 255, 255, 0.08);
+
+  --background: #191919;
+  --foreground: #f0efed;
+  --card: #202020;
+  --card-foreground: #f0efed;
+  --popover: #252525;
+  --popover-foreground: #f0efed;
+  --primary: #2383e2;
+  --primary-foreground: #ffffff;
+  --secondary: #2f2f2f;
+  --secondary-foreground: #f0efed;
+  --muted: #262626;
+  --muted-foreground: #999999;
+  --accent: #2f2f2f;
+  --accent-foreground: #f0efed;
+  --destructive: #e03e3e;
+  --destructive-foreground: #ffffff;
+  --border: #383836;
+  --input: #383836;
+  --ring: #2383e2;
+  --sidebar: #202020;
+  --sidebar-foreground: #f0efed;
+  --sidebar-primary: #2383e2;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(255, 255, 255, 0.055);
+  --sidebar-accent-foreground: #f0efed;
+  --sidebar-border: #383836;
+  --sidebar-ring: #2383e2;
+
+  --chart-1: #4fa7ff;
+  --chart-2: #2a533c;
+  --chart-3: #f9f3dc;
+  --chart-4: #fbebde;
+  --chart-5: #fce9e7;
+  --success: #2a533c;
+  --success-foreground: #e8f1ec;
+  --info: #213041;
+  --info-foreground: #e5f2fc;
+  --warning: #392e1e;
+  --warning-foreground: #f9f3dc;
+  --invert: #f0efed;
+  --invert-foreground: #191919;
+}
+
+/* Notion 10-Color Tag Helpers */
+.notion-tag-gray {
+  background-color: #ebeced;
+  color: #9b9a97;
+}
+.dark .notion-tag-gray {
+  background-color: #2f2f2f;
+  color: #9b9b9b;
+}
+
+.notion-tag-brown {
+  background-color: #e9e5e3;
+  color: #64473a;
+}
+.dark .notion-tag-brown {
+  background-color: #382d26;
+  color: #bca290;
+}
+
+.notion-tag-orange {
+  background-color: #faebdd;
+  color: #d9730d;
+}
+.dark .notion-tag-orange {
+  background-color: #45362d;
+  color: #fbebde;
+}
+
+.notion-tag-yellow {
+  background-color: #fbf3db;
+  color: #dfab01;
+}
+.dark .notion-tag-yellow {
+  background-color: #392e1e;
+  color: #f9f3dc;
+}
+
+.notion-tag-green {
+  background-color: #ddedea;
+  color: #0f7b6c;
+}
+.dark .notion-tag-green {
+  background-color: #2a533c;
+  color: #e8f1ec;
+}
+
+.notion-tag-blue {
+  background-color: #ddebf1;
+  color: #0b6e99;
+}
+.dark .notion-tag-blue {
+  background-color: #213041;
+  color: #e5f2fc;
+}
+
+.notion-tag-purple {
+  background-color: #eae4f2;
+  color: #6940a5;
+}
+.dark .notion-tag-purple {
+  background-color: #352b42;
+  color: #f3ebf9;
+}
+
+.notion-tag-pink {
+  background-color: #f4dfeb;
+  color: #ad1a72;
+}
+.dark .notion-tag-pink {
+  background-color: #3f2635;
+  color: #fae9f1;
+}
+
+.notion-tag-red {
+  background-color: #fbe4e4;
+  color: #e03e3e;
+}
+.dark .notion-tag-red {
+  background-color: #3e2626;
+  color: #fce9e7;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
-    @apply font-sans;
-    /* Variable fonts only: never let the browser fake a weight it lacks. */
+    font-family: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Ubuntu", "Cantarell", "Noto Sans", Arial, sans-serif;
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    font-family: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Ubuntu", "Cantarell", "Noto Sans", Arial, sans-serif;
+    @apply bg-background text-foreground;
   }
 
-  /* Headings carry their own balance; prose never leaves a lone word behind. */
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  h1, h2, h3, h4, h5, h6 {
     text-wrap: balance;
   }
   p {
     text-wrap: pretty;
   }
 
-  /* Sleek custom scrollbars matching theme palette across all browsers */
+  /* Notion minimal scrollbars */
   * {
     scrollbar-width: thin;
     scrollbar-color: var(--app-border) transparent;
@@ -266,7 +386,7 @@
   }
   ::-webkit-scrollbar-thumb {
     background: var(--app-border);
-    border-radius: 9999px;
+    border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
     background: var(--app-muted);

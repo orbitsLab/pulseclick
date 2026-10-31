@@ -6,13 +6,13 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
     <input
       className={cn(
-        "flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] file:inline-flex file:h-7 file:border-0 file:bg-transparent file:font-medium file:text-foreground file:text-sm placeholder:text-muted-foreground/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
-        "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
-        "aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
+        "flex h-8 w-full min-w-0 rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1 text-xs sm:text-sm text-[var(--app-text)] shadow-[0_1px_2px_rgba(15,15,15,0.04)] outline-none transition-colors file:inline-flex file:h-6 file:border-0 file:bg-transparent file:font-medium file:text-xs file:text-foreground placeholder:text-[var(--app-muted)]/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40",
+        "focus-visible:border-[var(--app-accent)] focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/35",
+        "aria-invalid:border-[#e03e3e] aria-invalid:ring-[#e03e3e]/20",
         type === "search" &&
           "[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none",
         type === "file" &&
-          "p-0 pr-3 text-muted-foreground/70 italic file:me-3 file:h-full file:border-0 file:border-input file:border-r file:border-solid file:bg-transparent file:px-3 file:font-medium file:text-foreground file:text-sm file:not-italic",
+          "p-0 pr-3 text-[var(--app-muted)]/70 italic file:me-3 file:h-full file:border-0 file:border-[var(--app-border)] file:border-r file:border-solid file:bg-transparent file:px-2.5 file:font-medium file:text-xs file:not-italic",
         className,
       )}
       data-slot="input"

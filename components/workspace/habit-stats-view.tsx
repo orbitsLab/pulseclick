@@ -30,102 +30,102 @@ export function HabitStatsView({ analytics, isLoading }: HabitStatsViewProps) {
   const maxMonthCount = Math.max(1, ...monthlyTrends.map((m) => m.count));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* 1. Header Overview KPI Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4">
-          <span className="app-overline font-semibold text-[var(--app-muted)] text-[10px]">
+        <div className="rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3.5">
+          <span className="text-[10px] font-semibold text-[var(--app-muted)] uppercase tracking-wider">
             ALL-TIME CHECK-INS
           </span>
-          <div className="app-figure text-3xl font-bold text-[var(--app-text)] mt-1">
+          <div className="text-2xl font-semibold text-[var(--app-text)] font-mono tabular-nums mt-1">
             {stats?.totalCheckIns || 0}
           </div>
-          <span className="app-meta text-emerald-500 font-medium mt-1 block">
+          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5 block">
             Practiced consistently
           </span>
         </div>
 
-        <div className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4">
-          <span className="app-overline font-semibold text-[var(--app-muted)] text-[10px]">
+        <div className="rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3.5">
+          <span className="text-[10px] font-semibold text-[var(--app-muted)] uppercase tracking-wider">
             COMPLETED CYCLES
           </span>
-          <div className="app-figure text-3xl font-bold text-[var(--app-accent-text)] mt-1 flex items-center gap-1.5">
-            <Trophy className="h-6 w-6 stroke-[2.2]" />
+          <div className="text-2xl font-semibold text-[var(--app-accent)] font-mono tabular-nums mt-1 flex items-center gap-1.5">
+            <Trophy className="h-5 w-5 stroke-[2]" />
             {stats?.totalCycles || 0}
           </div>
-          <span className="app-meta text-[var(--app-muted)] mt-1 block">
+          <span className="text-xs text-[var(--app-muted)] mt-0.5 block">
             Target intervals achieved
           </span>
         </div>
 
-        <div className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4">
-          <span className="app-overline font-semibold text-[var(--app-muted)] text-[10px]">
+        <div className="rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3.5">
+          <span className="text-[10px] font-semibold text-[var(--app-muted)] uppercase tracking-wider">
             PEAK STREAK
           </span>
-          <div className="app-figure text-3xl font-bold text-amber-500 mt-1 flex items-center gap-1">
-            <Flame className="h-6 w-6 fill-current" />
+          <div className="text-2xl font-semibold text-amber-500 font-mono tabular-nums mt-1 flex items-center gap-1">
+            <Flame className="h-5 w-5 fill-current" />
             {stats?.bestStreak || 0}
-            <span className="app-meta font-normal text-[var(--app-muted)] ml-1">days</span>
+            <span className="text-xs font-normal text-[var(--app-muted)] ml-1">days</span>
           </div>
-          <span className="app-meta text-[var(--app-muted)] mt-1 block">
+          <span className="text-xs text-[var(--app-muted)] mt-0.5 block">
             Active: {stats?.currentStreak || 0} days
           </span>
         </div>
 
-        <div className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4">
-          <span className="app-overline font-semibold text-[var(--app-muted)] text-[10px]">
+        <div className="rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3.5">
+          <span className="text-[10px] font-semibold text-[var(--app-muted)] uppercase tracking-wider">
             CONSISTENT DAY
           </span>
-          <div className="app-figure text-2xl font-bold text-[var(--app-text)] mt-1">
+          <div className="text-2xl font-semibold text-[var(--app-text)] font-mono tabular-nums mt-1">
             {peakWeekday ? peakWeekday.name : "—"}
           </div>
-          <span className="app-meta text-sky-400 font-medium mt-1 block">
+          <span className="text-xs text-[#2383e2] dark:text-[#529cca] font-medium mt-0.5 block">
             {peakWeekday?.count || 0} total check-ins
           </span>
         </div>
       </div>
 
       {/* 2. Charts Row: Weekly Rhythm & Monthly Trend */}
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-3 lg:grid-cols-2">
         {/* Weekly Rhythm */}
-        <div className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-5">
-          <div className="flex items-center justify-between pb-4 mb-4 border-b border-[var(--app-border)]/60">
+        <div className="rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-4">
+          <div className="flex items-center justify-between pb-3 mb-3 border-b border-[var(--app-border)]">
             <div>
-              <h4 className="app-title font-semibold text-[var(--app-text)]">
+              <h4 className="text-sm font-semibold text-[var(--app-text)]">
                 Weekly Rhythm
               </h4>
-              <p className="app-meta text-[var(--app-muted)]">
+              <p className="text-xs text-[var(--app-muted)]">
                 Check-in distribution across days of the week.
               </p>
             </div>
-            <span className="rounded-md bg-[var(--app-panel-alt)] px-2 py-1 app-meta font-bold text-[var(--app-accent-text)]">
+            <span className="rounded-[3px] bg-[var(--app-hover)] px-2 py-0.5 text-xs font-medium text-[var(--app-muted)]">
               Mon — Sun
             </span>
           </div>
 
-          <div className="space-y-3 pt-1">
+          <div className="space-y-2.5 pt-1">
             {dayOfWeekDistribution.map((day) => {
               const pct = Math.round((day.count / maxDayCount) * 100);
               const isPeak = day.name === peakWeekday?.name;
 
               return (
                 <div key={day.name} className="flex items-center gap-3">
-                  <span className={`w-8 app-label font-bold text-xs ${isPeak ? "text-[var(--app-accent-text)]" : "text-[var(--app-muted)]"}`}>
+                  <span className={`w-8 text-xs font-medium ${isPeak ? "text-[var(--app-accent)] font-semibold" : "text-[var(--app-muted)]"}`}>
                     {day.name}
                   </span>
 
-                  <div className="flex-1 h-3 rounded-full bg-[var(--app-panel-alt)] overflow-hidden">
+                  <div className="flex-1 h-2.5 rounded-[2px] bg-[var(--app-hover)] overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-500 ${
+                      className={`h-full rounded-[2px] transition-all duration-300 ${
                         isPeak
-                          ? "bg-gradient-to-r from-[var(--app-accent)] to-sky-400"
+                          ? "bg-[var(--app-accent)]"
                           : "bg-[var(--app-accent)]/60"
                       }`}
                       style={{ width: `${Math.max(5, pct)}%` }}
                     />
                   </div>
 
-                  <span className="w-8 text-right app-meta font-bold text-[var(--app-text)] text-xs">
+                  <span className="w-8 text-right font-mono text-xs text-[var(--app-text)]">
                     {day.count}
                   </span>
                 </div>
@@ -135,13 +135,13 @@ export function HabitStatsView({ analytics, isLoading }: HabitStatsViewProps) {
         </div>
 
         {/* Monthly Trend */}
-        <div className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-5">
-          <div className="flex items-center justify-between pb-4 mb-4 border-b border-[var(--app-border)]/60">
+        <div className="rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-4">
+          <div className="flex items-center justify-between pb-3 mb-3 border-b border-[var(--app-border)]">
             <div>
-              <h4 className="app-title font-semibold text-[var(--app-text)]">
+              <h4 className="text-sm font-semibold text-[var(--app-text)]">
                 Monthly Consistency
               </h4>
-              <p className="app-meta text-[var(--app-muted)]">
+              <p className="text-xs text-[var(--app-muted)]">
                 Habit completion trend over the last 6 months.
               </p>
             </div>
@@ -154,16 +154,16 @@ export function HabitStatsView({ analytics, isLoading }: HabitStatsViewProps) {
 
               return (
                 <div key={m.month} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
-                  <span className="app-meta font-bold text-[var(--app-text)] text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="font-mono text-xs text-[var(--app-text)] opacity-0 group-hover:opacity-100 transition-opacity">
                     {m.count}
                   </span>
-                  <div className="w-full max-w-[36px] bg-[var(--app-panel-alt)] rounded-t-lg h-full flex items-end overflow-hidden">
+                  <div className="w-full max-w-[32px] bg-[var(--app-hover)] rounded-t-[3px] h-full flex items-end overflow-hidden">
                     <div
-                      className="w-full rounded-t-lg bg-gradient-to-t from-[var(--app-accent)] to-sky-400 transition-all duration-500"
+                      className="w-full rounded-t-[3px] bg-[var(--app-accent)] transition-all duration-300"
                       style={{ height: `${Math.max(8, heightPct)}%` }}
                     />
                   </div>
-                  <span className="app-overline font-semibold text-[var(--app-muted)] text-[10px]">
+                  <span className="text-[10px] font-semibold text-[var(--app-muted)] uppercase tracking-wider">
                     {m.label}
                   </span>
                 </div>
@@ -174,17 +174,17 @@ export function HabitStatsView({ analytics, isLoading }: HabitStatsViewProps) {
       </div>
 
       {/* 3. Detailed Per-Habit Performance Table */}
-      <div className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-5 overflow-hidden">
-        <div className="flex items-center justify-between pb-3 mb-4 border-b border-[var(--app-border)]/60">
+      <div className="rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-4 overflow-hidden">
+        <div className="flex items-center justify-between pb-3 mb-3 border-b border-[var(--app-border)]">
           <div>
-            <h4 className="app-title font-semibold text-[var(--app-text)]">
+            <h4 className="text-sm font-semibold text-[var(--app-text)]">
               Habit Performance Breakdown
             </h4>
-            <p className="app-meta text-[var(--app-muted)]">
+            <p className="text-xs text-[var(--app-muted)]">
               Streaks, cycles, and completion rates by habit.
             </p>
           </div>
-          <span className="app-meta font-bold text-[var(--app-muted)]">
+          <span className="text-xs text-[var(--app-muted)]">
             {perHabitStats.length} habits
           </span>
         </div>
@@ -192,29 +192,29 @@ export function HabitStatsView({ analytics, isLoading }: HabitStatsViewProps) {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[var(--app-border)]/60 text-[11px] font-semibold text-[var(--app-muted)] uppercase tracking-wider">
-                <th className="pb-3 pl-1">Habit</th>
-                <th className="pb-3">Current Streak</th>
-                <th className="pb-3">Best Run</th>
-                <th className="pb-3">Cycles</th>
-                <th className="pb-3">Total Logs</th>
-                <th className="pb-3 pr-1 text-right">Completion Rate</th>
+              <tr className="border-b border-[var(--app-border)] text-[11px] font-semibold text-[var(--app-muted)] uppercase tracking-wider">
+                <th className="pb-2.5 pl-1">Habit</th>
+                <th className="pb-2.5">Current Streak</th>
+                <th className="pb-2.5">Best Run</th>
+                <th className="pb-2.5">Cycles</th>
+                <th className="pb-2.5">Total Logs</th>
+                <th className="pb-2.5 pr-1 text-right">Completion Rate</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[var(--app-border)]/40 text-sm">
+            <tbody className="divide-y divide-[var(--app-border)] text-xs">
               {perHabitStats.map((habit) => (
-                <tr key={habit.id} className="hover:bg-[var(--app-panel-alt)]/40 transition-colors">
-                  <td className="py-3.5 pl-1">
-                    <div className="flex items-center gap-2.5">
+                <tr key={habit.id} className="hover:bg-[var(--app-hover)]/30 transition-colors">
+                  <td className="py-2.5 pl-1">
+                    <div className="flex items-center gap-2">
                       <div
-                        className="h-3 w-3 rounded-full shrink-0"
+                        className="h-2.5 w-2.5 rounded-full shrink-0"
                         style={{ backgroundColor: habit.color || "var(--app-accent)" }}
                       />
                       <div>
-                        <span className="app-label font-semibold text-[var(--app-text)] block">
+                        <span className="text-xs font-semibold text-[var(--app-text)] block">
                           {habit.title}
                         </span>
-                        <span className="app-meta text-[var(--app-muted)]">
+                        <span className="text-[11px] text-[var(--app-muted)]">
                           {habit.frequency === "DAILY" ? "Daily" : `${habit.targetDays}x/wk`}
                           {habit.goalType === "NUMERIC" && ` · Target ${habit.goalValue} ${habit.goalUnit || ""}`}
                         </span>
@@ -222,33 +222,33 @@ export function HabitStatsView({ analytics, isLoading }: HabitStatsViewProps) {
                     </div>
                   </td>
 
-                  <td className="py-3.5">
-                    <span className="flex items-center gap-1 app-label font-bold text-amber-500">
-                      <Flame className="h-3.5 w-3.5 fill-current" />
+                  <td className="py-2.5">
+                    <span className="flex items-center gap-1 font-mono text-amber-500 font-semibold">
+                      <Flame className="h-3 w-3 fill-current" />
                       {habit.streak}d
                     </span>
                   </td>
 
-                  <td className="py-3.5">
-                    <span className="app-label font-medium text-[var(--app-text)]">
+                  <td className="py-2.5">
+                    <span className="font-mono text-[var(--app-text)]">
                       {habit.bestStreak} days
                     </span>
                   </td>
 
-                  <td className="py-3.5">
-                    <span className="inline-flex items-center gap-1 rounded-md bg-[var(--app-panel-alt)] px-2 py-0.5 app-meta font-bold text-[var(--app-accent-text)] border border-[var(--app-border)]/50">
+                  <td className="py-2.5">
+                    <span className="inline-flex items-center gap-1 rounded-[3px] bg-[var(--app-hover)] px-1.5 py-0.5 text-xs text-[var(--app-text)] border border-[var(--app-border)]">
                       <Trophy className="h-3 w-3" />
                       {habit.completedCycles}
                     </span>
                   </td>
 
-                  <td className="py-3.5 app-label font-medium text-[var(--app-text)]">
+                  <td className="py-2.5 font-mono text-[var(--app-text)]">
                     {habit.totalLogs}
                   </td>
 
-                  <td className="py-3.5 pr-1 text-right">
-                    <div className="flex items-center justify-end gap-2.5">
-                      <div className="w-20 h-2 rounded-full bg-[var(--app-panel-alt)] overflow-hidden">
+                  <td className="py-2.5 pr-1 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <div className="w-16 h-1.5 rounded-full bg-[var(--app-hover)] overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-300"
                           style={{
@@ -257,7 +257,7 @@ export function HabitStatsView({ analytics, isLoading }: HabitStatsViewProps) {
                           }}
                         />
                       </div>
-                      <span className="app-meta font-bold text-[var(--app-text)] w-8 text-right">
+                      <span className="font-mono text-xs text-[var(--app-text)] w-8 text-right">
                         {habit.completionRate}%
                       </span>
                     </div>

@@ -43,17 +43,17 @@ export function DeleteConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-text)] shadow-2xl">
         <DialogHeader>
           <div className="flex items-start gap-3 text-left">
-            <div className="bg-destructive/10 text-destructive rounded-full flex size-10 shrink-0 items-center justify-center">
-              <AlertTriangleIcon className="size-5" />
+            <div className="bg-[rgba(255,0,26,0.1)] text-[#eb5757] rounded-[6px] flex size-9 shrink-0 items-center justify-center">
+              <AlertTriangleIcon className="size-4.5" />
             </div>
             <div className="flex flex-col gap-1">
-              <DialogTitle className="app-heading font-semibold text-[var(--app-text)]">
+              <DialogTitle className="text-sm font-semibold text-[var(--app-text)]">
                 {title}
               </DialogTitle>
-              <DialogDescription className="app-body text-[var(--app-muted)]">
+              <DialogDescription className="text-xs text-[var(--app-muted)]">
                 {description}
               </DialogDescription>
             </div>
@@ -64,7 +64,7 @@ export function DeleteConfirmDialog({
             <Button
               variant="outline"
               disabled={isDeleting}
-              className="border-[var(--app-border)] bg-[var(--app-panel-alt)] hover:bg-[var(--app-panel-alt)]/80 text-[var(--app-text)]"
+              className="h-7 rounded-[4px] border-[var(--app-border)] bg-[var(--app-panel)] hover:bg-[var(--app-hover)] text-xs text-[var(--app-text)]"
             >
               Cancel
             </Button>
@@ -73,6 +73,7 @@ export function DeleteConfirmDialog({
             variant="destructive"
             onClick={handleConfirm}
             disabled={isDeleting}
+            className="h-7 rounded-[4px] text-xs font-medium bg-[#eb5757] hover:bg-[#eb5757]/90 text-white"
           >
             {isDeleting ? "Deleting..." : confirmLabel}
           </Button>

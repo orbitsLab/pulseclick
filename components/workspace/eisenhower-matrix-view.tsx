@@ -57,8 +57,8 @@ export function EisenhowerMatrixView({
       id: "q1",
       title: "Urgent & Important",
       subtitle: "Do First • Crises & Deadlines",
-      color: "border-rose-500/60 bg-rose-500/5 text-rose-500",
-      accent: "#ef4444",
+      color: "border-[rgba(255,0,26,0.25)] bg-[rgba(255,0,26,0.03)] text-[#eb5757] dark:text-[#ff7369]",
+      accent: "#eb5757",
       tasks: q1Tasks,
       defaultPriority: 3,
       defaultDueDate: today,
@@ -67,8 +67,8 @@ export function EisenhowerMatrixView({
       id: "q2",
       title: "Not Urgent & Important",
       subtitle: "Schedule • Strategic Planning & Growth",
-      color: "border-amber-500/60 bg-amber-500/5 text-amber-500",
-      accent: "#f59e0b",
+      color: "border-[rgba(203,145,47,0.25)] bg-[rgba(203,145,47,0.03)] text-[#dfab01] dark:text-[#f3cd46]",
+      accent: "#dfab01",
       tasks: q2Tasks,
       defaultPriority: 2,
       defaultDueDate: null,
@@ -77,8 +77,8 @@ export function EisenhowerMatrixView({
       id: "q3",
       title: "Urgent & Not Important",
       subtitle: "Delegate • Interruptions & Busywork",
-      color: "border-blue-500/60 bg-blue-500/5 text-blue-400",
-      accent: "#3b82f6",
+      color: "border-[rgba(35,131,226,0.25)] bg-[rgba(35,131,226,0.03)] text-[#2383e2] dark:text-[#529cca]",
+      accent: "#2383e2",
       tasks: q3Tasks,
       defaultPriority: 1,
       defaultDueDate: today,
@@ -87,8 +87,8 @@ export function EisenhowerMatrixView({
       id: "q4",
       title: "Not Urgent & Not Important",
       subtitle: "Eliminate • Distractions & Time Wasters",
-      color: "border-[var(--app-border)]/60 bg-[var(--app-panel-alt)]/5 text-[var(--app-muted)]",
-      accent: "#94a3b8",
+      color: "border-[var(--app-border)] bg-[rgba(55,53,47,0.03)] dark:bg-[rgba(255,255,255,0.02)] text-[var(--app-muted)]",
+      accent: "#787774",
       tasks: q4Tasks,
       defaultPriority: 0,
       defaultDueDate: null,
@@ -110,25 +110,25 @@ export function EisenhowerMatrixView({
 
   return (
     <div className="flex-1 min-h-0 overflow-y-auto pr-1 sm:pr-2 pb-12">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-4">
         {quadrants.map((quad) => (
           <div
             key={quad.id}
-            className={`flex flex-col rounded-2xl border-2 p-3.5 sm:p-4 transition-all ${quad.color} dark:bg-[var(--app-rail)]/60 min-h-[300px]`}
+            className={`flex flex-col rounded-[8px] border p-3.5 transition-all ${quad.color} min-h-[300px]`}
           >
           {/* Header */}
-          <div className="flex items-center justify-between pb-2 mb-2 border-b border-current/20">
+          <div className="flex items-center justify-between pb-2 mb-2 border-b border-current/15">
             <div>
-              <h3 className="app-overline font-semibold">{quad.title}</h3>
-              <p className="app-meta opacity-80">{quad.subtitle}</p>
+              <h3 className="text-xs font-semibold uppercase tracking-wider">{quad.title}</h3>
+              <p className="text-[11px] opacity-75">{quad.subtitle}</p>
             </div>
-            <span className="rounded-full px-2 py-0.5 app-label font-semibold bg-current/10">
+            <span className="rounded-[3px] px-1.5 py-0.5 text-xs font-medium bg-current/10">
               {quad.tasks.length}
             </span>
           </div>
 
           {/* Quick Input Form */}
-          <div className="flex items-center gap-1.5 mb-3">
+          <div className="flex items-center gap-1.5 mb-2.5">
             <input
               type="text"
               value={quickInput[quad.id] || ""}
@@ -139,32 +139,32 @@ export function EisenhowerMatrixView({
                 }
               }}
               placeholder="+ Add task to this quadrant..."
-              className="flex-1 rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1.5 app-label text-[var(--app-text)] placeholder-[var(--app-muted)] focus:outline-none focus:border-current"
+              className="flex-1 rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1 text-xs text-[var(--app-text)] placeholder-[var(--app-muted)] focus:outline-none focus:border-[var(--app-accent)]"
             />
             <button
               type="button"
               onClick={() => handleQuickAdd(quad.id, quad.defaultPriority, quad.defaultDueDate)}
-              className="rounded-lg p-1.5 bg-current/15 hover:bg-current/25 transition-colors"
+              className="rounded-[4px] p-1 bg-current/10 hover:bg-current/20 transition-colors cursor-pointer"
             >
               <Plus className="h-4 w-4" />
             </button>
           </div>
 
           {/* Tasks in Quadrant */}
-          <div className="flex-1 space-y-1.5 overflow-y-auto max-h-[340px]">
+          <div className="flex-1 space-y-1 overflow-y-auto max-h-[340px]">
             {isLoading && tasks.length === 0 ? (
               <div className="space-y-1.5 p-1">
-                <div className="flex items-center gap-2 rounded-xl border border-[var(--app-border)]/40 bg-[var(--app-panel)]/30 p-2.5">
-                  <Skeleton className="h-4 w-4 rounded-md bg-[var(--app-panel-alt)] shrink-0" />
-                  <Skeleton className="h-4 w-3/4 rounded bg-[var(--app-panel-alt)]" />
+                <div className="flex items-center gap-2 rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)]/30 p-2">
+                  <Skeleton className="h-3.5 w-3.5 rounded-[3px] bg-[var(--app-hover)] shrink-0" />
+                  <Skeleton className="h-3.5 w-3/4 rounded bg-[var(--app-hover)]" />
                 </div>
-                <div className="flex items-center gap-2 rounded-xl border border-[var(--app-border)]/40 bg-[var(--app-panel)]/30 p-2.5">
-                  <Skeleton className="h-4 w-4 rounded-md bg-[var(--app-panel-alt)] shrink-0" />
-                  <Skeleton className="h-4 w-1/2 rounded bg-[var(--app-panel-alt)]" />
+                <div className="flex items-center gap-2 rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)]/30 p-2">
+                  <Skeleton className="h-3.5 w-3.5 rounded-[3px] bg-[var(--app-hover)] shrink-0" />
+                  <Skeleton className="h-3.5 w-1/2 rounded bg-[var(--app-hover)]" />
                 </div>
               </div>
             ) : quad.tasks.length === 0 ? (
-              <div className="py-8 text-center app-label opacity-50">No tasks in this quadrant</div>
+              <div className="py-8 text-center text-xs opacity-50">No tasks in this quadrant</div>
             ) : (
               quad.tasks.map((task) => {
                 const isSelected = selectedTaskId === task.id;
@@ -172,7 +172,7 @@ export function EisenhowerMatrixView({
                   <div
                     key={task.id}
                     onClick={() => onSelectTask(task.id)}
-                    className={`flex items-center justify-between gap-2 rounded-xl border p-2.5 cursor-pointer transition-all ${ isSelected ? "border-[var(--app-accent)] bg-[var(--app-accent)]/10 ring-1 ring-[var(--app-accent)]" : "border-[var(--app-border)] bg-[var(--app-panel)] dark:border-[var(--app-border)] dark:bg-[var(--app-bg)]/80 hover:border-[var(--app-border)]" }`}
+                    className={`flex items-center justify-between gap-2 rounded-[4px] border p-2 cursor-pointer transition-colors ${ isSelected ? "border-[var(--app-accent)] bg-[var(--app-hover)] ring-1 ring-[var(--app-accent)]" : "border-[var(--app-border)] bg-[var(--app-panel)] hover:bg-[var(--app-hover)]" }`}
                   >
                     <div className="flex items-center gap-2 min-w-0 flex-1">
                       {(() => {
@@ -187,7 +187,7 @@ export function EisenhowerMatrixView({
                               }}
                               title={isWontDo ? "Won't Do" : task.completed ? "Completed" : "Mark complete"}
                               className={cn(
-                                "flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border transition-colors",
+                                "flex h-3.5 w-3.5 flex-shrink-0 items-center justify-center rounded-[3px] border transition-colors",
                                 task.completed
                                   ? isWontDo
                                     ? "border-rose-500 bg-rose-500 text-white"
@@ -196,17 +196,17 @@ export function EisenhowerMatrixView({
                               )}
                             >
                               {task.completed && (
-                                isWontDo ? <X className="h-3 w-3 stroke-[3]" /> : <Check className="h-3 w-3 stroke-[3]" />
+                                isWontDo ? <X className="h-2.5 w-2.5 stroke-[3]" /> : <Check className="h-2.5 w-2.5 stroke-[3]" />
                               )}
                             </button>
                             <span className={cn(
-                              "app-heading font-semibold truncate",
+                              "text-xs font-medium truncate",
                               task.completed ? "line-through text-[var(--app-muted)]" : "text-[var(--app-text)]"
                             )}>
                               {task.title}
                             </span>
                             {isWontDo && (
-                              <span className="inline-flex shrink-0 items-center gap-0.5 rounded px-1.5 py-0.2 app-meta font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25">
+                              <span className="inline-flex shrink-0 items-center gap-0.5 rounded-[3px] px-1 py-0.2 text-[10px] font-medium bg-[rgba(255,0,26,0.1)] text-[#eb5757] border border-[rgba(255,0,26,0.2)]">
                                 Won&apos;t Do
                               </span>
                             )}
@@ -219,11 +219,11 @@ export function EisenhowerMatrixView({
                       const schedule = formatTaskSchedule(task);
                       if (!schedule) return null;
                       return (
-                        <span className="app-meta text-[var(--app-muted)] flex items-center gap-1 flex-shrink-0">
+                        <span className="text-[11px] text-[var(--app-muted)] flex items-center gap-1 flex-shrink-0 font-mono">
                           <Calendar className="h-2.5 w-2.5" />
                           <span>{schedule.dateLabel}</span>
                           {schedule.durationBadge && (
-                            <span className="ml-0.5 rounded px-1 py-0.2 bg-[var(--app-accent)]/20 text-[var(--app-accent-text)] font-mono text-[9px] font-semibold">
+                            <span className="ml-0.5 rounded-[3px] px-1 py-0.2 bg-[var(--app-hover)] text-[var(--app-text)] text-[9px]">
                               {schedule.durationBadge}
                             </span>
                           )}

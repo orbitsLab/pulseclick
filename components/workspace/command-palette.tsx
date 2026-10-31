@@ -147,11 +147,11 @@ export function CommandPalette({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 pt-6 sm:pt-20 p-3 sm:p-4 backdrop-blur-xs">
-      <div className="w-full max-w-xl overflow-hidden rounded-2xl border border-[var(--app-border)] bg-[var(--app-rail)] text-[var(--app-text)] shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 pt-6 sm:pt-20 p-3 sm:p-4 backdrop-blur-[1px]">
+      <div className="w-full max-w-xl overflow-hidden rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-text)] shadow-[0_8px_30px_rgba(15,15,15,0.12),0_0_0_1px_rgba(15,15,15,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.08)] animate-in fade-in zoom-in-95 duration-150">
         {/* Search header */}
-        <div className="flex items-center gap-3 border-b border-[var(--app-border)] px-4 py-3">
-          <Search className="h-5 w-5 text-[var(--app-muted)] flex-shrink-0" />
+        <div className="flex items-center gap-2.5 border-b border-[var(--app-border)] px-3.5 py-2.5">
+          <Search className="h-4 w-4 text-[var(--app-muted)] flex-shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -162,21 +162,21 @@ export function CommandPalette({
             }}
             onKeyDown={handleKeyDown}
             placeholder="Type a command, search tasks, lists, or tags..."
-            className="flex-1 bg-transparent app-body text-white placeholder-[var(--app-muted)] focus:outline-none"
+            className="flex-1 bg-transparent text-xs sm:text-sm text-[var(--app-text)] placeholder-[var(--app-muted)]/70 focus:outline-none"
           />
           <button
             type="button"
             onClick={onClose}
-            className="rounded p-1 text-[var(--app-muted)] hover:text-white hover:bg-[var(--app-panel-alt)]"
+            className="rounded-[4px] p-1 text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)] cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Results List */}
-        <div className="max-h-80 overflow-y-auto p-2 space-y-1">
+        <div className="max-h-80 overflow-y-auto p-1.5 space-y-0.5">
           {allItems.length === 0 ? (
-            <div className="py-8 text-center app-label text-[var(--app-muted)]">
+            <div className="py-8 text-center text-xs text-[var(--app-muted)]">
               No results found for &quot;{query}&quot;
             </div>
           ) : (
@@ -188,13 +188,17 @@ export function CommandPalette({
                   type="button"
                   onClick={() => handleSelect(item.action)}
                   onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`flex w-full items-center justify-between rounded-xl px-3 py-2 app-label font-medium transition-colors ${ isSelected ? "bg-[var(--app-accent)]/20 text-[var(--app-accent-text)] font-bold" : "text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]/60" }`}
+                  className={`flex w-full items-center justify-between rounded-[4px] px-2.5 py-1.5 text-xs transition-colors cursor-pointer ${
+                    isSelected
+                      ? "bg-[var(--app-active)] text-[var(--app-text)] font-semibold"
+                      : "text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)]"
+                  }`}
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     {item.icon}
                     <span className="truncate">{item.label}</span>
                   </div>
-                  {isSelected && <ArrowRight className="h-3.5 w-3.5 text-[var(--app-accent-text)]" />}
+                  {isSelected && <ArrowRight className="h-3.5 w-3.5 text-[var(--app-accent)]" />}
                 </button>
               );
             })
@@ -202,18 +206,18 @@ export function CommandPalette({
         </div>
 
         {/* Footer shortcuts tip */}
-        <div className="flex items-center justify-between border-t border-[var(--app-border)] px-4 py-2 app-meta text-[var(--app-muted)] bg-[var(--app-bg)]/40">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between border-t border-[var(--app-border)] px-3 py-1.5 text-[11px] text-[var(--app-muted)] bg-[var(--app-panel-alt)]/60">
+          <div className="flex items-center gap-2.5">
             <span>
-              <kbd className="rounded bg-[var(--app-panel-alt)] px-1 py-0.5 font-mono">↑</kbd>{" "}
-              <kbd className="rounded bg-[var(--app-panel-alt)] px-1 py-0.5 font-mono">↓</kbd> to navigate
+              <kbd className="rounded-[3px] border border-[var(--app-border)] bg-[var(--app-panel)] px-1 py-0.2 font-mono text-[10px]">↑</kbd>{" "}
+              <kbd className="rounded-[3px] border border-[var(--app-border)] bg-[var(--app-panel)] px-1 py-0.2 font-mono text-[10px]">↓</kbd> to navigate
             </span>
             <span>
-              <kbd className="rounded bg-[var(--app-panel-alt)] px-1.5 py-0.5 font-mono">Enter</kbd> to select
+              <kbd className="rounded-[3px] border border-[var(--app-border)] bg-[var(--app-panel)] px-1 py-0.2 font-mono text-[10px]">Enter</kbd> to select
             </span>
           </div>
           <span>
-            <kbd className="rounded bg-[var(--app-panel-alt)] px-1.5 py-0.5 font-mono">Esc</kbd> to close
+            <kbd className="rounded-[3px] border border-[var(--app-border)] bg-[var(--app-panel)] px-1 py-0.2 font-mono text-[10px]">Esc</kbd> to close
           </span>
         </div>
       </div>

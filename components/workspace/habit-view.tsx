@@ -50,23 +50,23 @@ import { HabitEncouragementToast } from "./habit-encouragement-toast";
 
 export function HabitSkeleton({ count = 3 }: { count?: number }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[var(--app-border)]/60 bg-[var(--app-panel)]/40 p-4 transition-opacity"
+          className="flex flex-wrap items-center justify-between gap-4 rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3 transition-opacity"
           style={{ opacity: Math.max(0.35, 1 - i * 0.25) }}
         >
-          <div className="flex items-center gap-3">
-            <Skeleton className="h-10 w-10 rounded-xl bg-[var(--app-panel-alt)]" />
+          <div className="flex items-center gap-2.5">
+            <Skeleton className="h-8 w-8 rounded-[4px] bg-[var(--app-hover)]" />
             <div className="space-y-1.5">
-              <Skeleton className="h-4 w-36 rounded bg-[var(--app-panel-alt)]" />
-              <Skeleton className="h-3 w-24 rounded bg-[var(--app-panel-alt)]/60" />
+              <Skeleton className="h-3.5 w-32 rounded bg-[var(--app-hover)]" />
+              <Skeleton className="h-2.5 w-20 rounded bg-[var(--app-hover)]/60" />
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {Array.from({ length: 7 }).map((_, d) => (
-              <Skeleton key={d} className="h-7 w-7 rounded-full bg-[var(--app-panel-alt)]" />
+              <Skeleton key={d} className="h-6 w-6 rounded-full bg-[var(--app-hover)]" />
             ))}
           </div>
         </div>
@@ -391,24 +391,24 @@ export function HabitView(props: HabitViewProps = {}) {
   }, [habits, habitSections]);
 
   return (
-    <div className="flex-1 flex flex-col rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4 shadow-sm transition-colors sm:p-6 overflow-hidden">
+    <div className="flex-1 flex flex-col rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-4 transition-colors sm:p-5 overflow-hidden">
       {/* Top Header Card: Title, Module Tabs, Action Buttons */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 mb-4 border-b border-[var(--app-border)]">
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-4">
-            <h2 className="app-display text-2xl font-serif text-[var(--app-text)] tracking-tight">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 mb-3 border-b border-[var(--app-border)]">
+        <div className="space-y-1">
+          <div className="flex flex-wrap items-center gap-3">
+            <h2 className="text-base font-semibold text-[var(--app-text)] tracking-tight">
               Habits
             </h2>
 
             {/* View Mode Switcher */}
-            <div className="flex items-center rounded-xl bg-[var(--app-panel-alt)] p-0.5 border border-[var(--app-border)]">
+            <div className="flex items-center rounded-[6px] bg-[var(--app-panel)] p-0.5 border border-[var(--app-border)]">
               <button
                 type="button"
                 onClick={() => handleViewModeChange("ROUTINES")}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg app-label font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] text-xs font-medium transition-colors cursor-pointer ${
                   viewMode === "ROUTINES"
-                    ? "bg-[var(--app-accent-strong)] text-white shadow-xs"
-                    : "text-[var(--app-muted)] hover:text-[var(--app-text)]"
+                    ? "bg-[var(--app-hover)] text-[var(--app-text)] font-semibold shadow-xs"
+                    : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]/50"
                 }`}
               >
                 <Flame className="h-3.5 w-3.5" />
@@ -417,10 +417,10 @@ export function HabitView(props: HabitViewProps = {}) {
               <button
                 type="button"
                 onClick={() => handleViewModeChange("HEATMAP")}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg app-label font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] text-xs font-medium transition-colors cursor-pointer ${
                   viewMode === "HEATMAP"
-                    ? "bg-[var(--app-accent-strong)] text-white shadow-xs"
-                    : "text-[var(--app-muted)] hover:text-[var(--app-text)]"
+                    ? "bg-[var(--app-hover)] text-[var(--app-text)] font-semibold shadow-xs"
+                    : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]/50"
                 }`}
               >
                 <CalendarDays className="h-3.5 w-3.5" />
@@ -429,10 +429,10 @@ export function HabitView(props: HabitViewProps = {}) {
               <button
                 type="button"
                 onClick={() => handleViewModeChange("ANALYTICS")}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg app-label font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] text-xs font-medium transition-colors cursor-pointer ${
                   viewMode === "ANALYTICS"
-                    ? "bg-[var(--app-accent-strong)] text-white shadow-xs"
-                    : "text-[var(--app-muted)] hover:text-[var(--app-text)]"
+                    ? "bg-[var(--app-hover)] text-[var(--app-text)] font-semibold shadow-xs"
+                    : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]/50"
                 }`}
               >
                 <BarChart3 className="h-3.5 w-3.5" />
@@ -441,10 +441,10 @@ export function HabitView(props: HabitViewProps = {}) {
               <button
                 type="button"
                 onClick={() => handleViewModeChange("ACHIEVEMENTS")}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg app-label font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] text-xs font-medium transition-colors cursor-pointer ${
                   viewMode === "ACHIEVEMENTS"
-                    ? "bg-[var(--app-accent-strong)] text-white shadow-xs"
-                    : "text-[var(--app-muted)] hover:text-[var(--app-text)]"
+                    ? "bg-[var(--app-hover)] text-[var(--app-text)] font-semibold shadow-xs"
+                    : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]/50"
                 }`}
               >
                 <Trophy className="h-3.5 w-3.5" />
@@ -453,10 +453,10 @@ export function HabitView(props: HabitViewProps = {}) {
               <button
                 type="button"
                 onClick={() => handleViewModeChange("JOURNAL")}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg app-label font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] text-xs font-medium transition-colors cursor-pointer ${
                   viewMode === "JOURNAL"
-                    ? "bg-[var(--app-accent-strong)] text-white shadow-xs"
-                    : "text-[var(--app-muted)] hover:text-[var(--app-text)]"
+                    ? "bg-[var(--app-hover)] text-[var(--app-text)] font-semibold shadow-xs"
+                    : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]/50"
                 }`}
               >
                 <StickyNote className="h-3.5 w-3.5" />
@@ -465,7 +465,7 @@ export function HabitView(props: HabitViewProps = {}) {
             </div>
           </div>
 
-          <p className="app-body text-[var(--app-muted)]">
+          <p className="text-xs text-[var(--app-muted)]">
             {viewMode === "ROUTINES" && "Build enduring daily practices with custom metrics, sections, and streak protection."}
             {viewMode === "HEATMAP" && "365-day habit matrix visualizing continuous rhythm and intensity."}
             {viewMode === "ANALYTICS" && "Comprehensive cadence, weekday consistency, and cycle completion stats."}
@@ -475,18 +475,18 @@ export function HabitView(props: HabitViewProps = {}) {
         </div>
 
         {/* Right side controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {viewMode === "ROUTINES" ? (
             <>
               {/* Active / Archived sub-tabs */}
-              <div className="flex items-center rounded-xl bg-[var(--app-panel-alt)] p-0.5 border border-[var(--app-border)] mr-1">
+              <div className="flex items-center rounded-[6px] bg-[var(--app-panel)] p-0.5 border border-[var(--app-border)] mr-1">
                 <button
                   type="button"
                   onClick={() => handleTabChange("ACTIVE")}
-                  className={`px-2.5 py-1 rounded-lg app-label font-medium transition-all ${
+                  className={`px-2 py-0.5 rounded-[4px] text-xs font-medium transition-colors cursor-pointer ${
                     activeTab === "ACTIVE"
-                      ? "bg-[var(--app-accent-strong)] text-white shadow-xs"
-                      : "text-[var(--app-muted)] hover:text-[var(--app-text)]"
+                      ? "bg-[var(--app-hover)] text-[var(--app-text)] font-semibold shadow-xs"
+                      : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]/50"
                   }`}
                 >
                   Active
@@ -494,10 +494,10 @@ export function HabitView(props: HabitViewProps = {}) {
                 <button
                   type="button"
                   onClick={() => handleTabChange("ARCHIVED")}
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg app-label font-medium transition-all ${
+                  className={`flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-xs font-medium transition-colors cursor-pointer ${
                     activeTab === "ARCHIVED"
-                      ? "bg-[var(--app-accent-strong)] text-white shadow-xs"
-                      : "text-[var(--app-muted)] hover:text-[var(--app-text)]"
+                      ? "bg-[var(--app-hover)] text-[var(--app-text)] font-semibold shadow-xs"
+                      : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]/50"
                   }`}
                 >
                   <Archive className="h-3 w-3" />
@@ -510,7 +510,7 @@ export function HabitView(props: HabitViewProps = {}) {
                   <button
                     type="button"
                     onClick={() => setShowSectionModal(true)}
-                    className="flex items-center gap-1.5 rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-1.5 app-label font-medium text-[var(--app-text)] hover:border-[var(--app-accent)] transition-all"
+                    className="flex h-7 items-center gap-1 rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 text-xs font-medium text-[var(--app-text)] hover:bg-[var(--app-hover)] transition-colors cursor-pointer"
                     title="Create a new section to organize habits"
                   >
                     <FolderPlus className="h-3.5 w-3.5" />
@@ -520,9 +520,9 @@ export function HabitView(props: HabitViewProps = {}) {
                   <button
                     type="button"
                     onClick={() => openCreateModal()}
-                    className="flex items-center gap-1.5 rounded-xl bg-[var(--app-accent-strong)] px-3.5 py-1.5 app-label font-semibold text-white shadow-md shadow-[var(--app-accent)]/20 hover:brightness-105 transition-all active:scale-95"
+                    className="flex h-7 items-center gap-1 rounded-[4px] bg-[var(--app-accent)] hover:bg-[var(--app-accent)]/90 px-2.5 text-xs font-medium text-white transition-colors cursor-pointer shadow-none"
                   >
-                    <Plus className="h-4 w-4 stroke-[2.5]" />
+                    <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
                     <span>New Habit</span>
                   </button>
                 </>
@@ -532,9 +532,9 @@ export function HabitView(props: HabitViewProps = {}) {
             <button
               type="button"
               onClick={() => openCreateModal()}
-              className="flex items-center gap-1.5 rounded-xl bg-[var(--app-accent-strong)] px-3.5 py-1.5 app-label font-semibold text-white shadow-md shadow-[var(--app-accent)]/20 hover:brightness-105 transition-all active:scale-95"
+              className="flex h-7 items-center gap-1 rounded-[4px] bg-[var(--app-accent)] hover:bg-[var(--app-accent)]/90 px-2.5 text-xs font-medium text-white transition-colors cursor-pointer shadow-none"
             >
-              <Plus className="h-4 w-4 stroke-[2.5]" />
+              <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
               <span>New Habit</span>
             </button>
           )}
@@ -546,15 +546,15 @@ export function HabitView(props: HabitViewProps = {}) {
         <>
           {/* Today's Progress Bar (when viewing Active tab) */}
           {activeTab === "ACTIVE" && totalActiveHabits > 0 && (
-            <div className="mb-6 rounded-xl border border-[var(--app-border)]/60 bg-[var(--app-panel-alt)]/40 p-3.5 space-y-2">
-              <div className="flex items-center justify-between app-label">
+            <div className="mb-6 rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3.5 space-y-2">
+              <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-[var(--app-text)]">Today&apos;s Routines</span>
-                  <span className="rounded-full bg-[var(--app-accent)]/15 px-2 py-0.5 app-meta font-bold text-[var(--app-accent-text)]">
+                  <span className="rounded-[3px] bg-[var(--app-accent-tag-bg)] px-2 py-0.5 text-[11px] font-mono font-medium text-[var(--app-accent)]">
                     {completedTodayCount} of {totalActiveHabits} completed
                   </span>
                 </div>
-                <span className="app-meta font-bold text-[var(--app-muted)]">
+                <span className="text-xs font-mono font-semibold text-[var(--app-muted)]">
                   {Math.round(progressPercent)}%
                 </span>
               </div>
@@ -574,13 +574,13 @@ export function HabitView(props: HabitViewProps = {}) {
               <HabitSkeleton count={4} />
             ) : habits.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-center text-[var(--app-muted)]">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--app-accent)]/10 text-[var(--app-accent-text)] mb-3">
-                  {activeTab === "ACTIVE" ? <Flame className="h-7 w-7" /> : <Archive className="h-7 w-7" />}
+                <div className="flex h-12 w-12 items-center justify-center rounded-[8px] bg-[var(--app-accent-tag-bg)] text-[var(--app-accent)] mb-3">
+                  {activeTab === "ACTIVE" ? <Flame className="h-6 w-6" /> : <Archive className="h-6 w-6" />}
                 </div>
-                <h3 className="app-heading font-semibold text-[var(--app-text)]">
+                <h3 className="text-sm font-semibold text-[var(--app-text)]">
                   {activeTab === "ACTIVE" ? "No active habits created yet" : "No archived habits"}
                 </h3>
-                <p className="app-label text-[var(--app-muted)] mt-1 max-w-sm">
+                <p className="text-xs text-[var(--app-muted)] mt-1 max-w-sm">
                   {activeTab === "ACTIVE"
                     ? 'Click "New Habit" above to start tracking daily routines with check-ins or numeric targets.'
                     : "Habits you archive are preserved here with all past logs and streaks intact."}
@@ -638,12 +638,12 @@ export function HabitView(props: HabitViewProps = {}) {
                       {!isCollapsed && (
                         <div className="space-y-3 pl-1">
                           {sectionHabits.length === 0 ? (
-                            <div className="rounded-xl border border-dashed border-[var(--app-border)] p-4 text-center app-meta text-[var(--app-muted)]">
+                            <div className="rounded-[6px] border border-dashed border-[var(--app-border)] p-4 text-center text-xs text-[var(--app-muted)]">
                               No habits in this section.{" "}
                               <button
                                 type="button"
                                 onClick={() => openCreateModal(section.id)}
-                                className="text-[var(--app-accent-text)] underline font-medium hover:brightness-110"
+                                className="text-[var(--app-accent)] underline font-medium hover:underline cursor-pointer"
                               >
                                 Add one now
                               </button>
@@ -786,16 +786,16 @@ export function HabitView(props: HabitViewProps = {}) {
 
       {/* 1. Create / Edit Habit Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-md rounded-2xl border border-[var(--app-border)] bg-[var(--app-rail)] p-6 text-[var(--app-text)] shadow-2xl animate-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
-            <h3 className="app-title font-semibold text-white mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-md rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-5 text-[var(--app-text)] shadow-2xl animate-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-base font-semibold text-[var(--app-text)] mb-3">
               {editingHabit ? "Edit Habit" : "Create New Habit"}
             </h3>
 
-            <form onSubmit={handleSaveHabit} className="space-y-4">
+            <form onSubmit={handleSaveHabit} className="space-y-3.5">
               {/* Title */}
               <div>
-                <label className="block app-overline font-semibold text-[var(--app-muted)] mb-1">
+                <label className="block text-[11px] font-semibold text-[var(--app-muted)] uppercase tracking-wider mb-1">
                   Habit Name
                 </label>
                 <input
@@ -805,7 +805,7 @@ export function HabitView(props: HabitViewProps = {}) {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Read 20 pages, Drink Water, Morning Workout"
-                  className="w-full rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3.5 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                  className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-3 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)]"
                 />
               </div>
 
@@ -818,26 +818,26 @@ export function HabitView(props: HabitViewProps = {}) {
                   <button
                     type="button"
                     onClick={() => setGoalType("BOOLEAN")}
-                    className={`flex items-center justify-center gap-2 rounded-xl p-2.5 border app-label font-medium transition-all ${
+                    className={`flex items-center justify-center gap-2 rounded-[4px] p-2 border text-xs font-medium transition-colors ${
                       goalType === "BOOLEAN"
-                        ? "border-[var(--app-accent)] bg-[var(--app-accent)]/15 text-white"
-                        : "border-[var(--app-border)] bg-[var(--app-panel-alt)]/60 text-[var(--app-muted)] hover:text-white"
+                        ? "border-[var(--app-accent)] bg-[var(--app-accent-tag-bg)] text-[var(--app-accent)]"
+                        : "border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-hover)]"
                     }`}
                   >
-                    <Check className="h-4 w-4" />
+                    <Check className="h-3.5 w-3.5" />
                     <span>Yes / No Check-in</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setGoalType("NUMERIC")}
-                    className={`flex items-center justify-center gap-2 rounded-xl p-2.5 border app-label font-medium transition-all ${
+                    className={`flex items-center justify-center gap-2 rounded-[4px] p-2 border text-xs font-medium transition-colors ${
                       goalType === "NUMERIC"
-                        ? "border-[var(--app-accent)] bg-[var(--app-accent)]/15 text-white"
-                        : "border-[var(--app-border)] bg-[var(--app-panel-alt)]/60 text-[var(--app-muted)] hover:text-white"
+                        ? "border-[var(--app-accent)] bg-[var(--app-accent-tag-bg)] text-[var(--app-accent)]"
+                        : "border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-hover)]"
                     }`}
                   >
-                    <Target className="h-4 w-4" />
+                    <Target className="h-3.5 w-3.5" />
                     <span>Numeric Target</span>
                   </button>
                 </div>
@@ -845,7 +845,7 @@ export function HabitView(props: HabitViewProps = {}) {
 
               {/* Numeric Goal Target and Unit */}
               {goalType === "NUMERIC" && (
-                <div className="grid grid-cols-2 gap-3 p-3 rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)]/40">
+                <div className="grid grid-cols-2 gap-3 p-3 rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel-hover)]">
                   <div>
                     <label className="block app-overline font-semibold text-[var(--app-muted)] mb-1">
                       Target Amount
@@ -903,7 +903,7 @@ export function HabitView(props: HabitViewProps = {}) {
                 <select
                   value={sectionId}
                   onChange={(e) => setSectionId(e.target.value)}
-                  className="w-full rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                  className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)]"
                 >
                   <option value="">No Section (General)</option>
                   {habitSections.map((sec) => (
@@ -915,15 +915,15 @@ export function HabitView(props: HabitViewProps = {}) {
               </div>
 
               {/* Frequency */}
-              <div className="grid grid-cols-2 gap-2 app-label">
+              <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
-                  <label className="block app-overline font-semibold text-[var(--app-muted)] mb-1">
+                  <label className="block text-[11px] font-semibold text-[var(--app-muted)] uppercase tracking-wider mb-1">
                     Frequency
                   </label>
                   <select
                     value={frequency}
                     onChange={(e) => setFrequency(e.target.value)}
-                    className="w-full rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                    className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)]"
                   >
                     <option value="DAILY">Every Day</option>
                     <option value="WEEKLY">Weekly Target</option>
@@ -931,7 +931,7 @@ export function HabitView(props: HabitViewProps = {}) {
                 </div>
 
                 <div>
-                  <label className="block app-overline font-semibold text-[var(--app-muted)] mb-1">
+                  <label className="block text-[11px] font-semibold text-[var(--app-muted)] uppercase tracking-wider mb-1">
                     Days / Week
                   </label>
                   <input
@@ -940,7 +940,7 @@ export function HabitView(props: HabitViewProps = {}) {
                     max={7}
                     value={targetDays}
                     onChange={(e) => setTargetDays(Number(e.target.value))}
-                    className="w-full rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                    className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)] font-mono"
                   />
                 </div>
               </div>
@@ -1000,20 +1000,20 @@ export function HabitView(props: HabitViewProps = {}) {
                   value={encouragement}
                   onChange={(e) => setEncouragement(e.target.value)}
                   placeholder="e.g. Small steps every day create massive growth"
-                  className="w-full rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                  className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)]"
                 />
               </div>
 
               {/* Daily Reminder Time */}
-              <div className="rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)]/40 p-3 space-y-2.5">
+              <div className="rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel-hover)] p-3 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Bell className="h-4 w-4 text-[var(--app-accent-text)]" />
+                    <Bell className="h-4 w-4 text-[var(--app-accent)]" />
                     <div>
-                      <label htmlFor="habitReminderToggle" className="app-label font-semibold text-[var(--app-text)] block cursor-pointer">
+                      <label htmlFor="habitReminderToggle" className="text-xs font-semibold text-[var(--app-text)] block cursor-pointer">
                         Daily Reminder
                       </label>
-                      <span className="app-meta text-[var(--app-muted)]">
+                      <span className="text-[11px] text-[var(--app-muted)]">
                         Prompt at your chosen routine time
                       </span>
                     </div>
@@ -1023,19 +1023,19 @@ export function HabitView(props: HabitViewProps = {}) {
                     type="checkbox"
                     checked={reminderEnabled}
                     onChange={(e) => setReminderEnabled(e.target.checked)}
-                    className="h-4 w-4 rounded border-[var(--app-border)] accent-[var(--app-accent)] cursor-pointer"
+                    className="h-4 w-4 rounded-[3px] border-[var(--app-border)] accent-[var(--app-accent)] cursor-pointer"
                   />
                 </div>
 
                 {reminderEnabled && (
-                  <div className="flex items-center gap-2 pt-2 border-t border-[var(--app-border)]/60">
+                  <div className="flex items-center gap-2 pt-2 border-t border-[var(--app-border)]">
                     <Clock className="h-3.5 w-3.5 text-[var(--app-muted)]" />
-                    <span className="app-label text-[var(--app-muted)]">Remind at:</span>
+                    <span className="text-xs text-[var(--app-muted)]">Remind at:</span>
                     <input
                       type="time"
                       value={reminderTime}
                       onChange={(e) => setReminderTime(e.target.value)}
-                      className="rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-2.5 py-1 app-label text-white focus:outline-hidden focus:border-[var(--app-accent)]"
+                      className="rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2 py-1 text-xs text-[var(--app-text)] font-mono focus:outline-none focus:border-[var(--app-accent)]"
                     />
                   </div>
                 )}
@@ -1046,13 +1046,13 @@ export function HabitView(props: HabitViewProps = {}) {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="rounded-lg px-3.5 py-1.5 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
+                  className="rounded-[4px] px-3 py-1.5 text-xs text-[var(--app-muted)] hover:bg-[var(--app-panel-hover)]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-xl bg-[var(--app-accent-strong)] px-4 py-1.5 app-label font-semibold text-white hover:brightness-110 shadow-md shadow-[var(--app-accent)]/20"
+                  className="rounded-[4px] bg-[var(--app-accent)] px-3.5 py-1.5 text-xs font-medium text-white hover:bg-[var(--app-accent-hover)] transition-colors shadow-xs"
                 >
                   {editingHabit ? "Save Changes" : "Create Habit"}
                 </button>
@@ -1064,16 +1064,16 @@ export function HabitView(props: HabitViewProps = {}) {
 
       {/* 2. Create Section Modal */}
       {showSectionModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-sm rounded-2xl border border-[var(--app-border)] bg-[var(--app-rail)] p-5 text-[var(--app-text)] shadow-2xl animate-in zoom-in-95 duration-150">
-            <h3 className="app-title font-semibold text-white mb-3">Create Section</h3>
-            <p className="app-meta text-[var(--app-muted)] mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-sm rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-5 text-[var(--app-text)] shadow-2xl animate-in zoom-in-95 duration-150">
+            <h3 className="text-base font-semibold text-[var(--app-text)] mb-1">Create Section</h3>
+            <p className="text-xs text-[var(--app-muted)] mb-3">
               Organize your habits into focused groups like &quot;Morning Routine&quot; or &quot;Evening Wind-down&quot;.
             </p>
 
-            <form onSubmit={handleCreateSection} className="space-y-4">
+            <form onSubmit={handleCreateSection} className="space-y-3.5">
               <div>
-                <label className="block app-overline font-semibold text-[var(--app-muted)] mb-1">
+                <label className="block text-[11px] font-semibold text-[var(--app-muted)] uppercase tracking-wider mb-1">
                   Section Name
                 </label>
                 <input
@@ -1083,7 +1083,7 @@ export function HabitView(props: HabitViewProps = {}) {
                   value={newSectionName}
                   onChange={(e) => setNewSectionName(e.target.value)}
                   placeholder="e.g. Morning Routine, Fitness, Night"
-                  className="w-full rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+                  className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)]"
                 />
               </div>
 
@@ -1091,13 +1091,13 @@ export function HabitView(props: HabitViewProps = {}) {
                 <button
                   type="button"
                   onClick={() => setShowSectionModal(false)}
-                  className="rounded-lg px-3 py-1.5 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
+                  className="rounded-[4px] px-3 py-1.5 text-xs text-[var(--app-muted)] hover:bg-[var(--app-panel-hover)]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-xl bg-[var(--app-accent-strong)] px-4 py-1.5 app-label font-semibold text-white hover:brightness-110"
+                  className="rounded-[4px] bg-[var(--app-accent)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[var(--app-accent-hover)] transition-colors shadow-sm"
                 >
                   Save Section
                 </button>
@@ -1223,24 +1223,24 @@ function HabitRow({
   const numericProgressPct = Math.min(100, Math.round((currentVal / targetVal) * 100));
 
   return (
-    <div className="group relative flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[var(--app-border)]/80 bg-[var(--app-panel)] p-3.5 transition-all hover:border-[var(--app-border)] hover:shadow-xs">
+    <div className="group relative flex flex-wrap items-center justify-between gap-3 rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3 transition-colors hover:bg-[var(--app-hover)]/20">
       {/* Left: Icon, Title, Goal details & Streak */}
-      <div className="flex items-center gap-3 min-w-[200px] sm:min-w-[240px] flex-1">
+      <div className="flex items-center gap-2.5 min-w-[200px] sm:min-w-[240px] flex-1">
         <div
-          className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl font-bold text-white shadow-xs"
-          style={{ backgroundColor: habit.color || "#14b8a6" }}
+          className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[4px] font-medium text-white shadow-xs"
+          style={{ backgroundColor: habit.color || "#2383e2" }}
         >
-          {ICON_MAP[habit.icon] || <Flame className="h-4 w-4" />}
+          {ICON_MAP[habit.icon] || <Flame className="h-3.5 w-3.5" />}
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h4 className="app-heading font-semibold text-[var(--app-text)] truncate">
+            <h4 className="text-xs font-semibold text-[var(--app-text)] truncate">
               {habit.title}
             </h4>
 
             {isSkippedToday && (
-              <span className="rounded-md bg-amber-500/15 text-amber-500 app-meta font-bold px-1.5 py-0.2">
+              <span className="rounded-[3px] bg-amber-500/15 text-amber-500 text-[10px] font-medium px-1.5 py-0.2">
                 Skipped Today
               </span>
             )}
@@ -1422,14 +1422,14 @@ function HabitRow({
                 className="fixed inset-0 z-40"
                 onClick={() => setShowMenu(false)}
               />
-              <div className="absolute right-0 top-9 z-50 w-44 rounded-xl border border-[var(--app-border)] bg-[var(--app-rail)] p-1 shadow-xl animate-in zoom-in-95 duration-100">
+              <div className="absolute right-0 top-9 z-50 w-44 rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-1 shadow-xl animate-in zoom-in-95 duration-100">
                 <button
                   type="button"
                   onClick={() => {
                     setShowMenu(false);
                     onViewStats?.(habit);
                   }}
-                  className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 app-label text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]"
+                  className="flex w-full items-center gap-2 rounded-[4px] px-2.5 py-1.5 text-xs text-[var(--app-text)] hover:bg-[var(--app-panel-hover)]"
                 >
                   <BarChart3 className="h-3.5 w-3.5 text-[var(--app-accent-text)]" />
                   <span>Heat Map & Trends</span>
@@ -1543,26 +1543,26 @@ function NumericValueModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs">
-      <div className="w-full max-w-sm rounded-2xl border border-[var(--app-border)] bg-[var(--app-rail)] p-5 text-[var(--app-text)] shadow-2xl animate-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+      <div className="w-full max-w-sm rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-5 text-[var(--app-text)] shadow-2xl animate-in zoom-in-95 duration-150">
         <div className="flex items-center gap-2.5 mb-3">
           <div
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-white"
+            className="flex h-7 w-7 items-center justify-center rounded-[4px] text-white"
             style={{ backgroundColor: habit.color || "var(--app-accent)" }}
           >
-            {ICON_MAP[habit.icon] || <Target className="h-4 w-4" />}
+            {ICON_MAP[habit.icon] || <Target className="h-3.5 w-3.5" />}
           </div>
           <div>
-            <h3 className="app-heading font-semibold text-white">{habit.title}</h3>
-            <p className="app-meta text-[var(--app-muted)]">
+            <h3 className="text-sm font-semibold text-[var(--app-text)]">{habit.title}</h3>
+            <p className="text-xs text-[var(--app-muted)]">
               Target: {targetVal} {habit.goalUnit || "units"} for {date}
             </p>
           </div>
         </div>
 
         {/* Stepper Controls */}
-        <div className="my-4 rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)]/60 p-4 flex flex-col items-center gap-3">
-          <span className="app-overline font-semibold text-[var(--app-muted)]">
+        <div className="my-3 rounded-[6px] border border-[var(--app-border)] bg-[var(--app-hover)]/40 p-3.5 flex flex-col items-center gap-2">
+          <span className="text-[10px] font-semibold text-[var(--app-muted)] uppercase tracking-wider">
             RECORDED TODAY
           </span>
 
@@ -1570,7 +1570,7 @@ function NumericValueModal({
             <button
               type="button"
               onClick={() => handleQuickAdd(-1)}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--app-border)] bg-[var(--app-panel)] text-white hover:border-[var(--app-accent)] active:scale-95 transition-all"
+              className="flex h-9 w-9 items-center justify-center rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-text)] hover:bg-[var(--app-panel-hover)] active:scale-95 transition-all cursor-pointer"
             >
               <Minus className="h-4 w-4" />
             </button>
@@ -1582,15 +1582,15 @@ function NumericValueModal({
                 step="any"
                 value={val}
                 onChange={(e) => setVal(Math.max(0, Number(e.target.value)))}
-                className="w-20 text-center rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] py-1.5 text-2xl font-bold text-white focus:outline-none focus:border-[var(--app-accent)]"
+                className="w-20 text-center rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] py-1.5 text-xl font-bold font-mono text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)]"
               />
-              <span className="app-label text-[var(--app-muted)]">{habit.goalUnit || ""}</span>
+              <span className="text-xs text-[var(--app-muted)]">{habit.goalUnit || ""}</span>
             </div>
 
             <button
               type="button"
               onClick={() => handleQuickAdd(1)}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--app-border)] bg-[var(--app-panel)] text-white hover:border-[var(--app-accent)] active:scale-95 transition-all font-bold text-lg"
+              className="flex h-9 w-9 items-center justify-center rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-text)] hover:bg-[var(--app-panel-hover)] active:scale-95 transition-all font-bold text-base cursor-pointer"
             >
               +
             </button>
@@ -1601,21 +1601,21 @@ function NumericValueModal({
             <button
               type="button"
               onClick={() => handleQuickAdd(2)}
-              className="rounded-lg bg-[var(--app-panel)] px-2.5 py-1 app-meta text-[var(--app-muted)] hover:text-white border border-[var(--app-border)]"
+              className="rounded-[4px] bg-[var(--app-panel)] px-2.5 py-1 text-xs text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-hover)] border border-[var(--app-border)] cursor-pointer"
             >
               +2
             </button>
             <button
               type="button"
               onClick={() => handleQuickAdd(5)}
-              className="rounded-lg bg-[var(--app-panel)] px-2.5 py-1 app-meta text-[var(--app-muted)] hover:text-white border border-[var(--app-border)]"
+              className="rounded-[4px] bg-[var(--app-panel)] px-2.5 py-1 text-xs text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-hover)] border border-[var(--app-border)] cursor-pointer"
             >
               +5
             </button>
             <button
               type="button"
               onClick={handleMarkGoalMet}
-              className="rounded-lg bg-[var(--app-accent)]/20 px-2.5 py-1 app-meta font-bold text-[var(--app-accent-text)] border border-[var(--app-accent)]/30 hover:bg-[var(--app-accent)]/30"
+              className="rounded-[3px] bg-[var(--app-accent-tag-bg)] px-2 py-0.5 text-xs font-mono font-medium text-[var(--app-accent)] border border-[var(--app-accent)]/20 cursor-pointer"
             >
               Full Target ({targetVal})
             </button>
@@ -1624,7 +1624,7 @@ function NumericValueModal({
 
         {/* Optional reflection memo/note */}
         <div className="mb-4">
-          <label className="flex items-center gap-1.5 app-overline font-semibold text-[var(--app-muted)] mb-1">
+          <label className="flex items-center gap-1.5 text-[11px] font-semibold text-[var(--app-muted)] uppercase tracking-wider mb-1">
             <StickyNote className="h-3 w-3" />
             <span>Reflection Memo</span>
           </label>
@@ -1633,7 +1633,7 @@ function NumericValueModal({
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="e.g. Completed during lunch walk"
-            className="w-full rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2 app-label text-white focus:outline-none focus:border-[var(--app-accent)]"
+            className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1.5 text-xs text-[var(--app-text)] focus:outline-none focus:border-[var(--app-accent)]"
           />
         </div>
 
@@ -1642,14 +1642,14 @@ function NumericValueModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-3.5 py-1.5 app-label text-[var(--app-muted)] hover:bg-[var(--app-panel-alt)]"
+            className="rounded-[4px] px-3 py-1.5 text-xs text-[var(--app-muted)] hover:bg-[var(--app-panel-hover)]"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={() => onSave(val, note)}
-            className="rounded-xl bg-[var(--app-accent-strong)] px-4 py-1.5 app-label font-semibold text-white hover:brightness-110 shadow-md shadow-[var(--app-accent)]/20"
+            className="rounded-[4px] bg-[var(--app-accent)] px-3.5 py-1.5 text-xs font-medium text-white hover:bg-[var(--app-accent-hover)] transition-colors shadow-xs"
           >
             Save Log
           </button>

@@ -314,9 +314,9 @@ export function TaskInspector({
         onClick={onClose}
       />
 
-      <aside className="fixed inset-y-0 right-0 z-50 w-full sm:w-[420px] max-w-full lg:relative lg:inset-auto lg:z-20 lg:w-80 xl:w-96 flex flex-col h-full border-l border-[var(--app-border)] bg-[var(--app-panel)] shadow-2xl lg:shadow-xl flex-shrink-0 animate-in slide-in-from-right duration-200">
+      <aside className="fixed inset-y-0 right-0 z-50 w-full sm:w-[420px] max-w-full lg:relative lg:inset-auto lg:z-20 lg:w-80 xl:w-96 flex flex-col h-full border-l border-[var(--app-border)] bg-[var(--app-panel)] flex-shrink-0 animate-in slide-in-from-right duration-200">
         {/* Top Header Bar */}
-        <div className="flex items-center justify-between border-b border-[var(--app-border)]/80 px-3.5 py-2.5">
+        <div className="flex items-center justify-between border-b border-[var(--app-border)] px-3.5 py-2.5">
           <div className="flex items-center gap-2">
             {/* Complete Task Toggle Checkbox with Context Menu */}
             <ContextMenu>
@@ -332,11 +332,11 @@ export function TaskInspector({
                     });
                   }}
                   className={cn(
-                    "flex h-4.5 w-4.5 items-center justify-center rounded border transition-all active:scale-90 cursor-pointer",
+                    "flex h-4 w-4 items-center justify-center rounded-[3px] border transition-all active:scale-90 cursor-pointer",
                     task.completed
                       ? task.kanbanStatus === "WONT_DO"
                         ? "border-rose-500 bg-rose-500 text-white shadow-xs"
-                        : "border-emerald-500 bg-emerald-500 text-white shadow-xs"
+                        : "border-[var(--app-accent)] bg-[var(--app-accent)] text-white shadow-xs"
                       : "border-[var(--app-border)] hover:border-[var(--app-accent)] text-[var(--app-muted)]"
                   )}
                   title={
@@ -349,15 +349,15 @@ export function TaskInspector({
                 >
                   {task.completed && (
                     task.kanbanStatus === "WONT_DO" ? (
-                      <X className="h-3 w-3 stroke-[3]" />
+                      <X className="h-2.5 w-2.5 stroke-[3]" />
                     ) : (
-                      <Check className="h-3 w-3 stroke-[3]" />
+                      <Check className="h-2.5 w-2.5 stroke-[3]" />
                     )
                   )}
                 </button>
               </ContextMenuTrigger>
 
-              <ContextMenuContent className="w-52 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] shadow-xl p-1.5 z-50 rounded-xl">
+              <ContextMenuContent className="w-52 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] shadow-xl p-1 z-50 rounded-[6px]">
                 <ContextMenuItem
                   onClick={() => {
                     const nextCompleted = task.completed && task.kanbanStatus !== "WONT_DO" ? false : true;
@@ -367,7 +367,7 @@ export function TaskInspector({
                       kanbanStatus: nextCompleted ? "DONE" : "TODO",
                     });
                   }}
-                  className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-lg text-xs hover:bg-[var(--app-panel-alt)]"
+                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-[4px] text-xs hover:bg-[var(--app-hover)]"
                 >
                   <span className="flex items-center gap-2">
                     <Check className="h-3.5 w-3.5 text-emerald-500 stroke-[2.5]" />
@@ -387,7 +387,7 @@ export function TaskInspector({
                       kanbanStatus: nextWonDo ? "WONT_DO" : "TODO",
                     });
                   }}
-                  className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-lg text-xs hover:bg-[var(--app-panel-alt)]"
+                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-[4px] text-xs hover:bg-[var(--app-hover)]"
                 >
                   <span className="flex items-center gap-2">
                     <X className="h-3.5 w-3.5 text-rose-500 stroke-[2.5]" />
@@ -409,23 +409,23 @@ export function TaskInspector({
                           kanbanStatus: "TODO",
                         });
                       }}
-                      className="flex items-center justify-between cursor-pointer py-1.5 px-2.5 rounded-lg text-xs text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]"
+                      className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-[4px] text-xs text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]"
                     >
                       <span>Mark Incomplete</span>
                     </ContextMenuItem>
                   </>
                 )}
 
-                <ContextMenuSeparator className="my-1.5 bg-[var(--app-border)]" />
+                <ContextMenuSeparator className="my-1 bg-[var(--app-border)]" />
 
                 <div
-                  className="px-2.5 py-1.5 space-y-2 select-none"
+                  className="px-2 py-1.5 space-y-1.5 select-none"
                   onPointerDown={(e) => e.stopPropagation()}
                   onMouseDown={(e) => e.stopPropagation()}
                 >
-                  <div className="flex items-center justify-between app-meta text-[var(--app-muted)]">
+                  <div className="flex items-center justify-between text-xs text-[var(--app-muted)]">
                     <span>Progress</span>
-                    <span className="font-semibold text-[var(--app-text)]">{progress}%</span>
+                    <span className="font-semibold text-[var(--app-text)] font-mono">{progress}%</span>
                   </div>
                   <Slider
                     value={[progress]}
@@ -440,14 +440,14 @@ export function TaskInspector({
             </ContextMenu>
 
             {task.completed && task.kanbanStatus === "WONT_DO" && (
-              <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 app-meta font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25">
-                <X className="h-3 w-3 stroke-[2.5]" />
+              <span className="inline-flex items-center gap-1 rounded-[3px] px-1.5 py-0.2 text-[10px] font-medium bg-[rgba(255,0,26,0.1)] text-[#eb5757] border border-[rgba(255,0,26,0.2)]">
+                <X className="h-2.5 w-2.5 stroke-[2.5]" />
                 Won&apos;t Do
               </span>
             )}
 
             {/* Vertical Divider */}
-            <span className="h-3.5 w-px bg-[var(--app-border)]/80" />
+            <span className="h-3.5 w-px bg-[var(--app-border)]" />
 
             {/* Due Date Trigger Button with Popover */}
             <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
@@ -455,16 +455,16 @@ export function TaskInspector({
                 <button
                   type="button"
                   className={cn(
-                    "flex items-center gap-1.5 app-meta font-medium rounded px-1.5 py-0.5 transition-colors cursor-pointer",
+                    "flex items-center gap-1.5 text-xs font-medium rounded-[4px] px-1.5 py-0.5 transition-colors cursor-pointer",
                     schedule?.isOverdue
-                      ? "text-rose-500 font-semibold hover:bg-rose-500/10"
+                      ? "text-[#eb5757] font-semibold hover:bg-[rgba(255,0,26,0.1)]"
                       : schedule?.isDueToday
-                      ? "text-[var(--app-accent-text)] font-semibold hover:bg-[var(--app-panel-alt)]"
+                      ? "text-[var(--app-accent)] font-semibold hover:bg-[var(--app-hover)]"
                       : schedule?.isDueTomorrow
-                      ? "text-amber-400 font-semibold hover:bg-amber-500/10"
+                      ? "text-amber-500 font-semibold hover:bg-amber-500/10"
                       : schedule
-                      ? "text-[var(--app-accent-text)] hover:bg-[var(--app-panel-alt)]"
-                      : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]"
+                      ? "text-[var(--app-accent)] hover:bg-[var(--app-hover)]"
+                      : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]"
                   )}
                   title="Change due date"
                 >
@@ -472,11 +472,11 @@ export function TaskInspector({
                     className={cn(
                       "h-3.5 w-3.5",
                       schedule?.isOverdue
-                        ? "text-rose-500"
+                        ? "text-[#eb5757]"
                         : schedule?.isDueToday
-                        ? "text-[var(--app-accent-text)]"
+                        ? "text-[var(--app-accent)]"
                         : schedule?.isDueTomorrow
-                        ? "text-amber-400"
+                        ? "text-amber-500"
                         : undefined
                     )}
                   />
@@ -485,10 +485,10 @@ export function TaskInspector({
                       <span className="inline-flex items-center gap-1">
                         <span>{schedule.dateLabel}</span>
                         {schedule.timeLabel && (
-                          <span className="opacity-80 font-mono app-meta">{schedule.timeLabel}</span>
+                          <span className="opacity-80 font-mono text-xs">{schedule.timeLabel}</span>
                         )}
                         {schedule.durationBadge && (
-                          <span className="ml-0.5 rounded px-1 py-0.2 bg-[var(--app-accent)]/20 text-[var(--app-accent-text)] font-mono app-meta font-semibold">
+                          <span className="ml-0.5 rounded-[3px] px-1 py-0.2 bg-[var(--app-hover)] text-[var(--app-text)] font-mono text-[9px] font-semibold">
                             {schedule.durationBadge}
                           </span>
                         )}
@@ -531,7 +531,7 @@ export function TaskInspector({
           </div>
 
           <div className="flex items-center gap-1">
-            {/* Priority Flag Dropdown Menu (Image 3 Style) */}
+            {/* Priority Flag Dropdown Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
@@ -546,19 +546,19 @@ export function TaskInspector({
                       : "None"
                   }. Click to change.`}
                   className={cn(
-                    "p-1.5 rounded transition-colors cursor-pointer",
+                    "p-1.5 rounded-[4px] transition-colors cursor-pointer",
                     task.priority === 3
-                      ? "text-rose-500 hover:bg-rose-500/10"
+                      ? "text-[#eb5757] hover:bg-[rgba(255,0,26,0.1)]"
                       : task.priority === 2
-                      ? "text-amber-500 hover:bg-amber-500/10"
+                      ? "text-[#dfab01] hover:bg-[rgba(203,145,47,0.1)]"
                       : task.priority === 1
-                      ? "text-sky-500 hover:bg-sky-500/10"
-                      : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]"
+                      ? "text-[#2383e2] hover:bg-[rgba(35,131,226,0.1)]"
+                      : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]"
                   )}
                 >
                   <Flag
                     className={cn(
-                      "h-4 w-4",
+                      "h-3.5 w-3.5",
                       task.priority > 0 && "fill-current"
                     )}
                   />
@@ -566,47 +566,47 @@ export function TaskInspector({
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="min-w-36 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] p-1 z-50"
+                className="min-w-36 rounded-[6px] bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] p-1 z-50"
               >
                 <DropdownMenuItem
                   onClick={() => onUpdateTask({ taskId: task.id, priority: 3 })}
-                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-md hover:bg-[var(--app-panel-alt)]"
+                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-[4px] hover:bg-[var(--app-hover)]"
                 >
                   <span className="flex items-center gap-2">
-                    <Flag className="h-3.5 w-3.5 text-rose-500 fill-current" />
+                    <Flag className="h-3.5 w-3.5 text-[#eb5757] fill-current" />
                     <span className="text-xs font-medium">High</span>
                   </span>
-                  {task.priority === 3 && <Check className="h-3.5 w-3.5 text-rose-500" />}
+                  {task.priority === 3 && <Check className="h-3.5 w-3.5 text-[#eb5757]" />}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onUpdateTask({ taskId: task.id, priority: 2 })}
-                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-md hover:bg-[var(--app-panel-alt)]"
+                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-[4px] hover:bg-[var(--app-hover)]"
                 >
                   <span className="flex items-center gap-2">
-                    <Flag className="h-3.5 w-3.5 text-amber-500 fill-current" />
+                    <Flag className="h-3.5 w-3.5 text-[#dfab01] fill-current" />
                     <span className="text-xs font-medium">Medium</span>
                   </span>
-                  {task.priority === 2 && <Check className="h-3.5 w-3.5 text-amber-500" />}
+                  {task.priority === 2 && <Check className="h-3.5 w-3.5 text-[#dfab01]" />}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onUpdateTask({ taskId: task.id, priority: 1 })}
-                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-md hover:bg-[var(--app-panel-alt)]"
+                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-[4px] hover:bg-[var(--app-hover)]"
                 >
                   <span className="flex items-center gap-2">
-                    <Flag className="h-3.5 w-3.5 text-sky-500 fill-current" />
+                    <Flag className="h-3.5 w-3.5 text-[#2383e2] fill-current" />
                     <span className="text-xs font-medium">Low</span>
                   </span>
-                  {task.priority === 1 && <Check className="h-3.5 w-3.5 text-sky-500" />}
+                  {task.priority === 1 && <Check className="h-3.5 w-3.5 text-[#2383e2]" />}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onUpdateTask({ taskId: task.id, priority: 0 })}
-                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-md hover:bg-[var(--app-panel-alt)]"
+                  className="flex items-center justify-between cursor-pointer py-1.5 px-2 rounded-[4px] hover:bg-[var(--app-hover)]"
                 >
                   <span className="flex items-center gap-2">
-                    <Flag className="h-3.5 w-3.5 text-slate-400" />
+                    <Flag className="h-3.5 w-3.5 text-[var(--app-muted)]" />
                     <span className="text-xs font-medium">None</span>
                   </span>
-                  {task.priority === 0 && <Check className="h-3.5 w-3.5 text-slate-400" />}
+                  {task.priority === 0 && <Check className="h-3.5 w-3.5 text-[var(--app-muted)]" />}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -616,9 +616,9 @@ export function TaskInspector({
               type="button"
               onClick={onClose}
               title="Close drawer"
-              className="rounded p-1.5 text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-alt)] transition-colors cursor-pointer"
+              className="rounded-[4px] p-1.5 text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)] transition-colors cursor-pointer"
             >
-              <X className="h-4 w-4" />
+              <X className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
@@ -634,7 +634,7 @@ export function TaskInspector({
               onBlur={handleTitleBlur}
               placeholder="Task title..."
               className={cn(
-                "w-full bg-transparent app-title text-lg md:text-xl font-bold text-[var(--app-text)] focus:outline-none placeholder-[var(--app-muted)]/60",
+                "w-full bg-transparent text-lg font-semibold text-[var(--app-text)] focus:outline-none placeholder-[var(--app-muted)]/60 tracking-tight",
                 task.completed && "line-through opacity-60 text-[var(--app-muted)]"
               )}
             />
@@ -648,12 +648,12 @@ export function TaskInspector({
               onBlur={handleDescriptionBlur}
               placeholder="Write something or type / for commands"
               rows={3}
-              className="w-full bg-transparent app-body text-[var(--app-text)] placeholder-[var(--app-muted)]/70 resize-none focus:outline-none min-h-[70px] leading-relaxed"
+              className="w-full bg-transparent text-xs text-[var(--app-text)] placeholder-[var(--app-muted)]/70 resize-none focus:outline-none min-h-[70px] leading-relaxed"
             />
           </div>
 
           {/* Subtasks / Checklist Section */}
-          <div className="space-y-2 pt-1 border-t border-[var(--app-border)]/60">
+          <div className="space-y-1.5 pt-1 border-t border-[var(--app-border)]">
             {/* Existing Subtasks */}
             {task.subtasks.map((subtask) => (
               <div
@@ -664,17 +664,17 @@ export function TaskInspector({
                   type="button"
                   onClick={() => handleToggleSubtask(subtask.id, !subtask.completed)}
                   className={cn(
-                    "flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors cursor-pointer",
+                    "flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[3px] border transition-colors cursor-pointer",
                     subtask.completed
-                      ? "border-emerald-500 bg-emerald-500 text-white"
+                      ? "border-[var(--app-accent)] bg-[var(--app-accent)] text-white"
                       : "border-[var(--app-border)] hover:border-[var(--app-accent)]"
                   )}
                 >
-                  {subtask.completed && <Check className="h-2.5 w-2.5 stroke-[3]" />}
+                  {subtask.completed && <Check className="h-2 w-2 stroke-[3]" />}
                 </button>
                 <span
                   className={cn(
-                    "flex-1 app-body text-xs text-[var(--app-text)] truncate",
+                    "flex-1 text-xs text-[var(--app-text)] truncate",
                     subtask.completed && "line-through text-[var(--app-muted)] opacity-60"
                   )}
                 >
@@ -683,7 +683,7 @@ export function TaskInspector({
                 <button
                   type="button"
                   onClick={() => handleDeleteSubtask(subtask.id)}
-                  className="opacity-0 group-hover:opacity-100 p-0.5 text-[var(--app-muted)] hover:text-rose-500 transition-opacity"
+                  className="opacity-0 group-hover:opacity-100 p-0.5 text-[var(--app-muted)] hover:text-rose-500 transition-opacity cursor-pointer"
                   title="Delete subtask"
                 >
                   <XIcon className="h-3 w-3" />
@@ -693,7 +693,7 @@ export function TaskInspector({
 
             {/* Empty Subtask Row: "Press 'Enter' to add list item" */}
             <div className="flex items-center gap-2 py-0.5">
-              <Circle className="h-4 w-4 shrink-0 text-[var(--app-muted)]/60" />
+              <Circle className="h-3.5 w-3.5 shrink-0 text-[var(--app-muted)]/50" />
               <input
                 ref={newSubtaskInputRef}
                 type="text"
@@ -706,20 +706,20 @@ export function TaskInspector({
                   }
                 }}
                 placeholder="Press 'Enter' to add list item"
-                className="flex-1 bg-transparent app-body text-xs text-[var(--app-text)] placeholder-[var(--app-muted)]/70 focus:outline-none"
+                className="flex-1 bg-transparent text-xs text-[var(--app-text)] placeholder-[var(--app-muted)]/60 focus:outline-none"
               />
             </div>
           </div>
 
           {/* Tags Section */}
-          <div className="flex flex-wrap items-center gap-1.5 pt-2">
+          <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-[var(--app-border)]">
             {localTags.map((tag) => (
               <span
                 key={tag.id}
-                className="group inline-flex items-center gap-1 rounded-md px-2 py-0.5 app-meta font-medium transition-colors"
+                className="group inline-flex items-center gap-1 rounded-[3px] px-1.5 py-0.5 text-xs font-medium transition-colors"
                 style={{
-                  backgroundColor: `${tag.color || "#4772fa"}20`,
-                  color: tag.color || "#4772fa",
+                  backgroundColor: `${tag.color || "#2383e2"}20`,
+                  color: tag.color || "#2383e2",
                 }}
               >
                 <span>{tag.name}</span>
@@ -739,7 +739,7 @@ export function TaskInspector({
               <PopoverTrigger asChild>
                 <button
                   type="button"
-                  className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--app-panel-alt)] border border-[var(--app-border)] text-[var(--app-muted)] hover:text-[var(--app-text)] hover:border-[var(--app-accent)] transition-colors cursor-pointer"
+                  className="flex h-5 w-5 items-center justify-center rounded-[3px] bg-[var(--app-panel)] border border-[var(--app-border)] text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)] transition-colors cursor-pointer"
                   title="Add tag"
                 >
                   <Plus className="h-3 w-3" />
@@ -748,10 +748,10 @@ export function TaskInspector({
               <PopoverContent
                 align="start"
                 sideOffset={6}
-                className="w-52 p-2 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] rounded-xl shadow-xl z-50"
+                className="w-52 p-2 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] rounded-[6px] shadow-xl z-50"
               >
                 {/* Search / Create Tag Input */}
-                <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-[var(--app-panel-alt)] border border-[var(--app-border)] mb-2">
+                <div className="flex items-center gap-1.5 px-2 py-1 rounded-[4px] bg-[var(--app-panel)] border border-[var(--app-border)] mb-1.5">
                   <TagIcon className="h-3.5 w-3.5 text-[var(--app-muted)] shrink-0" />
                   <input
                     type="text"
@@ -765,7 +765,7 @@ export function TaskInspector({
                       }
                     }}
                     placeholder="Find or create tag..."
-                    className="w-full bg-transparent app-meta text-xs text-[var(--app-text)] placeholder-[var(--app-muted)] focus:outline-none"
+                    className="w-full bg-transparent text-xs text-[var(--app-text)] placeholder-[var(--app-muted)] focus:outline-none"
                   />
                 </div>
 

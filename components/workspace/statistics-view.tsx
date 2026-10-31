@@ -198,10 +198,10 @@ const RANGE_OPTIONS: { id: StatsRange; label: string }[] = [
 ];
 
 const PRIORITY_META: Record<number, { label: string; color: string }> = {
-  3: { label: "High", color: "#ef4444" },
-  2: { label: "Medium", color: "#f59e0b" },
-  1: { label: "Low", color: "#4772fa" },
-  0: { label: "None", color: "#94a3b8" },
+  3: { label: "High", color: "#eb5757" },
+  2: { label: "Medium", color: "#dfab01" },
+  1: { label: "Low", color: "#2383e2" },
+  0: { label: "None", color: "#787774" },
 };
 
 const PRIORITY_ORDER = [3, 2, 1, 0];
@@ -262,16 +262,16 @@ function SectionCard({
   action?: React.ReactNode;
 }) {
   return (
-    <section className="rounded-xl border border-[var(--app-border)] bg-[var(--app-panel)] p-5 shadow-sm transition-colors">
-      <header className="mb-4 flex items-start justify-between gap-3">
+    <section className="rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-4 transition-colors">
+      <header className="mb-3.5 flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--app-panel-alt)] text-[var(--app-muted)]">
+          <span className="flex h-7 w-7 items-center justify-center rounded-[4px] bg-[var(--app-hover)] text-[var(--app-muted)]">
             {icon}
           </span>
           <div>
-            <h3 className="app-heading font-semibold text-[var(--app-text)]">{title}</h3>
+            <h3 className="text-sm font-semibold text-[var(--app-text)]">{title}</h3>
             {subtitle ? (
-              <p className="app-label text-[var(--app-muted)]">{subtitle}</p>
+              <p className="text-xs text-[var(--app-muted)]">{subtitle}</p>
             ) : null}
           </div>
         </div>
@@ -284,9 +284,9 @@ function SectionCard({
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--app-border)] bg-[var(--app-panel-alt)]/60 px-4 py-8 text-center">
+    <div className="flex flex-col items-center justify-center gap-2 rounded-[6px] border border-dashed border-[var(--app-border)] bg-[var(--app-hover)]/40 px-4 py-8 text-center">
       <Sparkles className="h-4 w-4 text-[var(--app-muted)]" />
-      <p className="app-label text-[var(--app-muted)]">{message}</p>
+      <p className="text-xs text-[var(--app-muted)]">{message}</p>
     </div>
   );
 }
@@ -394,11 +394,11 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
       contentStyle: {
         backgroundColor: theme.panel,
         border: `1px solid ${theme.border}`,
-        borderRadius: 12,
+        borderRadius: 6,
         color: theme.text,
         fontSize: 12,
       },
-      labelStyle: { color: theme.text, fontWeight: 700, marginBottom: 4 },
+      labelStyle: { color: theme.text, fontWeight: 600, marginBottom: 4 },
       itemStyle: { color: theme.text },
     }),
     [theme]
@@ -409,9 +409,9 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
   return (
     <div className="flex-1 min-h-0 overflow-y-auto pr-1 sm:pr-2 space-y-4 pb-12">
       {/* Header + range switcher */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="app-body text-[var(--app-muted)]">
+          <p className="text-xs text-[var(--app-muted)]">
             {isLoading
               ? "Refreshing your insights…"
               : `A snapshot of your productivity for this ${range}.`}
@@ -419,7 +419,7 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
         </div>
 
         <div
-          className="inline-flex w-full items-center gap-1 self-start rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] p-1 sm:w-auto"
+          className="inline-flex w-full items-center gap-0.5 self-start rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-0.5 sm:w-auto"
           role="tablist"
           aria-label="Statistics range"
         >
@@ -432,8 +432,7 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
                 role="tab"
                 aria-selected={active}
                 onClick={() => onRangeChange(option.id)}
-                className={`flex-1 rounded-lg px-3 py-1.5 app-label font-semibold transition-all sm:flex-none ${ active ? "text-white shadow-md" : "text-[var(--app-muted)] hover:text-[var(--app-text)] dark:text-[var(--app-muted)] dark:hover:text-white" }`}
-                style={active ? { backgroundColor: theme.accent } : undefined}
+                className={`flex-1 rounded-[4px] px-2.5 py-1 text-xs font-medium transition-colors sm:flex-none cursor-pointer ${ active ? "bg-[var(--app-hover)] text-[var(--app-text)] font-semibold shadow-xs" : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]/50" }`}
               >
                 {option.label}
               </button>
@@ -443,13 +442,13 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
       </div>
 
       {/* KPI row */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <KpiCard
           icon={<CheckCircle2 className="h-4 w-4" />}
           label="Tasks completed"
           value={tasks.completed ?? 0}
           accent={theme.accent}
-          accentBackground={theme.panelAlt}
+          accentBackground="var(--app-hover)"
           hint="Finished in range"
         />
         <KpiCard
@@ -457,7 +456,7 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
           label="Tasks created"
           value={tasks.created ?? 0}
           accent={theme.muted}
-          accentBackground={theme.panelAlt}
+          accentBackground="var(--app-hover)"
           hint="Added in range"
         />
         <KpiCard
@@ -465,20 +464,20 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
           label="Open tasks"
           value={tasks.open ?? 0}
           accent={theme.muted}
-          accentBackground={theme.panelAlt}
+          accentBackground="var(--app-hover)"
           hint="Still to do"
         />
 
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4 shadow-sm transition-colors">
-          <div className="flex flex-col gap-1">
-            <span className="flex items-center gap-1.5 app-label font-medium text-[var(--app-muted)]">
-              <TrendingUp className="h-4 w-4" />
+        <div className="flex items-center justify-between gap-3 rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3.5 transition-colors">
+          <div className="flex flex-col gap-0.5">
+            <span className="flex items-center gap-1.5 text-xs font-medium text-[var(--app-muted)]">
+              <TrendingUp className="h-3.5 w-3.5" />
               Completion rate
             </span>
-            <span className="app-figure font-semibold text-[var(--app-text)]">
+            <span className="text-xl font-semibold text-[var(--app-text)] font-mono tabular-nums">
               {completionPercent}%
             </span>
-            <span className="app-meta text-[var(--app-muted)]">
+            <span className="text-[11px] text-[var(--app-muted)]">
               Completed vs created
             </span>
           </div>
@@ -614,20 +613,20 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-              <div className="mt-4 grid grid-cols-2 gap-4">
-                <div className="rounded-xl bg-[var(--app-panel-alt)] p-3">
-                  <span className="app-overline font-semibold tracking-wide text-[var(--app-muted)]">
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <div className="rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel-hover)] p-3">
+                  <span className="text-[11px] font-mono font-medium tracking-wide text-[var(--app-muted)] uppercase">
                     Total focus
                   </span>
-                  <p className="mt-1 app-title font-semibold text-[var(--app-text)]">
+                  <p className="mt-1 text-base font-semibold font-mono text-[var(--app-text)]">
                     {formatMinutes(focus.totalMinutes ?? 0)}
                   </p>
                 </div>
-                <div className="rounded-xl bg-[var(--app-panel-alt)] p-3">
-                  <span className="app-overline font-semibold tracking-wide text-[var(--app-muted)]">
+                <div className="rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel-hover)] p-3">
+                  <span className="text-[11px] font-mono font-medium tracking-wide text-[var(--app-muted)] uppercase">
                     Sessions
                   </span>
-                  <p className="mt-1 app-title font-semibold text-[var(--app-text)]">
+                  <p className="mt-1 text-base font-semibold font-mono text-[var(--app-text)]">
                     {focus.sessions ?? 0}
                   </p>
                 </div>
@@ -694,7 +693,7 @@ export function StatisticsView({ stats, range, onRangeChange, isLoading }: Stati
               {habitStreaks.map((habit, index) => (
                 <div
                   key={`${habit.title}-${index}`}
-                  className="flex items-center justify-between gap-3 rounded-xl bg-[var(--app-panel-alt)] p-3"
+                  className="flex items-center justify-between gap-3 rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel-hover)] p-3"
                 >
                   <div className="flex min-w-0 items-center gap-2">
                     <span
@@ -766,18 +765,18 @@ function KpiCard({
   accentBackground: string;
 }) {
   return (
-    <div className="flex flex-col gap-1 rounded-xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4 shadow-sm transition-colors">
+    <div className="flex flex-col gap-0.5 rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3.5 transition-colors">
       <span
-        className="flex h-8 w-8 items-center justify-center rounded-lg"
+        className="flex h-7 w-7 items-center justify-center rounded-[4px]"
         style={{ backgroundColor: accentBackground, color: accent }}
       >
         {icon}
       </span>
-      <span className="mt-1 app-label font-medium text-[var(--app-muted)]">{label}</span>
-      <span className="app-figure font-semibold text-[var(--app-text)]">
+      <span className="mt-1 text-xs font-medium text-[var(--app-muted)]">{label}</span>
+      <span className="text-xl font-semibold text-[var(--app-text)] font-mono tabular-nums">
         {value}
       </span>
-      <span className="app-meta text-[var(--app-muted)]">{hint}</span>
+      <span className="text-[11px] text-[var(--app-muted)]">{hint}</span>
     </div>
   );
 }

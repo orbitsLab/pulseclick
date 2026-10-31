@@ -140,26 +140,26 @@ export function HabitLogsView({
   }, [filteredLogs, todayIso, yesterdayIso]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* 1. Filter Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-2.5">
         {/* Search */}
         <div className="relative flex-1 min-w-[200px] max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--app-muted)] pointer-events-none" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--app-muted)] pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search journal entries & reflection notes..."
-            className="w-full rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] py-1.5 pl-9 pr-8 app-body text-[var(--app-text)] placeholder:text-[var(--app-muted)] focus:outline-hidden focus:border-[var(--app-accent)] transition-colors"
+            className="w-full rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] py-1 pl-8 pr-7 text-xs text-[var(--app-text)] placeholder:text-[var(--app-muted)] focus:outline-hidden focus:border-[var(--app-accent)] transition-colors"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--app-muted)] hover:text-[var(--app-text)]"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--app-muted)] hover:text-[var(--app-text)] cursor-pointer"
             >
-              <X className="h-3.5 w-3.5" />
+              <X className="h-3 w-3" />
             </button>
           )}
         </div>
@@ -170,7 +170,7 @@ export function HabitLogsView({
           <select
             value={selectedHabitId}
             onChange={(e) => setSelectedHabitId(e.target.value)}
-            className="rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-1.5 app-label font-medium text-[var(--app-text)] focus:outline-hidden focus:border-[var(--app-accent)] transition-colors"
+            className="rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1 text-xs font-medium text-[var(--app-text)] focus:outline-hidden focus:border-[var(--app-accent)] transition-colors cursor-pointer"
           >
             <option value="ALL">All Habits ({habits.length})</option>
             {habits.map((h) => (
@@ -184,7 +184,7 @@ export function HabitLogsView({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-1.5 app-label font-medium text-[var(--app-text)] focus:outline-hidden focus:border-[var(--app-accent)] transition-colors"
+            className="rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1 text-xs font-medium text-[var(--app-text)] focus:outline-hidden focus:border-[var(--app-accent)] transition-colors cursor-pointer"
           >
             <option value="ALL">All Statuses</option>
             <option value="COMPLETED">Completed</option>
@@ -196,43 +196,43 @@ export function HabitLogsView({
 
       {/* 2. Feed Container */}
       {isLoading ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
-              className="h-24 rounded-2xl border border-[var(--app-border)]/60 bg-[var(--app-panel-alt)]/40 animate-pulse"
+              className="h-20 rounded-[6px] border border-[var(--app-border)] bg-[var(--app-hover)]/30 animate-pulse"
             />
           ))}
         </div>
       ) : groupedByDate.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center text-[var(--app-muted)] rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-6">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--app-accent)]/10 text-[var(--app-accent-text)] mb-3">
-            <StickyNote className="h-6 w-6" />
+        <div className="flex flex-col items-center justify-center py-12 text-center text-[var(--app-muted)] rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-6">
+          <div className="flex h-10 w-10 items-center justify-center rounded-[6px] bg-[var(--app-hover)] text-[var(--app-muted)] mb-2.5">
+            <StickyNote className="h-5 w-5" />
           </div>
-          <h3 className="app-heading font-semibold text-[var(--app-text)]">No journal entries found</h3>
-          <p className="app-label text-[var(--app-muted)] mt-1 max-w-sm">
+          <h3 className="text-sm font-semibold text-[var(--app-text)]">No journal entries found</h3>
+          <p className="text-xs text-[var(--app-muted)] mt-1 max-w-sm">
             {searchQuery || selectedHabitId !== "ALL" || statusFilter !== "ALL"
               ? "No habit records match your active search filters. Try clearing or expanding your query."
               : "Check in on habits or log daily reflection notes to build your chronological practice log."}
           </p>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {groupedByDate.map((group) => (
-            <div key={group.date} className="space-y-3">
+            <div key={group.date} className="space-y-2">
               {/* Date Header */}
               <div className="flex items-center gap-2 px-1">
-                <Calendar className="h-3.5 w-3.5 text-[var(--app-accent-text)]" />
-                <span className="app-label font-semibold text-[var(--app-text)]">
+                <Calendar className="h-3.5 w-3.5 text-[var(--app-accent)]" />
+                <span className="text-xs font-semibold text-[var(--app-text)]">
                   {group.label}
                 </span>
-                <span className="rounded-full bg-[var(--app-panel-alt)] px-2 py-0.5 app-meta font-medium text-[var(--app-muted)] border border-[var(--app-border)]/60">
+                <span className="rounded-[3px] bg-[var(--app-hover)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--app-muted)] border border-[var(--app-border)]">
                   {group.logs.length} {group.logs.length === 1 ? "entry" : "entries"}
                 </span>
               </div>
 
               {/* Items for this date */}
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {group.logs.map((log) => {
                   const isCompleted = log.completed || log.status === "COMPLETED";
                   const isSkipped = log.status === "SKIPPED";
@@ -241,39 +241,39 @@ export function HabitLogsView({
                   return (
                     <div
                       key={log.id}
-                      className="group rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-3.5 sm:p-4 hover:border-[var(--app-border)]/80 transition-colors"
+                      className="group rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3 hover:bg-[var(--app-hover)]/30 transition-colors"
                     >
-                      <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="flex flex-wrap items-start justify-between gap-2.5">
                         {/* Habit Title & Icon */}
-                        <div className="flex items-start gap-3 min-w-0">
+                        <div className="flex items-start gap-2.5 min-w-0">
                           <div
-                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-white shadow-xs"
+                            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-white shadow-xs"
                             style={{ backgroundColor: log.color || "var(--app-accent)" }}
                           >
-                            {ICON_MAP[log.icon] || <Flame className="h-4 w-4" />}
+                            {ICON_MAP[log.icon] || <Flame className="h-3.5 w-3.5" />}
                           </div>
 
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                              <span className="app-body font-semibold text-[var(--app-text)]">
+                              <span className="text-xs font-semibold text-[var(--app-text)]">
                                 {log.title}
                               </span>
 
                               {/* Status Badge */}
                               {isCompleted && (
-                                <span className="flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 app-meta font-bold text-emerald-500">
-                                  <CheckCircle2 className="h-3 w-3 stroke-[2.2]" />
+                                <span className="flex items-center gap-1 rounded-[3px] bg-[rgba(68,131,97,0.1)] border border-[rgba(68,131,97,0.25)] px-1.5 py-0.2 text-[10px] font-medium text-[#448361] dark:text-[#4dab9a]">
+                                  <CheckCircle2 className="h-2.5 w-2.5 stroke-[2.2]" />
                                   Completed
                                 </span>
                               )}
                               {isSkipped && (
-                                <span className="flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 app-meta font-bold text-amber-500">
-                                  <SkipForward className="h-3 w-3" />
-                                  Skipped (Protected)
+                                <span className="flex items-center gap-1 rounded-[3px] bg-[rgba(203,145,47,0.1)] border border-[rgba(203,145,47,0.25)] px-1.5 py-0.2 text-[10px] font-medium text-[#dfab01] dark:text-[#f3cd46]">
+                                  <SkipForward className="h-2.5 w-2.5" />
+                                  Skipped
                                 </span>
                               )}
                               {isInProgress && (
-                                <span className="flex items-center gap-1 rounded-full bg-sky-500/15 px-2 py-0.5 app-meta font-bold text-sky-500">
+                                <span className="flex items-center gap-1 rounded-[3px] bg-[rgba(35,131,226,0.1)] border border-[rgba(35,131,226,0.25)] px-1.5 py-0.2 text-[10px] font-medium text-[#2383e2] dark:text-[#529cca]">
                                   In Progress
                                 </span>
                               )}
@@ -288,9 +288,9 @@ export function HabitLogsView({
 
                             {/* Reflection Memo Note */}
                             {log.note && (
-                              <div className="mt-2.5 rounded-xl border border-[var(--app-border)]/60 bg-[var(--app-panel-alt)]/50 p-2.5 flex items-start gap-2">
+                              <div className="mt-2 rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel-hover)] p-2.5 flex items-start gap-2">
                                 <StickyNote className="h-3.5 w-3.5 text-[var(--app-muted)] shrink-0 mt-0.5" />
-                                <p className="app-body text-xs text-[var(--app-text)]/90 leading-relaxed italic">
+                                <p className="text-xs text-[var(--app-text)] leading-relaxed italic">
                                   &ldquo;{log.note}&rdquo;
                                 </p>
                               </div>

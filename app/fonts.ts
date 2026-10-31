@@ -1,33 +1,44 @@
-import { Geist_Mono, Instrument_Serif, Onest } from "next/font/google";
+import localFont from "next/font/local";
 
 /**
- * PulseFlow type system — three voices, one job each.
+ * PulseFlow type system — Notion Design System (Tatami)
  *
- * - `onest` is the product voice: every label, control, task title and
- *   paragraph. It is a UI grotesque with a slightly squared, humanist
- *   skeleton — quiet at 11–15px without collapsing into the same Inter-like
- *   voice every generated interface reaches for.
- * - `instrumentSerif` is the display voice, used sparingly: the module title in
- *   the workspace header and the words that introduce a surface. This is where
- *   the personality lives.
- * - `geistMono` is the data voice: timers, countdowns, clock times and key
- *   hints, where digits must not jitter.
+ * Self-hosted variable fonts loaded locally from `public/fonts/`.
+ * Ensures 100% reliable rendering offline, in development, and in production,
+ * immune to external Google Fonts CDN or network failures.
  */
-export const onest = Onest({
-  subsets: ["latin"],
-  variable: "--font-onest",
+export const inter = localFont({
+  src: "../public/fonts/inter-variable.woff2",
+  variable: "--font-inter",
   display: "swap",
+  weight: "100 900",
+  fallback: [
+    "-apple-system",
+    "BlinkMacSystemFont",
+    "Segoe UI",
+    "Roboto",
+    "Helvetica Neue",
+    "Ubuntu",
+    "Cantarell",
+    "Noto Sans",
+    "Arial",
+    "sans-serif",
+  ],
 });
 
-export const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-instrument-serif",
-  display: "swap",
-});
-
-export const geistMono = Geist_Mono({
-  subsets: ["latin"],
+export const geistMono = localFont({
+  src: "../public/fonts/geist-mono-variable.woff2",
   variable: "--font-geist-mono",
   display: "swap",
+  weight: "100 900",
+  fallback: [
+    "ui-monospace",
+    "SFMono-Regular",
+    "Menlo",
+    "Monaco",
+    "Consolas",
+    "Liberation Mono",
+    "Courier New",
+    "monospace",
+  ],
 });

@@ -111,21 +111,21 @@ export function SettingsView({
   }
 
   return (
-    <div className="flex-1 space-y-4 overflow-y-auto pb-8">
+    <div className="flex-1 space-y-3.5 overflow-y-auto pb-8">
       {/* Subscribed calendars */}
-      <section className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4 shadow-sm">
+      <section className="rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-4">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="flex items-center gap-2 app-heading font-semibold text-[var(--app-text)]">
-            <Link2 className="h-4 w-4 text-[var(--app-accent-text)]" />
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--app-text)]">
+            <Link2 className="h-4 w-4 text-[var(--app-accent)]" />
             Subscribed calendars
           </h3>
-          <span className="app-meta text-[var(--app-muted)]">
+          <span className="text-xs text-[var(--app-muted)]">
             Import any public ICS feed as scheduled tasks
           </span>
         </div>
 
         {subscriptions.length === 0 ? (
-          <p className="rounded-xl bg-[var(--app-panel-alt)] px-3 py-4 text-center app-label text-[var(--app-muted)]">
+          <p className="rounded-[4px] bg-[var(--app-hover)]/50 px-3 py-3 text-center text-xs text-[var(--app-muted)]">
             No calendars subscribed yet. Paste an .ics URL below to pull in its events.
           </p>
         ) : (
@@ -133,17 +133,17 @@ export function SettingsView({
             {subscriptions.map((subscription) => (
               <li
                 key={subscription.id}
-                className="flex items-center gap-2 rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)]/60 px-3 py-2"
+                className="flex items-center gap-2 rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-3 py-2"
               >
                 <span
-                  className="h-2.5 w-2.5 shrink-0 rounded-full"
+                  className="h-2 w-2 shrink-0 rounded-full"
                   style={{ backgroundColor: subscription.color }}
                 />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate app-label font-semibold text-[var(--app-text)]">
+                  <span className="block truncate text-xs font-medium text-[var(--app-text)]">
                     {subscription.name}
                   </span>
-                  <span className="block truncate app-meta text-[var(--app-muted)]">
+                  <span className="block truncate text-[11px] text-[var(--app-muted)]">
                     {subscription.url}
                     {subscription.lastSyncedAt
                       ? ` · synced ${new Date(subscription.lastSyncedAt).toLocaleString("en-US", {
@@ -161,7 +161,7 @@ export function SettingsView({
                   disabled={isSyncing}
                   title="Sync now"
                   aria-label={`Sync ${subscription.name}`}
-                  className="rounded-md p-1.5 text-[var(--app-muted)] transition-colors hover:bg-[var(--app-panel-alt)] hover:text-[var(--app-accent-text)] disabled:opacity-50"
+                  className="rounded-[3px] p-1 text-[var(--app-muted)] transition-colors hover:bg-[var(--app-hover)] hover:text-[var(--app-text)] disabled:opacity-50 cursor-pointer"
                 >
                   <RefreshCw className={`h-3.5 w-3.5 ${isSyncing ? "animate-spin" : ""}`} />
                 </button>
@@ -170,7 +170,7 @@ export function SettingsView({
                   onClick={() => onDeleteSubscription(subscription.id)}
                   title="Remove subscription"
                   aria-label={`Remove ${subscription.name}`}
-                  className="rounded-md p-1.5 text-[var(--app-muted)] transition-colors hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-500/10"
+                  className="rounded-[3px] p-1 text-[var(--app-muted)] transition-colors hover:bg-[rgba(255,0,26,0.1)] hover:text-[#eb5757] cursor-pointer"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
@@ -187,7 +187,7 @@ export function SettingsView({
               onChange={(e) => setName(e.target.value)}
               placeholder="Calendar name"
               aria-label="Calendar name"
-              className="rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1.5 app-label text-[var(--app-text)] outline-none placeholder:text-[var(--app-muted)] focus:border-[var(--app-accent)]"
+              className="rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1 text-xs text-[var(--app-text)] outline-none placeholder:text-[var(--app-muted)] focus:border-[var(--app-accent)]"
             />
             <input
               type="url"
@@ -195,13 +195,13 @@ export function SettingsView({
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com/calendar.ics"
               aria-label="ICS feed URL"
-              className="rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1.5 app-label text-[var(--app-text)] outline-none placeholder:text-[var(--app-muted)] focus:border-[var(--app-accent)]"
+              className="rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1 text-xs text-[var(--app-text)] outline-none placeholder:text-[var(--app-muted)] focus:border-[var(--app-accent)]"
             />
             <select
               value={listId}
               onChange={(e) => setListId(e.target.value)}
               aria-label="Destination list"
-              className="rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1.5 app-label text-[var(--app-text)] outline-none focus:border-[var(--app-accent)]"
+              className="rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1 text-xs text-[var(--app-text)] outline-none focus:border-[var(--app-accent)] cursor-pointer"
             >
               <option value="">Inbox</option>
               {lists.map((list) => (
@@ -211,11 +211,11 @@ export function SettingsView({
               ))}
             </select>
           </div>
-          {error && <p className="app-meta font-semibold text-rose-500">{error}</p>}
+          {error && <p className="text-xs font-medium text-[#eb5757]">{error}</p>}
           <button
             type="submit"
             disabled={saving}
-            className="flex items-center gap-1.5 rounded-lg bg-[var(--app-accent-strong)] px-3 py-1.5 app-label font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-[4px] bg-[var(--app-accent)] hover:bg-[var(--app-accent)]/90 px-3 py-1 text-xs font-medium text-white transition-opacity disabled:opacity-50 cursor-pointer"
           >
             <CalendarPlus className="h-3.5 w-3.5" />
             {saving ? "Subscribing..." : "Subscribe"}
@@ -224,19 +224,19 @@ export function SettingsView({
       </section>
 
       {/* Time zone */}
-      <section className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4 shadow-sm">
-        <h3 className="mb-3 flex items-center gap-2 app-heading font-semibold text-[var(--app-text)]">
-          <Globe2 className="h-4 w-4 text-[var(--app-accent-text)]" />
+      <section className="rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-4">
+        <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--app-text)]">
+          <Globe2 className="h-4 w-4 text-[var(--app-accent)]" />
           Time zone
         </h3>
-        <p className="mb-2 app-meta text-[var(--app-muted)]">
+        <p className="mb-2 text-xs text-[var(--app-muted)]">
           Schedules and reminders are planned in this zone so travelling does not shift your day.
         </p>
         <select
           value={timezone}
           onChange={(e) => onUpdateSettings({ timezone: e.target.value })}
           aria-label="Time zone"
-          className="w-full max-w-xs rounded-lg border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-2 app-label text-[var(--app-text)] outline-none focus:border-[var(--app-accent)]"
+          className="w-full max-w-xs rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] px-2.5 py-1 text-xs text-[var(--app-text)] outline-none focus:border-[var(--app-accent)] cursor-pointer"
         >
           {TIMEZONES.map((tz) => (
             <option key={tz} value={tz}>
@@ -244,7 +244,7 @@ export function SettingsView({
             </option>
           ))}
         </select>
-        <p className="mt-2 flex items-center gap-1.5 app-meta text-[var(--app-muted)]">
+        <p className="mt-2 flex items-center gap-1.5 text-xs text-[var(--app-muted)] font-mono">
           <Clock className="h-3 w-3" />
           Local time right now:{" "}
           {new Date().toLocaleString("en-US", {
@@ -256,50 +256,50 @@ export function SettingsView({
       </section>
 
       {/* Theme */}
-      <section className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4 shadow-sm">
+      <section className="rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-4">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="flex items-center gap-2 app-heading font-semibold text-[var(--app-text)]">
-            <Palette className="h-4 w-4 text-[var(--app-accent-text)]" />
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--app-text)]">
+            <Palette className="h-4 w-4 text-[var(--app-accent)]" />
             Theme
           </h3>
           {onOpenThemePicker && (
             <button
               type="button"
               onClick={onOpenThemePicker}
-              className="rounded-lg border border-[var(--app-border)] px-2.5 py-1 app-meta font-bold text-[var(--app-text)] transition-colors hover:bg-[var(--app-panel-alt)]"
+              className="rounded-[4px] border border-[var(--app-border)] px-2.5 py-1 text-xs font-medium text-[var(--app-text)] transition-colors hover:bg-[var(--app-hover)] cursor-pointer"
             >
               Browse {THEMES.length} themes
             </button>
           )}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <span
-            className="h-10 w-10 rounded-xl border border-[var(--app-border)]"
+            className="h-8 w-8 rounded-[4px] border border-[var(--app-border)]"
             style={{ background: theme.palette.accent }}
           />
           <div>
-            <p className="app-label font-semibold text-[var(--app-text)]">{theme.name}</p>
-            <p className="app-meta capitalize text-[var(--app-muted)]">{theme.mode} mode</p>
+            <p className="text-xs font-semibold text-[var(--app-text)]">{theme.name}</p>
+            <p className="text-[11px] capitalize text-[var(--app-muted)]">{theme.mode} mode</p>
           </div>
         </div>
       </section>
 
       {/* List backgrounds */}
-      <section className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] p-4 shadow-sm">
-        <h3 className="mb-1 flex items-center gap-2 app-heading font-semibold text-[var(--app-text)]">
-          <Folder className="h-4 w-4 text-[var(--app-accent-text)]" />
+      <section className="rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-4">
+        <h3 className="mb-1 flex items-center gap-2 text-sm font-semibold text-[var(--app-text)]">
+          <Folder className="h-4 w-4 text-[var(--app-accent)]" />
           List backgrounds
         </h3>
-        <p className="mb-3 app-meta text-[var(--app-muted)]">
+        <p className="mb-3 text-xs text-[var(--app-muted)]">
           Give each list its own backdrop.
         </p>
         {lists.length === 0 ? (
-          <p className="app-label text-[var(--app-muted)]">Create a list to customise it.</p>
+          <p className="text-xs text-[var(--app-muted)]">Create a list to customise it.</p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {lists.map((list) => (
               <div key={list.id} className="flex items-center gap-3">
-                <span className="w-28 truncate app-label font-medium text-[var(--app-text)]">
+                <span className="w-28 truncate text-xs font-medium text-[var(--app-text)]">
                   {list.name}
                 </span>
                 <div className="flex flex-wrap gap-1.5">
@@ -320,15 +320,15 @@ export function SettingsView({
                           }
                         }}
                         style={{ background: bg.css }}
-                        className={`h-7 w-9 rounded-md border transition-all cursor-pointer ${
+                        className={`h-6 w-8 rounded-[3px] border transition-all cursor-pointer ${
                           active
-                            ? "border-[var(--app-accent)] ring-2 ring-[var(--app-accent)]/50 scale-105 shadow-xs"
-                            : "border-[var(--app-border)] hover:scale-105 hover:border-[var(--app-accent)]/50"
+                            ? "border-[var(--app-accent)] ring-1 ring-[var(--app-accent)] scale-105 shadow-xs"
+                            : "border-[var(--app-border)] hover:border-[var(--app-border-subtle)]"
                         }`}
                       >
                         {active && (
-                          <span className="flex h-full items-center justify-center bg-black/15 rounded-sm">
-                            <Check className="h-3.5 w-3.5 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] stroke-[3]" />
+                          <span className="flex h-full items-center justify-center bg-black/15 rounded-xs">
+                            <Check className="h-3 w-3 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] stroke-[3]" />
                           </span>
                         )}
                       </button>

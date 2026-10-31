@@ -330,7 +330,7 @@ export function EventItem({
       role="button"
       tabIndex={0}
       className={cn(
-        "flex w-full flex-col gap-1.5 rounded-xl border p-3 text-left outline-none transition focus-visible:border-ring focus-visible:ring-[2px] focus-visible:ring-ring/50 cursor-pointer",
+        "flex w-full flex-col gap-1.5 rounded-[6px] border p-3 text-left outline-none transition focus-visible:border-[var(--app-accent)] cursor-pointer",
         getEventColorClasses(eventColor, isCompleted),
         isCompleted && "line-through opacity-60",
         className,

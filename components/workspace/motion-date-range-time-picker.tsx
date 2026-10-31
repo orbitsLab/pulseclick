@@ -485,7 +485,7 @@ export function MotionDateRangeTimePicker({
   return (
     <div
       className={cn(
-        "flex flex-col select-none overflow-hidden rounded-2xl border border-zinc-800 bg-[#121214] text-zinc-100 shadow-2xl transition-all font-sans antialiased",
+        "flex flex-col select-none overflow-hidden rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-text)] shadow-xl transition-all font-sans antialiased",
         "w-[560px] max-w-[calc(100vw-2rem)]",
         className
       )}
@@ -497,7 +497,7 @@ export function MotionDateRangeTimePicker({
         {/* ---------------------------------------------------------------- */}
         {/* Panel 1 (Left): Presets List matching screenshot                 */}
         {/* ---------------------------------------------------------------- */}
-        <div className="w-[136px] min-w-[136px] shrink-0 py-2.5 px-2 border-r border-zinc-800 flex flex-col gap-0.5 bg-[#121214] overflow-y-auto">
+        <div className="w-[136px] min-w-[136px] shrink-0 py-2.5 px-2 border-r border-[var(--app-border)] flex flex-col gap-0.5 bg-[var(--app-sidebar-bg)] overflow-y-auto">
           {presets.map((preset) => {
             const isActive = activePresetId === preset.id
 
@@ -507,10 +507,10 @@ export function MotionDateRangeTimePicker({
                 type="button"
                 onClick={() => handleSelectPreset(preset)}
                 className={cn(
-                  "w-full text-left rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-colors truncate outline-hidden",
+                  "w-full text-left rounded-[4px] px-2.5 py-1.5 text-xs font-medium transition-colors truncate outline-hidden",
                   isActive
-                    ? "bg-zinc-800 text-white font-semibold"
-                    : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50"
+                    ? "bg-[var(--app-panel-hover)] text-[var(--app-text)] font-semibold"
+                    : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-hover)]"
                 )}
               >
                 {preset.label}
@@ -523,7 +523,7 @@ export function MotionDateRangeTimePicker({
         {/* Panel 2 (Center): Calendar with continuous capsule & white badge */}
         {/* ---------------------------------------------------------------- */}
         <div
-          className="w-[284px] min-w-[284px] shrink-0 p-3 flex flex-col bg-[#121214]"
+          className="w-[284px] min-w-[284px] shrink-0 p-3 flex flex-col bg-[var(--app-panel)]"
           onPointerLeave={() => {
             if (pickingRangeStart) {
               setHoverISO(null)
@@ -532,15 +532,15 @@ export function MotionDateRangeTimePicker({
         >
           {/* Mode Switcher: Single Date vs Duration/Range */}
           <div className="flex items-center justify-between pb-2">
-            <div className="flex items-center gap-1 rounded-lg bg-zinc-900/90 p-0.5 border border-zinc-800 text-xs">
+            <div className="flex items-center gap-1 rounded-[4px] bg-[var(--app-panel-hover)] p-0.5 border border-[var(--app-border)] text-xs">
               <button
                 type="button"
                 onClick={() => handleModeChange("single")}
                 className={cn(
-                  "px-2 py-0.5 rounded-md font-medium transition-all text-xs outline-hidden",
+                  "px-2 py-0.5 rounded-[3px] font-medium transition-all text-xs outline-hidden",
                   mode === "single"
-                    ? "bg-zinc-800 text-white font-semibold shadow-xs"
-                    : "text-zinc-400 hover:text-zinc-200"
+                    ? "bg-[var(--app-panel)] text-[var(--app-text)] font-semibold shadow-xs"
+                    : "text-[var(--app-muted)] hover:text-[var(--app-text)]"
                 )}
               >
                 Single Date
@@ -549,10 +549,10 @@ export function MotionDateRangeTimePicker({
                 type="button"
                 onClick={() => handleModeChange("range")}
                 className={cn(
-                  "px-2 py-0.5 rounded-md font-medium transition-all text-xs outline-hidden",
+                  "px-2 py-0.5 rounded-[3px] font-medium transition-all text-xs outline-hidden",
                   mode === "range"
-                    ? "bg-[#4772fa] text-white font-semibold shadow-xs"
-                    : "text-zinc-400 hover:text-zinc-200"
+                    ? "bg-[var(--app-accent)] text-white font-semibold shadow-xs"
+                    : "text-[var(--app-muted)] hover:text-[var(--app-text)]"
                 )}
               >
                 Duration
@@ -560,7 +560,7 @@ export function MotionDateRangeTimePicker({
             </div>
 
             {mode === "range" && (
-              <span className="text-xs font-semibold text-[#4772fa] truncate max-w-[110px]">
+              <span className="text-xs font-semibold text-[var(--app-accent)] truncate max-w-[110px]">
                 {pickingRangeStart ? "Select end date" : endDate ? "Duration set" : "Pick range"}
               </span>
             )}
@@ -574,12 +574,12 @@ export function MotionDateRangeTimePicker({
               transition={SPRING_PRESS}
               onClick={handlePrevMonth}
               aria-label="Previous month"
-              className="size-7 shrink-0 rounded-lg inline-flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800/80 transition-colors"
+              className="size-7 shrink-0 rounded-[4px] inline-flex items-center justify-center text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-hover)] transition-colors"
             >
               <ChevronLeft className="size-4" />
             </motion.button>
 
-            <span className="text-sm font-semibold text-zinc-100 whitespace-nowrap tracking-wide select-none">
+            <span className="text-xs font-semibold text-[var(--app-text)] whitespace-nowrap tracking-wide select-none">
               {format(viewDate, "MMMM yyyy")}
             </span>
 
@@ -589,7 +589,7 @@ export function MotionDateRangeTimePicker({
               transition={SPRING_PRESS}
               onClick={handleNextMonth}
               aria-label="Next month"
-              className="size-7 shrink-0 rounded-lg inline-flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800/80 transition-colors"
+              className="size-7 shrink-0 rounded-[4px] inline-flex items-center justify-center text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-panel-hover)] transition-colors"
             >
               <ChevronRight className="size-4" />
             </motion.button>
@@ -600,7 +600,7 @@ export function MotionDateRangeTimePicker({
             {WEEKDAY_NAMES.map((name) => (
               <span
                 key={name}
-                className="w-9 h-7 inline-flex items-center justify-center text-xs font-medium text-zinc-500 select-none"
+                className="w-9 h-7 inline-flex items-center justify-center text-[11px] font-medium text-[var(--app-muted)] select-none"
               >
                 {name}
               </span>
@@ -666,8 +666,8 @@ export function MotionDateRangeTimePicker({
                             <span
                               aria-hidden="true"
                               className={cn(
-                                "pointer-events-none absolute inset-y-0.5 left-0 w-1/2 bg-[#27272a]",
-                                isInRange && day.colIndex === 0 && "rounded-l-xl"
+                                "pointer-events-none absolute inset-y-0.5 left-0 w-1/2 bg-[var(--app-accent-tag-bg)]",
+                                isInRange && day.colIndex === 0 && "rounded-l-[4px]"
                               )}
                             />
                           )}
@@ -677,8 +677,8 @@ export function MotionDateRangeTimePicker({
                             <span
                               aria-hidden="true"
                               className={cn(
-                                "pointer-events-none absolute inset-y-0.5 right-0 w-1/2 bg-[#27272a]",
-                                isInRange && day.colIndex === 6 && "rounded-r-xl"
+                                "pointer-events-none absolute inset-y-0.5 right-0 w-1/2 bg-[var(--app-accent-tag-bg)]",
+                                isInRange && day.colIndex === 6 && "rounded-r-[4px]"
                               )}
                             />
                           )}
@@ -688,9 +688,9 @@ export function MotionDateRangeTimePicker({
                             <span
                               aria-hidden="true"
                               className={cn(
-                                "pointer-events-none absolute inset-y-0.5 inset-x-0 bg-[#27272a]",
-                                day.colIndex === 0 && "rounded-l-xl",
-                                day.colIndex === 6 && "rounded-r-xl"
+                                "pointer-events-none absolute inset-y-0.5 inset-x-0 bg-[var(--app-accent-tag-bg)]",
+                                day.colIndex === 0 && "rounded-l-[4px]",
+                                day.colIndex === 6 && "rounded-r-[4px]"
                               )}
                             />
                           )}
@@ -702,15 +702,15 @@ export function MotionDateRangeTimePicker({
                             transition={SPRING_PRESS}
                             onClick={() => handleDayClick(day)}
                             className={cn(
-                              "relative z-10 size-8 rounded-xl text-xs font-semibold tabular-nums flex items-center justify-center transition-all outline-hidden select-none",
-                              // Selected endpoint: elevated white badge
+                              "relative z-10 size-8 rounded-[4px] text-xs font-mono font-medium tabular-nums flex items-center justify-center transition-all outline-hidden select-none",
+                              // Selected endpoint: Notion accent badge
                               isEndpoint
-                                ? "bg-white text-zinc-950 font-bold shadow-xs hover:bg-white"
+                                ? "bg-[var(--app-accent)] text-white font-semibold shadow-xs hover:bg-[var(--app-accent)]"
                                 : isInRange
-                                ? "text-zinc-100 font-semibold"
+                                ? "text-[var(--app-accent)] font-semibold"
                                 : day.isOutside
-                                ? "text-zinc-600 hover:text-zinc-300 hover:bg-zinc-800/40"
-                                : "text-zinc-200 hover:text-white hover:bg-zinc-800/70"
+                                ? "text-[var(--app-muted)]/40 hover:text-[var(--app-muted)] hover:bg-[var(--app-panel-hover)]"
+                                : "text-[var(--app-text)] hover:bg-[var(--app-panel-hover)]"
                             )}
                           >
                             <span>{day.dayNumber}</span>
@@ -721,7 +721,7 @@ export function MotionDateRangeTimePicker({
                                 aria-hidden="true"
                                 className={cn(
                                   "absolute bottom-1 left-1/2 -translate-x-1/2 size-1 rounded-full",
-                                  isEndpoint ? "bg-zinc-950" : "bg-white"
+                                  isEndpoint ? "bg-white" : "bg-[var(--app-accent)]"
                                 )}
                               />
                             )}
@@ -739,10 +739,10 @@ export function MotionDateRangeTimePicker({
         {/* ---------------------------------------------------------------- */}
         {/* Panel 3 (Right): Time Slots Column                               */}
         {/* ---------------------------------------------------------------- */}
-        <div className="w-[138px] min-w-[138px] shrink-0 border-l border-zinc-800 flex flex-col bg-[#121214]">
+        <div className="w-[138px] min-w-[138px] shrink-0 border-l border-[var(--app-border)] flex flex-col bg-[var(--app-sidebar-bg)]">
           {/* Header displaying formatted selected date */}
-          <div className="h-10 shrink-0 flex items-center justify-center px-3 border-b border-zinc-800">
-            <span className="text-xs font-semibold text-zinc-100 truncate whitespace-nowrap">
+          <div className="h-10 shrink-0 flex items-center justify-center px-3 border-b border-[var(--app-border)]">
+            <span className="text-xs font-semibold text-[var(--app-text)] truncate whitespace-nowrap">
               {timeHeader}
             </span>
           </div>
@@ -759,10 +759,10 @@ export function MotionDateRangeTimePicker({
                     type="button"
                     onClick={() => handleTimeClick(timeSlot)}
                     className={cn(
-                      "h-8 w-full rounded-lg border text-xs font-mono font-medium transition-all flex items-center justify-center tabular-nums outline-hidden",
+                      "h-8 w-full rounded-[4px] border text-xs font-mono font-medium transition-all flex items-center justify-center tabular-nums outline-hidden",
                       isSelected
-                        ? "border-[#4772fa] bg-[#4772fa] text-white font-semibold shadow-xs"
-                        : "border-zinc-800/80 bg-zinc-900/30 text-zinc-300 hover:border-zinc-700 hover:bg-zinc-800/70 hover:text-white"
+                        ? "border-[var(--app-accent)] bg-[var(--app-accent)] text-white font-semibold shadow-xs"
+                        : "border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-muted)] hover:border-[var(--app-border-strong)] hover:bg-[var(--app-panel-hover)] hover:text-[var(--app-text)]"
                     )}
                   >
                     {timeSlot}
@@ -777,10 +777,10 @@ export function MotionDateRangeTimePicker({
       {/* ================================================================== */}
       {/* Footer Bar: Selection summary, Clear button & Done button          */}
       {/* ================================================================== */}
-      <div className="h-12 shrink-0 flex items-center justify-between border-t border-zinc-800 bg-zinc-900/40 px-3.5">
+      <div className="h-12 shrink-0 flex items-center justify-between border-t border-[var(--app-border)] bg-[var(--app-sidebar-bg)] px-3.5">
         <div className="flex items-center gap-1.5 text-xs truncate max-w-[340px]">
-          <CalendarIcon className="size-3.5 shrink-0 text-[#4772fa]" />
-          <span className="font-medium text-zinc-200 truncate">{summaryText}</span>
+          <CalendarIcon className="size-3.5 shrink-0 text-[var(--app-accent)]" />
+          <span className="font-medium text-[var(--app-text)] truncate">{summaryText}</span>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
@@ -790,7 +790,7 @@ export function MotionDateRangeTimePicker({
               variant="ghost"
               size="xs"
               onClick={handleClear}
-              className="h-7 gap-1 px-2 text-xs text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10"
+              className="h-7 gap-1 px-2 text-xs text-[var(--app-muted)] hover:text-rose-500 hover:bg-rose-500/10 rounded-[4px]"
             >
               <X className="size-3" />
               Clear
@@ -801,7 +801,7 @@ export function MotionDateRangeTimePicker({
             type="button"
             size="xs"
             onClick={onClose}
-            className="h-7 gap-1 px-3 text-xs font-semibold bg-[#4772fa] hover:bg-[#3e64dc] text-white shadow-xs"
+            className="h-7 gap-1 px-3 text-xs font-medium bg-[var(--app-accent)] hover:bg-[var(--app-accent-hover)] text-white shadow-xs rounded-[4px]"
           >
             <Check className="size-3" />
             Done

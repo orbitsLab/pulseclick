@@ -4,11 +4,13 @@ import React, { useState, useEffect, useRef, Suspense } from "react";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { WorkspaceApp } from "@/components/workspace/workspace-app";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { applyTheme, getTheme, DEFAULT_THEME_ID } from "@/lib/themes";
+import { applyTheme, getTheme, DEFAULT_THEME_ID, getSystemDefaultThemeId } from "@/lib/themes";
 
 export function WorkspaceMain() {
   const queryClient = useQueryClient();
-  const [themeId, setThemeId] = useState<string>(DEFAULT_THEME_ID);
+  const [themeId, setThemeId] = useState<string>(() => {
+    return typeof window !== "undefined" ? getSystemDefaultThemeId() : DEFAULT_THEME_ID;
+  });
   const [isDark, setIsDark] = useState<boolean>(false);
   const hasLoadedTheme = useRef(false);
 
@@ -24,12 +26,19 @@ export function WorkspaceMain() {
             setThemeId(data.themeId);
             setIsDark(getTheme(data.themeId).mode === "dark");
             applyTheme(data.themeId);
+            return;
           }
         }
       } catch {
-        // Keep the default theme when the settings request fails.
+        // Keep the system-detected default theme when the settings request fails.
       } finally {
         hasLoadedTheme.current = true;
+      }
+      if (!cancelled) {
+        const initialTheme = getSystemDefaultThemeId();
+        setThemeId(initialTheme);
+        setIsDark(getTheme(initialTheme).mode === "dark");
+        applyTheme(initialTheme);
       }
     })();
     return () => {
@@ -73,7 +82,7 @@ export function WorkspaceMain() {
   }
 
   function handleToggleTheme() {
-    handleThemeChange(isDark ? DEFAULT_THEME_ID : "midnight");
+    handleThemeChange(isDark ? "notion-light" : "notion-dark");
   }
 
   return (

@@ -305,7 +305,7 @@ export function EventCalendar({
   return (
     <div
       className={cn(
-        "flex flex-1 min-h-0 flex-col rounded-2xl border border-[var(--app-border)] bg-[var(--app-panel)] overflow-hidden transition-colors shadow-sm",
+        "flex flex-1 min-h-0 flex-col rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] overflow-hidden transition-colors",
         className
       )}
       style={
@@ -318,44 +318,44 @@ export function EventCalendar({
     >
       <CalendarDndProvider onEventUpdate={handleEventUpdate}>
         {/* Navigation Toolbar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4 border-b border-[var(--app-border)] bg-[var(--app-panel)]">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 border-b border-[var(--app-border)] bg-[var(--app-panel)]">
           {/* Left Controls: Today, Prev/Next, Title */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2">
             <Button
               onClick={handleToday}
               variant="outline"
               size="sm"
-              className="border-[var(--app-border)] bg-[var(--app-panel-alt)] text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/80 app-label font-medium"
+              className="h-7 rounded-[4px] border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-text)] hover:bg-[var(--app-hover)] text-xs font-medium px-2.5"
             >
               <RiCalendarCheckLine
                 aria-hidden="true"
                 className="sm:hidden"
-                size={16}
+                size={14}
               />
               <span className="hidden sm:inline">Today</span>
             </Button>
 
-            <div className="flex items-center rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] p-0.5">
+            <div className="flex items-center rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] p-0.5">
               <button
                 type="button"
                 aria-label="Previous period"
                 onClick={handlePrevious}
-                className="p-1.5 text-[var(--app-text)] hover:text-white rounded-md transition-colors cursor-pointer"
+                className="p-1 text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)] rounded-[3px] transition-colors cursor-pointer"
               >
-                <ChevronLeftIcon aria-hidden="true" size={16} />
+                <ChevronLeftIcon aria-hidden="true" size={15} />
               </button>
               <button
                 type="button"
                 aria-label="Next period"
                 onClick={handleNext}
-                className="p-1.5 text-[var(--app-text)] hover:text-white rounded-md transition-colors cursor-pointer"
+                className="p-1 text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)] rounded-[3px] transition-colors cursor-pointer"
               >
-                <ChevronRightIcon aria-hidden="true" size={16} />
+                <ChevronRightIcon aria-hidden="true" size={15} />
               </button>
             </div>
 
-            <h2 className="app-heading font-semibold text-[var(--app-text)] ml-1 flex items-center gap-2">
-              <CalendarDays className="h-4 w-4 text-[var(--app-accent-text)] hidden sm:inline-block" />
+            <h2 className="text-sm font-semibold text-[var(--app-text)] ml-1 flex items-center gap-2">
+              <CalendarDays className="h-4 w-4 text-[var(--app-accent)] hidden sm:inline-block" />
               <span>{viewTitle}</span>
             </h2>
           </div>
@@ -363,7 +363,7 @@ export function EventCalendar({
           {/* Right Controls: View Switcher & New Task */}
           <div className="flex items-center gap-2">
             {/* Desktop Segmented View Switcher */}
-            <div className="hidden md:flex items-center rounded-lg border border-[var(--app-border)] bg-[var(--app-panel-alt)] p-0.5">
+            <div className="hidden md:flex items-center rounded-[4px] border border-[var(--app-border)] bg-[var(--app-panel)] p-0.5">
               {(
                 [
                   { id: "month", label: "Month", shortcut: "M" },
@@ -379,10 +379,10 @@ export function EventCalendar({
                   onClick={() => setView(v.id)}
                   title={`${v.label} (${v.shortcut})`}
                   className={cn(
-                    "rounded-md px-2.5 py-1 app-label font-medium transition-colors cursor-pointer",
+                    "rounded-[3px] px-2 py-0.5 text-xs font-medium transition-colors cursor-pointer",
                     view === v.id
-                      ? "bg-[var(--app-panel)] text-[var(--app-accent-text)] shadow-xs font-semibold border border-[var(--app-border)]/60"
-                      : "text-[var(--app-muted)] hover:text-[var(--app-text)]"
+                      ? "bg-[var(--app-hover)] text-[var(--app-text)] font-semibold shadow-xs"
+                      : "text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]/50"
                   )}
                 >
                   {v.label}
@@ -395,7 +395,7 @@ export function EventCalendar({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    className="gap-1.5 border-[var(--app-border)] bg-[var(--app-panel-alt)] text-[var(--app-text)]"
+                    className="h-7 gap-1.5 rounded-[4px] border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-text)] text-xs"
                     variant="outline"
                     size="sm"
                   >
@@ -403,13 +403,13 @@ export function EventCalendar({
                     <ChevronDownIcon
                       aria-hidden="true"
                       className="opacity-60"
-                      size={14}
+                      size={13}
                     />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="min-w-32 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)]"
+                  className="min-w-32 rounded-[6px] bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)]"
                 >
                   <DropdownMenuItem onClick={() => setView("month")}>
                     Month <DropdownMenuShortcut>M</DropdownMenuShortcut>
@@ -437,17 +437,17 @@ export function EventCalendar({
                 size="sm"
                 onClick={onToggleShowCompleted}
                 className={cn(
-                  "gap-1.5 border-[var(--app-border)] app-label font-medium cursor-pointer transition-colors",
+                  "h-7 gap-1.5 rounded-[4px] border-[var(--app-border)] text-xs font-medium cursor-pointer transition-colors px-2.5",
                   showCompleted
-                    ? "bg-[var(--app-accent)]/10 border-[var(--app-accent)]/40 text-[var(--app-accent-text)]"
-                    : "bg-[var(--app-panel-alt)] text-[var(--app-muted)] hover:text-[var(--app-text)]"
+                    ? "bg-[rgba(35,131,226,0.12)] border-[rgba(35,131,226,0.25)] text-[#2383e2] dark:text-[#529cca]"
+                    : "bg-[var(--app-panel)] text-[var(--app-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-hover)]"
                 )}
                 title={showCompleted ? "Hide completed tasks" : "Show completed tasks"}
               >
                 <RiCalendarCheckLine
                   className={cn(
-                    "h-4 w-4",
-                    showCompleted ? "text-[var(--app-accent-text)]" : "text-[var(--app-muted)]"
+                    "h-3.5 w-3.5",
+                    showCompleted ? "text-[#2383e2] dark:text-[#529cca]" : "text-[var(--app-muted)]"
                   )}
                 />
                 <span className="hidden sm:inline">Completed</span>
@@ -461,7 +461,7 @@ export function EventCalendar({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="gap-1.5 border-[var(--app-border)] bg-[var(--app-panel-alt)] text-[var(--app-text)] hover:bg-[var(--app-panel-alt)]/80 app-label font-medium cursor-pointer"
+                    className="h-7 gap-1.5 rounded-[4px] border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-text)] hover:bg-[var(--app-hover)] text-xs font-medium cursor-pointer px-2.5"
                   >
                     <Folder className="h-3.5 w-3.5 text-[var(--app-muted)]" />
                     <span className="hidden sm:inline">
@@ -469,12 +469,12 @@ export function EventCalendar({
                         ? "All Lists"
                         : lists.find((l) => l.id === selectedListId)?.name || "List"}
                     </span>
-                    <ChevronDownIcon aria-hidden="true" size={14} className="opacity-60" />
+                    <ChevronDownIcon aria-hidden="true" size={13} className="opacity-60" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="min-w-36 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)]"
+                  className="min-w-36 rounded-[6px] bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)]"
                 >
                   <DropdownMenuItem onClick={() => setSelectedListId("all")} className="cursor-pointer">
                     All Lists
@@ -502,9 +502,9 @@ export function EventCalendar({
                 handleEventCreate(new Date());
               }}
               size="sm"
-              className="bg-[var(--app-accent-strong)] text-white hover:bg-[var(--app-accent-strong)]/90 gap-1.5 rounded-lg shadow-sm cursor-pointer"
+              className="h-7 bg-[var(--app-accent)] hover:bg-[var(--app-accent)]/90 text-white gap-1 rounded-[4px] text-xs font-medium cursor-pointer px-2.5 shadow-none"
             >
-              <PlusIcon aria-hidden="true" size={16} />
+              <PlusIcon aria-hidden="true" size={14} />
               <span className="hidden sm:inline">New task</span>
             </Button>
           </div>

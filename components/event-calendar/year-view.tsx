@@ -60,15 +60,15 @@ export function YearView({
           return (
             <div
               key={monthIndex}
-              className="flex flex-col rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)]/40 p-3 hover:border-[var(--app-border)]/80 transition-colors"
+              className="flex flex-col rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-3 hover:border-[var(--app-border-strong)] transition-colors"
             >
               {/* Month Header */}
               <div className="mb-2 flex items-center justify-between">
-                <span className="app-label font-semibold text-[var(--app-text)]">
+                <span className="text-xs font-semibold text-[var(--app-text)]">
                   {format(mFirst, "MMMM")}
                 </span>
                 {monthCount > 0 && (
-                  <span className="rounded-full bg-[var(--app-panel)] border border-[var(--app-border)] px-1.5 py-0.5 app-meta font-medium text-[var(--app-muted)]">
+                  <span className="rounded-[3px] bg-[var(--app-panel-hover)] px-1.5 py-0.5 text-[11px] font-mono font-medium text-[var(--app-muted)]">
                     {monthCount} {monthCount === 1 ? "task" : "tasks"}
                   </span>
                 )}

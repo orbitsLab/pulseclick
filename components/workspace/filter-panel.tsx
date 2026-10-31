@@ -309,7 +309,7 @@ export function FilterPanel({
         if (!open) onClose();
       }}
     >
-      <DialogContent className="max-h-[88vh] gap-0 overflow-hidden border border-[var(--app-border)] bg-[var(--app-panel)] p-0 text-[var(--app-text)] ring-0 sm:max-w-3xl">
+      <DialogContent className="max-h-[88vh] gap-0 overflow-hidden rounded-[8px] border border-[var(--app-border)] bg-[var(--app-panel)] p-0 text-[var(--app-text)] shadow-2xl ring-0 sm:max-w-3xl">
         <FilterPanelBody
           isOpen={isOpen}
           filters={filters}
@@ -499,15 +499,15 @@ function FilterPanelBody({
             )}
 
             {filters.length === 0 ? (
-              <p className="rounded-xl bg-[var(--app-panel-alt)] px-3 py-6 text-center app-label text-[var(--app-muted)]">
+              <p className="rounded-[6px] bg-[var(--app-panel-hover)] px-3 py-6 text-center text-xs text-[var(--app-muted)]">
                 No smart filters yet. Create one to save a set of criteria.
               </p>
             ) : (
-              <ul className="space-y-2">
+              <ul className="space-y-1.5">
                 {filters.map((filter) => (
                   <li
                     key={filter.id}
-                    className="flex items-center gap-3 rounded-xl border border-[var(--app-border)] bg-[var(--app-panel)] px-3 py-2.5"
+                    className="flex items-center gap-3 rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel)] px-3 py-2 text-xs"
                   >
                     <span
                       aria-hidden="true"
@@ -909,7 +909,7 @@ function FilterPanelBody({
               <div className="grid gap-2 sm:grid-cols-3">
                 <label
                   htmlFor="filter-hasDescription"
-                  className="flex cursor-pointer items-start gap-2 rounded-xl border border-[var(--app-border)] px-3 py-2.5 transition-colors hover:bg-[var(--app-panel-alt)] dark:hover:bg-[var(--app-panel-alt)]/60"
+                  className="flex cursor-pointer items-start gap-2 rounded-[6px] border border-[var(--app-border)] px-3 py-2 transition-colors hover:bg-[var(--app-panel-hover)]"
                 >
                   <Checkbox
                     id="filter-hasDescription"
@@ -917,21 +917,21 @@ function FilterPanelBody({
                     onCheckedChange={(checked: boolean) =>
                       updateDraft({ hasDescription: checked })
                     }
-                    className="mt-0.5 border-[var(--app-border)] data-checked:border-[var(--app-accent)] data-checked:bg-[var(--app-accent-strong)] data-checked:text-white"
+                    className="mt-0.5 border-[var(--app-border)] data-checked:border-[var(--app-accent)] data-checked:bg-[var(--app-accent)] data-checked:text-white"
                   />
                   <span className="flex flex-col">
-                    <span className="app-label font-semibold text-[var(--app-text)]">
+                    <span className="text-xs font-semibold text-[var(--app-text)]">
                       Has description
                     </span>
-                    <span className="app-meta text-[var(--app-muted)]">
-                      Only tasks with a description
+                    <span className="text-[11px] text-[var(--app-muted)]">
+                      Only tasks with description
                     </span>
                   </span>
                 </label>
 
                 <label
                   htmlFor="filter-hasSubtasks"
-                  className="flex cursor-pointer items-start gap-2 rounded-xl border border-[var(--app-border)] px-3 py-2.5 transition-colors hover:bg-[var(--app-panel-alt)] dark:hover:bg-[var(--app-panel-alt)]/60"
+                  className="flex cursor-pointer items-start gap-2 rounded-[6px] border border-[var(--app-border)] px-3 py-2 transition-colors hover:bg-[var(--app-panel-hover)]"
                 >
                   <Checkbox
                     id="filter-hasSubtasks"
@@ -939,13 +939,13 @@ function FilterPanelBody({
                     onCheckedChange={(checked: boolean) =>
                       updateDraft({ hasSubtasks: checked })
                     }
-                    className="mt-0.5 border-[var(--app-border)] data-checked:border-[var(--app-accent)] data-checked:bg-[var(--app-accent-strong)] data-checked:text-white"
+                    className="mt-0.5 border-[var(--app-border)] data-checked:border-[var(--app-accent)] data-checked:bg-[var(--app-accent)] data-checked:text-white"
                   />
                   <span className="flex flex-col">
-                    <span className="app-label font-semibold text-[var(--app-text)]">
+                    <span className="text-xs font-semibold text-[var(--app-text)]">
                       Has subtasks
                     </span>
-                    <span className="app-meta text-[var(--app-muted)]">
+                    <span className="text-[11px] text-[var(--app-muted)]">
                       Only tasks with sub tasks
                     </span>
                   </span>
@@ -953,7 +953,7 @@ function FilterPanelBody({
 
                 <label
                   htmlFor="filter-pinned"
-                  className="flex cursor-pointer items-start gap-2 rounded-xl border border-[var(--app-border)] px-3 py-2.5 transition-colors hover:bg-[var(--app-panel-alt)] dark:hover:bg-[var(--app-panel-alt)]/60"
+                  className="flex cursor-pointer items-start gap-2 rounded-[6px] border border-[var(--app-border)] px-3 py-2 transition-colors hover:bg-[var(--app-panel-hover)]"
                 >
                   <Checkbox
                     id="filter-pinned"
@@ -961,13 +961,13 @@ function FilterPanelBody({
                     onCheckedChange={(checked: boolean) =>
                       updateDraft({ pinned: checked })
                     }
-                    className="mt-0.5 border-[var(--app-border)] data-checked:border-[var(--app-accent)] data-checked:bg-[var(--app-accent-strong)] data-checked:text-white"
+                    className="mt-0.5 border-[var(--app-border)] data-checked:border-[var(--app-accent)] data-checked:bg-[var(--app-accent)] data-checked:text-white"
                   />
                   <span className="flex flex-col">
-                    <span className="app-label font-semibold text-[var(--app-text)]">
+                    <span className="text-xs font-semibold text-[var(--app-text)]">
                       Pinned only
                     </span>
-                    <span className="app-meta text-[var(--app-muted)]">
+                    <span className="text-[11px] text-[var(--app-muted)]">
                       Only pinned tasks
                     </span>
                   </span>
@@ -978,7 +978,7 @@ function FilterPanelBody({
               <div className="flex flex-col gap-1.5">
                 <Label
                   htmlFor="filter-keyword"
-                  className="app-label font-semibold text-[var(--app-text)]"
+                  className="text-xs font-semibold text-[var(--app-text)]"
                 >
                   Keyword
                 </Label>
@@ -989,18 +989,18 @@ function FilterPanelBody({
                   placeholder="Search title or description"
                   aria-label="Filter keyword"
                   autoComplete="off"
-                  className="rounded-lg border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-text)] focus-visible:border-[var(--app-accent)] focus-visible:ring-[var(--app-accent)]/40"
+                  className="rounded-[4px] border-[var(--app-border)] bg-[var(--app-panel)] text-[var(--app-text)] focus-visible:border-[var(--app-accent)] focus-visible:ring-1 focus-visible:ring-[var(--app-accent)]"
                 />
               </div>
 
               {/* Live summary */}
-              <div className="rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)] px-3 py-2.5">
-                <p className="app-meta font-bold tracking-wider text-[var(--app-muted)] uppercase">
+              <div className="rounded-[6px] border border-[var(--app-border)] bg-[var(--app-panel-hover)] px-3 py-2.5">
+                <p className="text-[11px] font-mono font-medium tracking-wider text-[var(--app-muted)] uppercase">
                   Summary
                 </p>
                 <p
                   aria-live="polite"
-                  className="mt-0.5 app-label font-medium text-[var(--app-text)]"
+                  className="mt-0.5 text-xs font-medium text-[var(--app-text)]"
                 >
                   {summary}
                 </p>

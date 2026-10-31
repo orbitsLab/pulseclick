@@ -247,28 +247,28 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
 
   return (
     <div className="flex flex-col gap-2">
-      {/* Main Single-line Input Bar (Image 4 & 5 Style) */}
+      {/* Main Single-line Input Bar (Notion "+ New" database row style) */}
       <form
         onSubmit={handleSubmit}
-        className="group relative flex items-center justify-between rounded-xl border border-[var(--app-border)] bg-[var(--app-panel-alt)]/60 px-3.5 py-2.5 shadow-xs transition-all focus-within:border-[var(--app-accent)] focus-within:ring-1 focus-within:ring-[var(--app-accent)]"
+        className="group relative flex items-center justify-between rounded-md border border-[var(--app-border)] bg-[var(--app-panel)] px-3 py-1.5 shadow-xs transition-colors focus-within:border-[var(--app-accent)] focus-within:ring-2 focus-within:ring-[var(--app-accent)]/30"
       >
-        <div className="flex flex-1 items-center gap-2.5 min-w-0">
-          <Plus className="h-4 w-4 text-[var(--app-muted)] shrink-0" />
+        <div className="flex flex-1 items-center gap-2 min-w-0">
+          <Plus className="h-3.5 w-3.5 text-[var(--app-muted)] shrink-0" />
           <input
             type="text"
             required
             value={title}
             onChange={(e) => handleTitleChange(e.target.value)}
-            placeholder={`Add task to "${targetList?.name || currentListName}", press Enter to save`}
-            className="flex-1 bg-transparent app-body text-sm text-[var(--app-text)] placeholder-[var(--app-muted)]/70 focus:outline-none"
+            placeholder={`New task in "${targetList?.name || currentListName}"...`}
+            className="flex-1 bg-transparent text-xs sm:text-sm text-[var(--app-text)] placeholder-[var(--app-muted)]/70 focus:outline-none"
           />
         </div>
 
         {/* Right-side Controls: Date and Menu Dropdown */}
-        <div className="flex items-center gap-1.5 shrink-0 ml-2">
+        <div className="flex items-center gap-1 shrink-0 ml-2">
           {/* Active Date Label Pill if set */}
           {dueDate && (
-            <span className="flex items-center gap-1.5 rounded-md bg-[var(--app-accent)]/15 px-2 py-0.5 app-meta font-medium text-[var(--app-accent-text)]">
+            <span className="flex items-center gap-1 rounded-[3px] bg-[var(--app-accent)]/15 border border-[var(--app-accent)]/20 px-1.5 py-0.5 text-[11px] font-medium text-[var(--app-accent-text)]">
               <span>
                 {endDate && endDate !== dueDate ? (
                   <>
@@ -307,14 +307,14 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
               type="button"
               onClick={() => setShowDatePicker(!showDatePicker)}
               className={cn(
-                "flex h-7 w-7 items-center justify-center rounded-lg transition-colors cursor-pointer",
+                "flex h-6.5 w-6.5 items-center justify-center rounded-[4px] transition-colors cursor-pointer",
                 dueDate
                   ? "text-[var(--app-accent-text)] bg-[var(--app-accent)]/15"
-                  : "text-[var(--app-muted)] hover:bg-[var(--app-panel)] hover:text-[var(--app-text)]"
+                  : "text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)]"
               )}
               title="Set date"
             >
-              <Calendar className="h-4 w-4" />
+              <Calendar className="h-3.5 w-3.5" />
             </button>
 
             {/* Date Picker Popover */}
@@ -339,32 +339,32 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
             )}
           </div>
 
-          {/* Options Dropdown (Image 5 Pattern) */}
+          {/* Options Dropdown */}
           <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--app-muted)] hover:bg-[var(--app-panel)] hover:text-[var(--app-text)] transition-colors cursor-pointer"
+                className="flex h-6.5 w-6.5 items-center justify-center rounded-[4px] text-[var(--app-muted)] hover:bg-[var(--app-hover)] hover:text-[var(--app-text)] transition-colors cursor-pointer"
                 title="Task options"
               >
-                <ChevronDown className="h-4 w-4" />
+                <ChevronDown className="h-3.5 w-3.5" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="w-56 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] p-2 shadow-xl"
+              className="w-56 bg-[var(--app-panel)] border-[var(--app-border)] text-[var(--app-text)] p-2 shadow-[0_4px_16px_rgba(15,15,15,0.1),0_0_0_1px_rgba(15,15,15,0.08)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.08)]"
             >
               {/* Priority Flags Header */}
               <div className="px-2 py-1.5">
-                <span className="block app-overline font-semibold text-[var(--app-muted)] mb-1.5">
+                <span className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--app-muted)] mb-1.5">
                   Priority
                 </span>
                 <div className="flex items-center justify-between gap-1">
                   {[
-                    { level: 3, label: "High", color: "text-rose-500", bg: "hover:bg-rose-500/15" },
-                    { level: 2, label: "Medium", color: "text-amber-500", bg: "hover:bg-amber-500/15" },
-                    { level: 1, label: "Low", color: "text-sky-500", bg: "hover:bg-sky-500/15" },
-                    { level: 0, label: "None", color: "text-[var(--app-muted)]", bg: "hover:bg-[var(--app-panel-alt)]" },
+                    { level: 3, label: "High", color: "text-[#e03e3e]", bg: "hover:bg-[#e03e3e]/15" },
+                    { level: 2, label: "Medium", color: "text-[#dfab01]", bg: "hover:bg-[#dfab01]/15" },
+                    { level: 1, label: "Low", color: "text-[#2383e2]", bg: "hover:bg-[#2383e2]/15" },
+                    { level: 0, label: "None", color: "text-[var(--app-muted)]", bg: "hover:bg-[var(--app-hover)]" },
                   ].map((p) => (
                     <button
                       key={p.level}
@@ -375,7 +375,7 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
                       }}
                       title={`${p.label} Priority`}
                       className={cn(
-                        "flex h-8 w-11 items-center justify-center rounded-md border transition-all cursor-pointer",
+                        "flex h-7 w-10 items-center justify-center rounded-[4px] border transition-colors cursor-pointer",
                         p.color,
                         p.bg,
                         priority === p.level
@@ -383,7 +383,7 @@ export function TaskInputBar(props: TaskInputBarProps = {}) {
                           : "border-transparent"
                       )}
                     >
-                      <Flag className={cn("h-4 w-4", p.level > 0 && "fill-current")} />
+                      <Flag className={cn("h-3.5 w-3.5", p.level > 0 && "fill-current")} />
                     </button>
                   ))}
                 </div>
